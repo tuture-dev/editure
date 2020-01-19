@@ -8,7 +8,7 @@ import { Slate, Editable, withReact } from "slate-react";
 import isHotkey from "is-hotkey";
 
 import CustomEditor from "./helpers";
-import { DefaultElement, CodeElement } from "./element";
+import { DefaultElement, CodeBlockElement, LinkElement } from "./elements";
 import {
   DefaultMark,
   CodeMark,
@@ -16,7 +16,7 @@ import {
   ItalicMark,
   UnderlineMark,
   StrikethroughMark
-} from "./mark";
+} from "./marks";
 
 const defaultValue = [
   {
@@ -35,7 +35,11 @@ const App = () => {
   const renderElement = useCallback(props => {
     switch (props.element.type) {
       case "codeBlock":
-        return <CodeElement {...props} />;
+        return <CodeBlockElement {...props} />;
+
+      case "link":
+        return <LinkElement {...props} />;
+
       default:
         return <DefaultElement {...props} />;
     }
@@ -78,7 +82,13 @@ const App = () => {
           if (isHotkey("alt+mod+c", event)) {
             event.preventDefault();
 
-            CustomEditor.toggleCodeBlock(editor);
+            CustomEditor.toggleCodeBlockElement(editor);
+          }
+
+          if (isHotkey("mod+k", event)) {
+            event.preventDefault();
+
+            CustomEditor.toggleCodeBlockElement(editor);
           }
 
           if (isHotkey("mod+b", event)) {
