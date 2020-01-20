@@ -7,6 +7,7 @@ import { createEditor } from "slate";
 import { Slate, Editable, withReact } from "slate-react";
 import isHotkey from "is-hotkey";
 import { withHistory } from "slate-history";
+import { css } from "emotion";
 
 import CustomEditor, { withLinks, withImages } from "./helpers";
 import {
@@ -24,6 +25,8 @@ import {
   UnderlineMark,
   StrikethroughMark
 } from "./marks";
+
+import "./App.css";
 
 const defaultValue = [
   {
@@ -84,94 +87,105 @@ const App = () => {
   }, []);
 
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      onChange={value => {
-        setValue(value);
-      }}
+    <div
+      className={css`
+        max-width: 42em;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+      `}
     >
-      <Editable
-        renderElement={renderElement}
-        renderLeaf={renderLeaf}
-        onKeyDown={event => {
-          if (isHotkey("mod+shift+c", event)) {
-            event.preventDefault();
-
-            CustomEditor.toggleCodeBlockElement(editor);
-          }
-
-          if (isHotkey("mod+k", event)) {
-            event.preventDefault();
-
-            if (CustomEditor.isLinkActive(editor)) {
-              CustomEditor.unwrapLink(editor);
-            } else {
-              const url = window.prompt("输入链接");
-
-              if (!url) {
-                return;
-              }
-
-              CustomEditor.wrapLink(editor, url);
-            }
-          }
-
-          if (isHotkey("mod+shift+i", event)) {
-            event.preventDefault();
-
-            if (CustomEditor.isImageActive(editor)) {
-              CustomEditor.removeImage(editor);
-            } else {
-              const url = window.prompt("输入图片链接");
-
-              if (!url) {
-                return;
-              }
-
-              CustomEditor.insertImage(editor, url);
-            }
-          }
-
-          console.log("hello", isHotkey("shift+alt+q", event));
-          if (isHotkey("mod+shift+u", event)) {
-            event.preventDefault();
-
-            CustomEditor.toggleBlockquoteElement(editor);
-          }
-
-          if (isHotkey("mod+b", event)) {
-            event.preventDefault();
-
-            CustomEditor.toggleBoldMark(editor);
-          }
-
-          if (isHotkey("mod+`", event)) {
-            event.preventDefault();
-
-            CustomEditor.toggleCodeMark(editor);
-          }
-
-          if (isHotkey("mod+i", event)) {
-            event.preventDefault();
-
-            CustomEditor.toggleItalicMark(editor);
-          }
-
-          if (isHotkey("mod+u", event)) {
-            event.preventDefault();
-
-            CustomEditor.toggleUnderlineMark(editor);
-          }
-
-          if (isHotkey("mod+shift+`", event)) {
-            event.preventDefault();
-
-            CustomEditor.toggleStrikethroughMark(editor);
-          }
+      <Slate
+        editor={editor}
+        value={value}
+        onChange={value => {
+          setValue(value);
         }}
-      />
-    </Slate>
+      >
+        <Editable
+          renderElement={renderElement}
+          renderLeaf={renderLeaf}
+          spellCheck
+          autoFocus
+          onKeyDown={event => {
+            if (isHotkey("mod+shift+c", event)) {
+              event.preventDefault();
+
+              CustomEditor.toggleCodeBlockElement(editor);
+            }
+
+            if (isHotkey("mod+k", event)) {
+              event.preventDefault();
+
+              if (CustomEditor.isLinkActive(editor)) {
+                CustomEditor.unwrapLink(editor);
+              } else {
+                const url = window.prompt("输入链接");
+
+                if (!url) {
+                  return;
+                }
+
+                CustomEditor.wrapLink(editor, url);
+              }
+            }
+
+            if (isHotkey("mod+shift+i", event)) {
+              event.preventDefault();
+
+              if (CustomEditor.isImageActive(editor)) {
+                CustomEditor.removeImage(editor);
+              } else {
+                const url = window.prompt("输入图片链接");
+
+                if (!url) {
+                  return;
+                }
+
+                CustomEditor.insertImage(editor, url);
+              }
+            }
+
+            console.log("hello", isHotkey("shift+alt+q", event));
+            if (isHotkey("mod+shift+u", event)) {
+              event.preventDefault();
+
+              CustomEditor.toggleBlockquoteElement(editor);
+            }
+
+            if (isHotkey("mod+b", event)) {
+              event.preventDefault();
+
+              CustomEditor.toggleBoldMark(editor);
+            }
+
+            if (isHotkey("mod+`", event)) {
+              event.preventDefault();
+
+              CustomEditor.toggleCodeMark(editor);
+            }
+
+            if (isHotkey("mod+i", event)) {
+              event.preventDefault();
+
+              CustomEditor.toggleItalicMark(editor);
+            }
+
+            if (isHotkey("mod+u", event)) {
+              event.preventDefault();
+
+              CustomEditor.toggleUnderlineMark(editor);
+            }
+
+            if (isHotkey("mod+shift+`", event)) {
+              event.preventDefault();
+
+              CustomEditor.toggleStrikethroughMark(editor);
+            }
+          }}
+        />
+      </Slate>
+    </div>
   );
 };
 
