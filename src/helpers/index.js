@@ -9,6 +9,7 @@ import {
   toggleStrikethroughMark
 } from "./strikethrough";
 import { withImages, isImageActive, insertImage, removeImage } from "./image";
+import { isBlockquoteActive, toggleBlockquoteElement } from "./blockquote";
 
 const CustomEditor = {
   isLinkActive,
@@ -28,7 +29,9 @@ const CustomEditor = {
   toggleStrikethroughMark,
   isImageActive,
   insertImage,
-  removeImage
+  removeImage,
+  isBlockquoteActive,
+  toggleBlockquoteElement
 };
 
 export default CustomEditor;

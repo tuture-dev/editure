@@ -1,11 +1,7 @@
 import React from "react";
 
 const UnderlineMark = props => {
-  return (
-    <span {...props.attributes} style={{ textDecoration: "underline" }}>
-      {props.children}
-    </span>
-  );
+  return <u {...props.attributes}>{props.children}</u>;
 };
 
 export default UnderlineMark;

@@ -1,7 +1,7 @@
 import React from "react";
 
 const ItalicMark = props => {
-  return <i {...props.attributes}>{props.children}</i>;
+  return <em {...props.attributes}>{props.children}</em>;
 };
 
 export default ItalicMark;

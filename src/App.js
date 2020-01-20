@@ -13,7 +13,8 @@ import {
   DefaultElement,
   CodeBlockElement,
   LinkElement,
-  ImageElement
+  ImageElement,
+  BlockquoteElement
 } from "./elements";
 import {
   DefaultMark,
@@ -51,6 +52,9 @@ const App = () => {
 
       case "image":
         return <ImageElement {...props} />;
+
+      case "blockquote":
+        return <BlockquoteElement {...props} />;
 
       default:
         return <DefaultElement {...props} />;
@@ -91,7 +95,7 @@ const App = () => {
         renderElement={renderElement}
         renderLeaf={renderLeaf}
         onKeyDown={event => {
-          if (isHotkey("alt+mod+c", event)) {
+          if (isHotkey("mod+shift+c", event)) {
             event.preventDefault();
 
             CustomEditor.toggleCodeBlockElement(editor);
@@ -129,13 +133,20 @@ const App = () => {
             }
           }
 
+          console.log("hello", isHotkey("shift+alt+q", event));
+          if (isHotkey("mod+shift+u", event)) {
+            event.preventDefault();
+
+            CustomEditor.toggleBlockquoteElement(editor);
+          }
+
           if (isHotkey("mod+b", event)) {
             event.preventDefault();
 
             CustomEditor.toggleBoldMark(editor);
           }
 
-          if (isHotkey("ctrl+`", event)) {
+          if (isHotkey("mod+`", event)) {
             event.preventDefault();
 
             CustomEditor.toggleCodeMark(editor);
@@ -153,7 +164,7 @@ const App = () => {
             CustomEditor.toggleUnderlineMark(editor);
           }
 
-          if (isHotkey("shift+alt+`", event)) {
+          if (isHotkey("mod+shift+`", event)) {
             event.preventDefault();
 
             CustomEditor.toggleStrikethroughMark(editor);
