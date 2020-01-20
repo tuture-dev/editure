@@ -6,8 +6,9 @@ import { createEditor } from "slate";
 // Import the Slate components and React plugin.
 import { Slate, Editable, withReact } from "slate-react";
 import isHotkey from "is-hotkey";
+import { withHistory } from "slate-history";
 
-import CustomEditor from "./helpers";
+import CustomEditor, { withLinks } from "./helpers";
 import { DefaultElement, CodeBlockElement, LinkElement } from "./elements";
 import {
   DefaultMark,
@@ -29,7 +30,10 @@ const defaultValue = [
 ];
 
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), []);
+  const editor = useMemo(
+    () => withLinks(withHistory(withReact(createEditor()))),
+    []
+  );
   const [value, setValue] = useState(defaultValue);
 
   const renderElement = useCallback(props => {
@@ -88,7 +92,17 @@ const App = () => {
           if (isHotkey("mod+k", event)) {
             event.preventDefault();
 
-            CustomEditor.toggleCodeBlockElement(editor);
+            if (CustomEditor.isLinkActive(editor)) {
+              CustomEditor.unwrapLink(editor);
+            } else {
+              const url = window.prompt("输入链接");
+
+              if (!url) {
+                return;
+              }
+
+              CustomEditor.wrapLink(editor, url);
+            }
           }
 
           if (isHotkey("mod+b", event)) {

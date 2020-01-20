@@ -1,4 +1,33 @@
-import { Transforms, Editor, Text } from "slate";
+import { Transforms, Editor, Range } from "slate";
+import isUrl from "is-url";
+
+export const withLinks = editor => {
+  const { insertData, insertText, isInline } = editor;
+
+  editor.isInline = element => {
+    return element.type === "link" ? true : isInline(element);
+  };
+
+  editor.insertText = text => {
+    if (text && isUrl(text)) {
+      wrapLink(editor, text);
+    } else {
+      insertText(text);
+    }
+  };
+
+  editor.insertData = data => {
+    const text = data.getData("text/plain");
+
+    if (text && isUrl(text)) {
+      wrapLink(editor, text);
+    } else {
+      insertData(data);
+    }
+  };
+
+  return editor;
+};
 
 export const isLinkActive = editor => {
   const [match] = Editor.nodes(editor, {
@@ -8,17 +37,35 @@ export const isLinkActive = editor => {
   return !!match;
 };
 
-export const toggleLinkElement = editor => {
-  const isActive = isLinkActive(editor);
+export const unwrapLink = editor => {
+  if (!editor.selection) {
+    return;
+  }
 
-  Transforms.setNodes(
-    editor,
-    {
-      type: isActive ? null : "link"
-    },
-    {
-      match: n => Text.isText(n),
-      split: true
-    }
-  );
+  Transforms.unwrapNodes(editor, { match: n => n.type === "link" });
+};
+
+export const wrapLink = (editor, url) => {
+  if (!editor.selection) {
+    return;
+  }
+
+  if (isLinkActive(editor)) {
+    unwrapLink(editor);
+  }
+
+  const { selection } = editor;
+  const isCollapsed = selection && Range.isCollapsed(selection);
+  const link = {
+    type: "link",
+    url,
+    children: isCollapsed ? [{ text: url }] : []
+  };
+
+  if (isCollapsed) {
+    Transforms.insertNodes(editor, link);
+  } else {
+    Transforms.wrapNodes(editor, link, { split: true });
+    Transforms.collapse(editor, { edge: "end" });
+  }
 };

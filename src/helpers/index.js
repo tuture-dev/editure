@@ -1,4 +1,4 @@
-import { isLinkActive, toggleLinkElement } from "./link";
+import { isLinkActive, wrapLink, unwrapLink, withLinks } from "./link";
 import { isCodeBlockActive, toggleCodeBlockElement } from "./codeBlock";
 import { isBoldMarkActive, toggleBoldMark } from "./bold";
 import { isCodeMarkActive, toggleCodeMark } from "./code";
@@ -11,7 +11,8 @@ import {
 
 const CustomEditor = {
   isLinkActive,
-  toggleLinkElement,
+  wrapLink,
+  unwrapLink,
   isCodeBlockActive,
   toggleCodeBlockElement,
   isBoldMarkActive,
@@ -27,3 +28,5 @@ const CustomEditor = {
 };
 
 export default CustomEditor;
+
+export { withLinks };
