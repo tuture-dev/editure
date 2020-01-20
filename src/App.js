@@ -146,7 +146,6 @@ const App = () => {
               }
             }
 
-            console.log("hello", isHotkey("shift+alt+q", event));
             if (isHotkey("mod+shift+u", event)) {
               event.preventDefault();
 
@@ -159,7 +158,7 @@ const App = () => {
               CustomEditor.toggleBoldMark(editor);
             }
 
-            if (isHotkey("mod+`", event)) {
+            if (isHotkey("ctrl+`", event)) {
               event.preventDefault();
 
               CustomEditor.toggleCodeMark(editor);
@@ -177,7 +176,7 @@ const App = () => {
               CustomEditor.toggleUnderlineMark(editor);
             }
 
-            if (isHotkey("mod+shift+`", event)) {
+            if (isHotkey("ctrl+shift+`", event)) {
               event.preventDefault();
 
               CustomEditor.toggleStrikethroughMark(editor);
