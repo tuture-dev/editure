@@ -10,6 +10,10 @@ import {
 } from "./strikethrough";
 import { withImages, isImageActive, insertImage, removeImage } from "./image";
 import { isBlockquoteActive, toggleBlockquoteElement } from "./blockquote";
+import {
+  isBulletedListActive,
+  toggleBulletedListElement
+} from "./bulletedList";
 
 const CustomEditor = {
   isLinkActive,
@@ -31,7 +35,9 @@ const CustomEditor = {
   insertImage,
   removeImage,
   isBlockquoteActive,
-  toggleBlockquoteElement
+  toggleBlockquoteElement,
+  isBulletedListActive,
+  toggleBulletedListElement
 };
 
 export default CustomEditor;
