@@ -8,8 +8,13 @@ import { Slate, Editable, withReact } from "slate-react";
 import isHotkey from "is-hotkey";
 import { withHistory } from "slate-history";
 
-import CustomEditor, { withLinks } from "./helpers";
-import { DefaultElement, CodeBlockElement, LinkElement } from "./elements";
+import CustomEditor, { withLinks, withImages } from "./helpers";
+import {
+  DefaultElement,
+  CodeBlockElement,
+  LinkElement,
+  ImageElement
+} from "./elements";
 import {
   DefaultMark,
   CodeMark,
@@ -31,7 +36,7 @@ const defaultValue = [
 
 const App = () => {
   const editor = useMemo(
-    () => withLinks(withHistory(withReact(createEditor()))),
+    () => withImages(withLinks(withHistory(withReact(createEditor())))),
     []
   );
   const [value, setValue] = useState(defaultValue);
@@ -43,6 +48,9 @@ const App = () => {
 
       case "link":
         return <LinkElement {...props} />;
+
+      case "image":
+        return <ImageElement {...props} />;
 
       default:
         return <DefaultElement {...props} />;
@@ -102,6 +110,22 @@ const App = () => {
               }
 
               CustomEditor.wrapLink(editor, url);
+            }
+          }
+
+          if (isHotkey("mod+shift+i", event)) {
+            event.preventDefault();
+
+            if (CustomEditor.isImageActive(editor)) {
+              CustomEditor.removeImage(editor);
+            } else {
+              const url = window.prompt("输入图片链接");
+
+              if (!url) {
+                return;
+              }
+
+              CustomEditor.insertImage(editor, url);
             }
           }
 

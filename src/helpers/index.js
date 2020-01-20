@@ -8,6 +8,7 @@ import {
   isStrikethroughMarkActive,
   toggleStrikethroughMark
 } from "./strikethrough";
+import { withImages, isImageActive, insertImage, removeImage } from "./image";
 
 const CustomEditor = {
   isLinkActive,
@@ -24,9 +25,12 @@ const CustomEditor = {
   isUnderlineMarkActive,
   toggleUnderlineMark,
   isStrikethroughMarkActive,
-  toggleStrikethroughMark
+  toggleStrikethroughMark,
+  isImageActive,
+  insertImage,
+  removeImage
 };
 
 export default CustomEditor;
 
-export { withLinks };
+export { withLinks, withImages };
