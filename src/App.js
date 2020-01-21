@@ -9,7 +9,12 @@ import isHotkey from "is-hotkey";
 import { withHistory } from "slate-history";
 import { css } from "emotion";
 
-import CustomEditor, { withLinks, withImages, withHr } from "./helpers";
+import CustomEditor, {
+  withLinks,
+  withImages,
+  withHr,
+  withShortcuts
+} from "./helpers";
 import {
   DefaultElement,
   CodeBlockElement,
@@ -50,7 +55,10 @@ const defaultValue = [
 
 const App = () => {
   const editor = useMemo(
-    () => withHr(withImages(withLinks(withHistory(withReact(createEditor()))))),
+    () =>
+      withShortcuts(
+        withHr(withImages(withLinks(withHistory(withReact(createEditor())))))
+      ),
     []
   );
   const [value, setValue] = useState(defaultValue);

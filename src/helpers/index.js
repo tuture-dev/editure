@@ -32,6 +32,7 @@ import {
 } from "./numberedList";
 import { isHeadingActive, toggleHeading } from "./heading";
 import { insertHr, withHr } from "./hr";
+import { withShortcuts } from "./shortcut";
 
 const CustomEditor = {
   isLinkActive,
@@ -67,4 +68,4 @@ const CustomEditor = {
 
 export default CustomEditor;
 
-export { withLinks, withImages, withHr };
+export { withLinks, withImages, withHr, withShortcuts };
