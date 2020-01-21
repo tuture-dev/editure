@@ -2,14 +2,6 @@ import { Transforms, Editor } from "slate";
 import imageExtensions from "image-extensions";
 import isUrl from "is-url";
 
-export const isImageActive = editor => {
-  const [match] = Editor.nodes(editor, {
-    match: n => n.type === "image"
-  });
-
-  return !!match;
-};
-
 export const withImages = editor => {
   const { insertData, isVoid } = editor;
 
@@ -43,6 +35,28 @@ export const withImages = editor => {
   };
 
   return editor;
+};
+
+export const isImageActive = editor => {
+  const [match] = Editor.nodes(editor, {
+    match: n => n.type === "image"
+  });
+
+  return !!match;
+};
+
+export const toggleImageElement = editor => {
+  if (isImageActive(editor)) {
+    removeImage(editor);
+  } else {
+    const url = window.prompt("输入图片链接");
+
+    if (!url) {
+      return;
+    }
+
+    insertImage(editor, url);
+  }
 };
 
 export const insertImage = (editor, url) => {

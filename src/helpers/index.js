@@ -1,4 +1,10 @@
-import { isLinkActive, wrapLink, unwrapLink, withLinks } from "./link";
+import {
+  isLinkActive,
+  wrapLink,
+  unwrapLink,
+  withLinks,
+  toggleLinkElement
+} from "./link";
 import { isCodeBlockActive, toggleCodeBlockElement } from "./codeBlock";
 import { isBoldMarkActive, toggleBoldMark } from "./bold";
 import { isCodeMarkActive, toggleCodeMark } from "./code";
@@ -8,7 +14,13 @@ import {
   isStrikethroughMarkActive,
   toggleStrikethroughMark
 } from "./strikethrough";
-import { withImages, isImageActive, insertImage, removeImage } from "./image";
+import {
+  withImages,
+  isImageActive,
+  insertImage,
+  removeImage,
+  toggleImageElement
+} from "./image";
 import { isBlockquoteActive, toggleBlockquoteElement } from "./blockquote";
 import {
   isBulletedListActive,
@@ -25,6 +37,7 @@ const CustomEditor = {
   isLinkActive,
   wrapLink,
   unwrapLink,
+  toggleLinkElement,
   isCodeBlockActive,
   toggleCodeBlockElement,
   isBoldMarkActive,
@@ -40,6 +53,7 @@ const CustomEditor = {
   isImageActive,
   insertImage,
   removeImage,
+  toggleImageElement,
   isBlockquoteActive,
   toggleBlockquoteElement,
   isBulletedListActive,

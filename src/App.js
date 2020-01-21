@@ -33,8 +33,10 @@ import {
   UnderlineMark,
   StrikethroughMark
 } from "./marks";
+import { Toolbar, MarkButton, BlockButton } from "./components";
 
 import "./App.css";
+import "material-icons/iconfont/material-icons.css";
 
 const defaultValue = [
   {
@@ -67,7 +69,7 @@ const App = () => {
       case "image":
         return <ImageElement {...props} />;
 
-      case "blockquote":
+      case "block-quote":
         return <BlockquoteElement {...props} />;
 
       case "bulleted-list":
@@ -137,6 +139,92 @@ const App = () => {
           setValue(value);
         }}
       >
+        <Toolbar>
+          <MarkButton
+            format="bold"
+            icon="format_bold"
+            isMarkActive={CustomEditor.isBoldMarkActive}
+            toggleMark={CustomEditor.toggleBoldMark}
+          />
+          <MarkButton
+            format="italic"
+            icon="format_italic"
+            isMarkActive={CustomEditor.isItalicMarkActive}
+            toggleMark={CustomEditor.toggleItalicMark}
+          />
+          <MarkButton
+            format="underline"
+            icon="format_underlined"
+            isMarkActive={CustomEditor.isUnderlineMarkActive}
+            toggleMark={CustomEditor.toggleUnderlineMark}
+          />
+          <MarkButton
+            format="strikethrough"
+            icon="format_strikethrough"
+            isMarkActive={CustomEditor.isStrikethroughMarkActive}
+            toggleMark={CustomEditor.toggleStrikethroughMark}
+          />
+          <MarkButton
+            format="code"
+            icon="code"
+            isMarkActive={CustomEditor.isCodeMarkActive}
+            toggleMark={CustomEditor.toggleCodeMark}
+          />
+          <BlockButton
+            format="link"
+            icon="link"
+            isBlockActive={CustomEditor.isLinkActive}
+            toggleBlock={CustomEditor.toggleLinkElement}
+          />
+          <BlockButton
+            format="heading-one"
+            icon="looks_one"
+            isBlockActive={CustomEditor.isHeadingActive}
+            toggleBlock={CustomEditor.toggleHeading}
+          />
+          <BlockButton
+            format="heading-two"
+            icon="looks_two"
+            isBlockActive={CustomEditor.isHeadingActive}
+            toggleBlock={CustomEditor.toggleHeading}
+          />
+          <BlockButton
+            format="block-quote"
+            icon="format_quote"
+            isBlockActive={CustomEditor.isBlockquoteActive}
+            toggleBlock={CustomEditor.toggleBlockquoteElement}
+          />
+          <BlockButton
+            format="codeBlock"
+            icon="attach_money"
+            isBlockActive={CustomEditor.isCodeBlockActive}
+            toggleBlock={CustomEditor.toggleCodeBlockElement}
+          />
+          <BlockButton
+            format="numbered-list"
+            icon="format_list_numbered"
+            isBlockActive={CustomEditor.isNumberedListActive}
+            toggleBlock={CustomEditor.toggleNumberedListElement}
+          />
+          <BlockButton
+            format="bulleted-list"
+            icon="format_list_bulleted"
+            isBlockActive={CustomEditor.isBulletedListActive}
+            toggleBlock={CustomEditor.toggleBulletedListElement}
+          />
+          <BlockButton
+            format="image"
+            icon="image"
+            isBlockActive={CustomEditor.isImageActive}
+            toggleBlock={CustomEditor.toggleImageElement}
+          />
+          <BlockButton
+            format="hr"
+            icon="remove"
+            isBlockActive={CustomEditor.isBlockquoteActive}
+            toggleBlock={CustomEditor.insertHr}
+          />
+        </Toolbar>
         <Editable
           renderElement={renderElement}
           renderLeaf={renderLeaf}
@@ -182,33 +270,13 @@ const App = () => {
             if (isHotkey("mod+k", event)) {
               event.preventDefault();
 
-              if (CustomEditor.isLinkActive(editor)) {
-                CustomEditor.unwrapLink(editor);
-              } else {
-                const url = window.prompt("输入链接");
-
-                if (!url) {
-                  return;
-                }
-
-                CustomEditor.wrapLink(editor, url);
-              }
+              CustomEditor.toggleLinkElement(editor);
             }
 
             if (isHotkey("mod+shift+i", event)) {
               event.preventDefault();
 
-              if (CustomEditor.isImageActive(editor)) {
-                CustomEditor.removeImage(editor);
-              } else {
-                const url = window.prompt("输入图片链接");
-
-                if (!url) {
-                  return;
-                }
-
-                CustomEditor.insertImage(editor, url);
-              }
+              CustomEditor.toggleImageElement(editor);
             }
 
             if (isHotkey("mod+shift+u", event)) {

@@ -37,6 +37,20 @@ export const isLinkActive = editor => {
   return !!match;
 };
 
+export const toggleLinkElement = editor => {
+  if (isLinkActive(editor)) {
+    unwrapLink(editor);
+  } else {
+    const url = window.prompt("输入链接");
+
+    if (!url) {
+      return;
+    }
+
+    wrapLink(editor, url);
+  }
+};
+
 export const unwrapLink = editor => {
   if (!editor.selection) {
     return;
