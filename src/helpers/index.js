@@ -31,7 +31,7 @@ import {
   toggleNumberedListElement
 } from "./numberedList";
 import { isHeadingActive, toggleHeading } from "./heading";
-import { insertHr, withHr } from "./hr";
+import { isHrActive, insertHr, withHr } from "./hr";
 import { withShortcuts } from "./shortcut";
 
 const CustomEditor = {
@@ -63,7 +63,8 @@ const CustomEditor = {
   toggleNumberedListElement,
   isHeadingActive,
   toggleHeading,
-  insertHr
+  insertHr,
+  isHrActive
 };
 
 export default CustomEditor;

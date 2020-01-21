@@ -47,7 +47,7 @@ const defaultValue = [
   {
     children: [
       {
-        text: "A line of text in a paragraph."
+        text: "Hail Tuture!"
       }
     ]
   }
@@ -229,7 +229,7 @@ const App = () => {
           <BlockButton
             format="hr"
             icon="remove"
-            isBlockActive={CustomEditor.isBlockquoteActive}
+            isBlockActive={CustomEditor.isHrActive}
             toggleBlock={CustomEditor.insertHr}
           />
         </Toolbar>

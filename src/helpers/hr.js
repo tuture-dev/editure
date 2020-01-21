@@ -1,5 +1,13 @@
 import { Transforms, Editor } from "slate";
 
+export const isHrActive = editor => {
+  const [match] = Editor.nodes(editor, {
+    match: n => n.type === "hr"
+  });
+
+  return !!match;
+};
+
 export const withHr = editor => {
   const { isVoid } = editor;
 
