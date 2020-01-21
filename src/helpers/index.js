@@ -19,6 +19,7 @@ import {
   toggleNumberedListElement
 } from "./numberedList";
 import { isHeadingActive, toggleHeading } from "./heading";
+import { insertHr, withHr } from "./hr";
 
 const CustomEditor = {
   isLinkActive,
@@ -46,9 +47,10 @@ const CustomEditor = {
   isNumberedListActive,
   toggleNumberedListElement,
   isHeadingActive,
-  toggleHeading
+  toggleHeading,
+  insertHr
 };
 
 export default CustomEditor;
 
-export { withLinks, withImages };
+export { withLinks, withImages, withHr };

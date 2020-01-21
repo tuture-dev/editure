@@ -9,7 +9,7 @@ import isHotkey from "is-hotkey";
 import { withHistory } from "slate-history";
 import { css } from "emotion";
 
-import CustomEditor, { withLinks, withImages } from "./helpers";
+import CustomEditor, { withLinks, withImages, withHr } from "./helpers";
 import {
   DefaultElement,
   CodeBlockElement,
@@ -22,7 +22,8 @@ import {
   HeadingOneElement,
   HeadingTwoElement,
   HeadingThreeElement,
-  HeadingFourElement
+  HeadingFourElement,
+  HrElement
 } from "./elements";
 import {
   DefaultMark,
@@ -47,7 +48,7 @@ const defaultValue = [
 
 const App = () => {
   const editor = useMemo(
-    () => withImages(withLinks(withHistory(withReact(createEditor())))),
+    () => withHr(withImages(withLinks(withHistory(withReact(createEditor()))))),
     []
   );
   const [value, setValue] = useState(defaultValue);
@@ -89,6 +90,9 @@ const App = () => {
 
       case "heading-four":
         return <HeadingFourElement {...props} />;
+
+      case "hr":
+        return <HrElement {...props} />;
 
       default:
         return <DefaultElement {...props} />;
@@ -223,6 +227,12 @@ const App = () => {
               event.preventDefault();
 
               CustomEditor.toggleNumberedListElement(editor);
+            }
+
+            if (isHotkey("mod+alt+-", event)) {
+              event.preventDefault();
+
+              CustomEditor.insertHr(editor);
             }
 
             if (isHotkey("mod+b", event)) {

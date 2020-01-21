@@ -12,6 +12,7 @@ import {
   HeadingThreeElement,
   HeadingFourElement
 } from "./heading";
+import HrElement from "./hr";
 
 export {
   DefaultElement,
@@ -25,5 +26,6 @@ export {
   HeadingOneElement,
   HeadingTwoElement,
   HeadingThreeElement,
-  HeadingFourElement
+  HeadingFourElement,
+  HrElement
 };
