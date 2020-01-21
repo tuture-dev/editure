@@ -14,6 +14,10 @@ import {
   isBulletedListActive,
   toggleBulletedListElement
 } from "./bulletedList";
+import {
+  isNumberedListActive,
+  toggleNumberedListElement
+} from "./numberedList";
 
 const CustomEditor = {
   isLinkActive,
@@ -37,7 +41,9 @@ const CustomEditor = {
   isBlockquoteActive,
   toggleBlockquoteElement,
   isBulletedListActive,
-  toggleBulletedListElement
+  toggleBulletedListElement,
+  isNumberedListActive,
+  toggleNumberedListElement
 };
 
 export default CustomEditor;

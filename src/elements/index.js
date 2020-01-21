@@ -5,6 +5,7 @@ import ImageElement from "./image";
 import BlockquoteElement from "./blockquote";
 import BulletedListElement from "./bulletedList";
 import ListItemElement from "./listItem";
+import NumberedListElement from "./numberedList";
 
 export {
   DefaultElement,
@@ -13,5 +14,6 @@ export {
   ImageElement,
   BlockquoteElement,
   BulletedListElement,
-  ListItemElement
+  ListItemElement,
+  NumberedListElement
 };

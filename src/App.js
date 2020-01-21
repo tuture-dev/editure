@@ -17,7 +17,8 @@ import {
   ImageElement,
   BlockquoteElement,
   BulletedListElement,
-  ListItemElement
+  ListItemElement,
+  NumberedListElement
 } from "./elements";
 import {
   DefaultMark,
@@ -66,6 +67,9 @@ const App = () => {
 
       case "list-item":
         return <ListItemElement {...props} />;
+
+      case "numbered-list":
+        return <NumberedListElement {...props} />;
 
       default:
         return <DefaultElement {...props} />;
@@ -160,10 +164,16 @@ const App = () => {
               CustomEditor.toggleBlockquoteElement(editor);
             }
 
-            if (isHotkey("mod+alt+o", event)) {
+            if (isHotkey("mod+alt+u", event)) {
               event.preventDefault();
 
               CustomEditor.toggleBulletedListElement(editor);
+            }
+
+            if (isHotkey("mod+alt+o", event)) {
+              event.preventDefault();
+
+              CustomEditor.toggleNumberedListElement(editor);
             }
 
             if (isHotkey("mod+b", event)) {
