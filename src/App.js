@@ -18,7 +18,11 @@ import {
   BlockquoteElement,
   BulletedListElement,
   ListItemElement,
-  NumberedListElement
+  NumberedListElement,
+  HeadingOneElement,
+  HeadingTwoElement,
+  HeadingThreeElement,
+  HeadingFourElement
 } from "./elements";
 import {
   DefaultMark,
@@ -50,6 +54,9 @@ const App = () => {
 
   const renderElement = useCallback(props => {
     switch (props.element.type) {
+      case "paragraph":
+        return <DefaultElement {...props} />;
+
       case "codeBlock":
         return <CodeBlockElement {...props} />;
 
@@ -70,6 +77,18 @@ const App = () => {
 
       case "numbered-list":
         return <NumberedListElement {...props} />;
+
+      case "heading-one":
+        return <HeadingOneElement {...props} />;
+
+      case "heading-two":
+        return <HeadingTwoElement {...props} />;
+
+      case "heading-three":
+        return <HeadingThreeElement {...props} />;
+
+      case "heading-four":
+        return <HeadingFourElement {...props} />;
 
       default:
         return <DefaultElement {...props} />;
@@ -120,6 +139,36 @@ const App = () => {
           spellCheck
           autoFocus
           onKeyDown={event => {
+            if (isHotkey("mod+0", event)) {
+              event.preventDefault();
+
+              CustomEditor.toggleHeading(editor, "paragraph");
+            }
+
+            if (isHotkey("mod+1", event)) {
+              event.preventDefault();
+
+              CustomEditor.toggleHeading(editor, "heading-one");
+            }
+
+            if (isHotkey("mod+2", event)) {
+              event.preventDefault();
+
+              CustomEditor.toggleHeading(editor, "heading-two");
+            }
+
+            if (isHotkey("mod+3", event)) {
+              event.preventDefault();
+
+              CustomEditor.toggleHeading(editor, "heading-three");
+            }
+
+            if (isHotkey("mod+4", event)) {
+              event.preventDefault();
+
+              CustomEditor.toggleHeading(editor, "heading-four");
+            }
+
             if (isHotkey("mod+shift+c", event)) {
               event.preventDefault();
 

@@ -18,6 +18,7 @@ import {
   isNumberedListActive,
   toggleNumberedListElement
 } from "./numberedList";
+import { isHeadingActive, toggleHeading } from "./heading";
 
 const CustomEditor = {
   isLinkActive,
@@ -43,7 +44,9 @@ const CustomEditor = {
   isBulletedListActive,
   toggleBulletedListElement,
   isNumberedListActive,
-  toggleNumberedListElement
+  toggleNumberedListElement,
+  isHeadingActive,
+  toggleHeading
 };
 
 export default CustomEditor;

@@ -6,6 +6,12 @@ import BlockquoteElement from "./blockquote";
 import BulletedListElement from "./bulletedList";
 import ListItemElement from "./listItem";
 import NumberedListElement from "./numberedList";
+import {
+  HeadingOneElement,
+  HeadingTwoElement,
+  HeadingThreeElement,
+  HeadingFourElement
+} from "./heading";
 
 export {
   DefaultElement,
@@ -15,5 +21,9 @@ export {
   BlockquoteElement,
   BulletedListElement,
   ListItemElement,
-  NumberedListElement
+  NumberedListElement,
+  HeadingOneElement,
+  HeadingTwoElement,
+  HeadingThreeElement,
+  HeadingFourElement
 };
