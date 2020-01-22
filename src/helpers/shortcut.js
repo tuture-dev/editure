@@ -4,7 +4,7 @@ import { toggleCodeMark } from "./code";
 import { toggleBoldMark } from "./bold";
 import { toggleItalicMark } from "./italic";
 import { toggleStrikethroughMark } from "./strikethrough";
-import { toggleUnderlineMark } from './underline'
+import { toggleUnderlineMark } from "./underline";
 
 const UNARY_SHORTCUTS = {
   "*": "list-item",
@@ -16,7 +16,9 @@ const UNARY_SHORTCUTS = {
   "###": "heading-three",
   "####": "heading-four",
   "#####": "heading-five",
-  "######": "heading-six"
+  "######": "heading-six",
+  "```": "code-block",
+  "---": "hr"
 };
 
 const BINARY_SHORTCUTS = [
@@ -24,8 +26,8 @@ const BINARY_SHORTCUTS = [
   "bold",
   "italic",
   "strikethrough",
-  'underline'
-]
+  "underline"
+];
 
 const BINARY_SHORTCUTS_REGEX = [
   "`([^`]+)`",
@@ -90,9 +92,9 @@ export const withShortcuts = editor => {
         }
 
         regex = new RegExp(regexStr, "g");
-        
+
         if (regex.test(beforeText)) {
-          format = BINARY_SHORTCUTS[index]
+          format = BINARY_SHORTCUTS[index];
         }
       });
 
@@ -102,17 +104,17 @@ export const withShortcuts = editor => {
 
       if (matchArr) {
         const targetTextWithMdTag = matchArr[matchArr.length - 1];
-        console.log('children', children)
-        const chilrenText = children[anchor.path[0]].children[anchor.path[1]].text
+        console.log("children", children);
+        const chilrenText =
+          children[anchor.path[0]].children[anchor.path[1]].text;
 
         // 删除逻辑
         const deleteRangeStartOffset =
-        chilrenText.length - targetTextWithMdTag.length;
+          chilrenText.length - targetTextWithMdTag.length;
         const deleteRangeEndOffset = chilrenText.length;
 
-        const deleteRangeStart = { ...anchor, offset: deleteRangeStartOffset }
-        const deleteRangeEnd = { ...anchor, offset: deleteRangeEndOffset }
-        console.log('deleteRangeStart', deleteRangeStart, deleteRangeEnd)
+        const deleteRangeStart = { ...anchor, offset: deleteRangeStartOffset };
+        const deleteRangeEnd = { ...anchor, offset: deleteRangeEndOffset };
 
         const deleteRange = { anchor: deleteRangeStart, focus: deleteRangeEnd };
         Transforms.select(editor, deleteRange);
@@ -127,8 +129,11 @@ export const withShortcuts = editor => {
         const needMarkRangeStartOffset = deleteRangeStartOffset;
         const needMarkRangeEndOffset =
           needMarkRangeStartOffset + targetInsertText.length;
-        const needMarkRangeStart = { ...anchor, offset: needMarkRangeStartOffset }
-        const needMarkRangeEnd = { ...anchor, offset: needMarkRangeEndOffset }
+        const needMarkRangeStart = {
+          ...anchor,
+          offset: needMarkRangeStartOffset
+        };
+        const needMarkRangeEnd = { ...anchor, offset: needMarkRangeEndOffset };
 
         const needMarkRange = {
           anchor: needMarkRangeStart,
@@ -158,7 +163,7 @@ export const withShortcuts = editor => {
             break;
           }
 
-          case 'underline': {
+          case "underline": {
             toggleUnderlineMark(editor);
             break;
           }
@@ -209,11 +214,6 @@ export const withShortcuts = editor => {
   return editor;
 };
 
+const handleBlockShortcuts = () => {};
 
-const handleBlockShortcuts = () => {
-
-}
-
-const handleMarkShortcuts = () => {
-
-}
+const handleMarkShortcuts = () => {};

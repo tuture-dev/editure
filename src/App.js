@@ -68,7 +68,7 @@ const App = () => {
       case "paragraph":
         return <DefaultElement {...props} />;
 
-      case "codeBlock":
+      case "code-block":
         return <CodeBlockElement {...props} />;
 
       case "link":
@@ -203,7 +203,7 @@ const App = () => {
             toggleBlock={CustomEditor.toggleBlockquoteElement}
           />
           <BlockButton
-            format="codeBlock"
+            format="code-block"
             icon="attach_money"
             isBlockActive={CustomEditor.isCodeBlockActive}
             toggleBlock={CustomEditor.toggleCodeBlockElement}
