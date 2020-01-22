@@ -4,6 +4,7 @@ import { toggleCodeMark } from "./code";
 import { toggleBoldMark } from "./bold";
 import { toggleItalicMark } from "./italic";
 import { toggleStrikethroughMark } from "./strikethrough";
+import { toggleUnderlineMark } from './underline'
 
 const UNARY_SHORTCUTS = {
   "*": "list-item",
@@ -22,21 +23,23 @@ const BINARY_SHORTCUTS = [
   "code",
   "bold",
   "italic",
-  "strikethrough"
+  "strikethrough",
+  'underline'
 ]
 
 const BINARY_SHORTCUTS_REGEX = [
   "`([^`]+)`",
   "\\*\\*([^\\*]+)\\*\\*",
   "\\*([^\\*]+)\\*",
-  "~~([^~]+)~~"
+  "~~([^~]+)~~",
+  "<u>([^(<u>)|(</u>)]+)</u>"
 ];
 
 export const withShortcuts = editor => {
   const { deleteBackward, insertText } = editor;
 
   editor.insertText = text => {
-    const { selection } = editor;
+    const { selection, children } = editor;
 
     if (text === " " && selection && Range.isCollapsed(selection)) {
       const { anchor } = selection;
@@ -99,45 +102,33 @@ export const withShortcuts = editor => {
 
       if (matchArr) {
         const targetTextWithMdTag = matchArr[matchArr.length - 1];
+        console.log('children', children)
+        const chilrenText = children[anchor.path[0]].children[anchor.path[1]].text
 
         // 删除逻辑
         const deleteRangeStartOffset =
-          beforeText.length - targetTextWithMdTag.length;
-        const deleteRangeEndOffset = beforeText.length;
+        chilrenText.length - targetTextWithMdTag.length;
+        const deleteRangeEndOffset = chilrenText.length;
 
-        let deleteRangeStart = Editor.start(editor, path);
-        deleteRangeStart = {
-          ...deleteRangeStart,
-          offset: deleteRangeStartOffset
-        };
-
-        let deleteRangeEnd = Editor.start(editor, path);
-        deleteRangeEnd = { ...deleteRangeEnd, offset: deleteRangeEndOffset };
+        const deleteRangeStart = { ...anchor, offset: deleteRangeStartOffset }
+        const deleteRangeEnd = { ...anchor, offset: deleteRangeEndOffset }
+        console.log('deleteRangeStart', deleteRangeStart, deleteRangeEnd)
 
         const deleteRange = { anchor: deleteRangeStart, focus: deleteRangeEnd };
         Transforms.select(editor, deleteRange);
         Transforms.delete(editor);
 
-        // 插入新的内容
+        // // 插入新的内容
         const targetTextArr = regex.exec(targetTextWithMdTag);
         const targetInsertText = targetTextArr[1];
         insertText(targetInsertText);
 
-        // 开始对新内容进行标注
+        // // 开始对新内容进行标注
         const needMarkRangeStartOffset = deleteRangeStartOffset;
         const needMarkRangeEndOffset =
           needMarkRangeStartOffset + targetInsertText.length;
-        let needMarkRangeStart = Editor.start(editor, path);
-        needMarkRangeStart = {
-          ...needMarkRangeStart,
-          offset: needMarkRangeStartOffset
-        };
-
-        let needMarkRangeEnd = Editor.start(editor, path);
-        needMarkRangeEnd = {
-          ...needMarkRangeEnd,
-          offset: needMarkRangeEndOffset
-        };
+        const needMarkRangeStart = { ...anchor, offset: needMarkRangeStartOffset }
+        const needMarkRangeEnd = { ...anchor, offset: needMarkRangeEndOffset }
 
         const needMarkRange = {
           anchor: needMarkRangeStart,
@@ -166,10 +157,15 @@ export const withShortcuts = editor => {
             toggleStrikethroughMark(editor);
             break;
           }
+
+          case 'underline': {
+            toggleUnderlineMark(editor);
+            break;
+          }
         }
 
         Transforms.collapse(editor, {
-          edge: "focus"
+          edge: "end"
         });
 
         return;
@@ -212,3 +208,12 @@ export const withShortcuts = editor => {
 
   return editor;
 };
+
+
+const handleBlockShortcuts = () => {
+
+}
+
+const handleMarkShortcuts = () => {
+
+}
