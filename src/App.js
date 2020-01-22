@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 
 // Import the Slate editor factory.
-import { createEditor } from "slate";
+import { createEditor, Transforms } from "slate";
 
 // Import the Slate components and React plugin.
 import { Slate, Editable, withReact } from "slate-react";
@@ -269,10 +269,21 @@ const App = () => {
               CustomEditor.toggleHeading(editor, "heading-four");
             }
 
+            // 处理代码逻辑
             if (isHotkey("mod+shift+c", event)) {
               event.preventDefault();
 
               CustomEditor.toggleCodeBlockElement(editor);
+            }
+
+            if (
+              event.key === "Enter" &&
+              (CustomEditor.isCodeBlockActive(editor) ||
+                CustomEditor.isBlockquoteActive(editor))
+            ) {
+              event.preventDefault();
+
+              Transforms.insertText(editor, "\n");
             }
 
             if (isHotkey("mod+k", event)) {
