@@ -37,6 +37,38 @@ const BINARY_SHORTCUTS_REGEX = [
   "<u>([^(<u>)|(</u>)]+)</u>"
 ];
 
+const toggleMark = (editor, format) => {
+  switch (format) {
+    case "code": {
+      toggleCodeMark(editor);
+      break;
+    }
+
+    case "bold": {
+      toggleBoldMark(editor);
+      break;
+    }
+
+    case "italic": {
+      toggleItalicMark(editor);
+      break;
+    }
+
+    case "strikethrough": {
+      toggleStrikethroughMark(editor);
+      break;
+    }
+
+    case "underline": {
+      toggleUnderlineMark(editor);
+      break;
+    }
+
+    default: {
+    }
+  }
+};
+
 export const withShortcuts = editor => {
   const { deleteBackward, insertText } = editor;
 
@@ -49,17 +81,10 @@ export const withShortcuts = editor => {
         match: n => Editor.isBlock(editor, n)
       });
 
-      console.log("editor", editor);
-      console.log("match", match);
-
       const path = match ? match[1] : [];
       const start = Editor.start(editor, path);
       const range = { anchor, focus: start };
       const beforeText = Editor.string(editor, range);
-
-      console.log("start", start);
-      console.log("anchor", anchor);
-      console.log("beforeText", beforeText);
 
       const type = UNARY_SHORTCUTS[beforeText];
 
@@ -104,7 +129,6 @@ export const withShortcuts = editor => {
 
       if (matchArr) {
         const targetTextWithMdTag = matchArr[matchArr.length - 1];
-        console.log("children", children);
         const chilrenText =
           children[anchor.path[0]].children[anchor.path[1]].text;
 
@@ -120,12 +144,12 @@ export const withShortcuts = editor => {
         Transforms.select(editor, deleteRange);
         Transforms.delete(editor);
 
-        // // 插入新的内容
+        // 插入新的内容
         const targetTextArr = regex.exec(targetTextWithMdTag);
         const targetInsertText = targetTextArr[1];
         insertText(targetInsertText);
 
-        // // 开始对新内容进行标注
+        // 开始对新内容进行标注
         const needMarkRangeStartOffset = deleteRangeStartOffset;
         const needMarkRangeEndOffset =
           needMarkRangeStartOffset + targetInsertText.length;
@@ -141,33 +165,19 @@ export const withShortcuts = editor => {
         };
 
         Transforms.select(editor, needMarkRange);
+        toggleMark(editor, format);
 
-        switch (format) {
-          case "code": {
-            toggleCodeMark(editor);
-            break;
-          }
+        Transforms.collapse(editor, {
+          edge: "end"
+        });
 
-          case "bold": {
-            toggleBoldMark(editor);
-            break;
-          }
-
-          case "italic": {
-            toggleItalicMark(editor);
-            break;
-          }
-
-          case "strikethrough": {
-            toggleStrikethroughMark(editor);
-            break;
-          }
-
-          case "underline": {
-            toggleUnderlineMark(editor);
-            break;
-          }
-        }
+        insertText(text);
+        const { focus } = editor.selection;
+        Transforms.select(editor, {
+          anchor: { path: focus.path, offset: focus.offset - 1 },
+          focus
+        });
+        toggleMark(editor, format);
 
         Transforms.collapse(editor, {
           edge: "end"
@@ -213,7 +223,3 @@ export const withShortcuts = editor => {
 
   return editor;
 };
-
-const handleBlockShortcuts = () => {};
-
-const handleMarkShortcuts = () => {};

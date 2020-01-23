@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, useCallback } from "react";
+import React, { useMemo, useState, useCallback } from "react";
 
 // Import the Slate editor factory.
 import { createEditor, Transforms, Editor, Element, Text } from "slate";
@@ -11,6 +11,9 @@ import { css } from "emotion";
 import Prism from "prismjs";
 
 import CustomEditor, {
+  withBulletedLists,
+  withNumberedLists,
+  withHeadings,
   withLinks,
   withImages,
   withHr,
@@ -63,12 +66,21 @@ const defaultValue = [
   }
 ];
 
+const plugins = [
+  withReact,
+  withHistory,
+  withBulletedLists,
+  withNumberedLists,
+  withHeadings,
+  withHr,
+  withImages,
+  withLinks,
+  withShortcuts
+];
+
 const App = () => {
   const editor = useMemo(
-    () =>
-      withShortcuts(
-        withHr(withImages(withLinks(withHistory(withReact(createEditor())))))
-      ),
+    () => plugins.reduce((editor, plugin) => plugin(editor), createEditor()),
     []
   );
   const [value, setValue] = useState(defaultValue);

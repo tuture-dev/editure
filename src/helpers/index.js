@@ -23,14 +23,16 @@ import {
 } from "./image";
 import { isBlockquoteActive, toggleBlockquoteElement } from "./blockquote";
 import {
+  withBulletedLists,
   isBulletedListActive,
   toggleBulletedListElement
 } from "./bulletedList";
 import {
+  withNumberedLists,
   isNumberedListActive,
   toggleNumberedListElement
 } from "./numberedList";
-import { isHeadingActive, toggleHeading } from "./heading";
+import { withHeadings, isHeadingActive, toggleHeading } from "./heading";
 import { isHrActive, insertHr, withHr } from "./hr";
 import { withShortcuts } from "./shortcut";
 
@@ -69,4 +71,12 @@ const CustomEditor = {
 
 export default CustomEditor;
 
-export { withLinks, withImages, withHr, withShortcuts };
+export {
+  withBulletedLists,
+  withNumberedLists,
+  withHeadings,
+  withLinks,
+  withImages,
+  withHr,
+  withShortcuts
+};
