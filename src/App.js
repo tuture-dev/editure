@@ -54,15 +54,6 @@ const defaultValue = [
         text: "Hail Tuture!"
       }
     ]
-  },
-  {
-    type: "code-block",
-    lang: "javascript",
-    children: [
-      {
-        children: [{ text: "console.log('hello world')" }]
-      }
-    ]
   }
 ];
 
@@ -166,23 +157,24 @@ const App = () => {
   const decorate = useCallback(([node, path]) => {
     const decorations = [];
     const isCodeBlock = Element.matches(node, { type: "code-block" });
-    console.log("isCodeBlock", isCodeBlock, node);
 
     if (isCodeBlock) {
       const grammarName = node.lang;
       const grammar = Prism.languages[grammarName];
 
-      console.log("grammar", grammar);
-
       if (!grammar) {
         return [];
       }
 
-      const texts = node.children.map(item => item.children[0].text);
+      const texts = node.children.map(item => {
+        if (item.children) {
+          return item.children[0].text;
+        }
+
+        return item.text;
+      });
       const blockText = texts.join("\n");
       const tokens = Prism.tokenize(blockText, grammar);
-
-      console.log("blockText", blockText, tokens);
 
       let textStart = 0;
       let textEnd = 0;
@@ -195,8 +187,6 @@ const App = () => {
         function processToken(token, accu) {
           accu = accu || "";
 
-          console.log("token, accu", token);
-
           if (typeof token === "string") {
             if (accu) {
               const decoration = createDecoration({
@@ -207,8 +197,6 @@ const App = () => {
                 end: offset + token.length,
                 className: `prism-token token ${accu}`
               });
-
-              console.log("createDecoration", decoration);
 
               if (decoration) {
                 decorations.push(decoration);
@@ -272,8 +260,6 @@ const App = () => {
         };
       }
     }
-
-    console.log("decorations", decorations);
 
     return decorations;
   }, []);

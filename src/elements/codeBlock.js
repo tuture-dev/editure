@@ -3,7 +3,10 @@ import { useSlate } from "slate-react";
 import { Transforms, Editor, Element } from "slate";
 
 const CodeBlockElement = props => {
-  const [lang, setLang] = useState("");
+  const { element } = props;
+  const { lang: defaultLang = "" } = element;
+
+  const [lang, setLang] = useState(defaultLang || "");
   const editor = useSlate();
 
   function handleChange(event) {
@@ -26,7 +29,7 @@ const CodeBlockElement = props => {
         <option value="javascript">JavaScript</option>
       </select>
       <pre>
-        <code>{props.children}</code>
+        <code lang={`language-${lang}`}>{props.children}</code>
       </pre>
     </div>
   );

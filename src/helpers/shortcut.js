@@ -6,35 +6,48 @@ import { toggleItalicMark } from "./italic";
 import { toggleStrikethroughMark } from "./strikethrough";
 import { toggleUnderlineMark } from "./underline";
 
-const UNARY_SHORTCUTS = {
-  "*": "list-item",
-  "-": "list-item",
-  "+": "list-item",
-  ">": "block-quote",
-  "#": "heading-one",
-  "##": "heading-two",
-  "###": "heading-three",
-  "####": "heading-four",
-  "#####": "heading-five",
-  "######": "heading-six",
-  "```": "code-block",
-  "---": "hr"
-};
-
-const BINARY_SHORTCUTS = [
+const UNARY_SHORTCUTS = [
   "code",
   "bold",
   "italic",
   "strikethrough",
   "underline"
 ];
+const BINARY_SHORTCUTS = [
+  "list-item",
+  "list-item",
+  "list-item",
+  "block-quote",
+  "heading-one",
+  "heading-two",
+  "heading-three",
+  "heading-four",
+  "heading-five",
+  "heading-six",
+  "code-block",
+  "hr"
+];
 
-const BINARY_SHORTCUTS_REGEX = [
+const SHORTCUTS = [...UNARY_SHORTCUTS, ...BINARY_SHORTCUTS];
+
+const SHORTCUTS_REGEX = [
   "`([^`]+)`",
   "\\*\\*([^\\*]+)\\*\\*",
   "\\*([^\\*]+)\\*",
   "~~([^~]+)~~",
-  "<u>([^(<u>)|(</u>)]+)</u>"
+  "<u>([^(<u>)|(</u>)]+)</u>",
+  "^\\*$",
+  "^-$",
+  "^\\+$",
+  "^>$",
+  "^#$",
+  "^##$",
+  "^###$",
+  "^####$",
+  "^#####$",
+  "^######$",
+  "^```([a-zA-Z]*)$",
+  "^---$"
 ];
 
 const toggleMark = (editor, format) => {
@@ -86,18 +99,48 @@ export const withShortcuts = editor => {
       const range = { anchor, focus: start };
       const beforeText = Editor.string(editor, range);
 
-      const type = UNARY_SHORTCUTS[beforeText];
+      let matchArr;
+      let regex;
+      let format;
 
-      if (type) {
+      SHORTCUTS_REGEX.map((regexStr, index) => {
+        if (format) {
+          return;
+        }
+
+        console.log("regexStr", regexStr);
+        regex = new RegExp(regexStr, "g");
+
+        if (regex.test(beforeText)) {
+          format = SHORTCUTS[index];
+        }
+      });
+
+      if (format) {
+        matchArr = beforeText.match(regex);
+      }
+
+      if (BINARY_SHORTCUTS.includes(format)) {
+        let nodeProp = { type: format };
+
         Transforms.select(editor, range);
         Transforms.delete(editor);
+
+        if (format === "code-block") {
+          const targetTextWithMdTag = matchArr[matchArr.length - 1];
+          const targetTextArr = regex.exec(targetTextWithMdTag);
+          const targetLang = targetTextArr[1];
+
+          nodeProp = { ...nodeProp, lang: targetLang };
+        }
+
         Transforms.setNodes(
           editor,
-          { type },
+          { ...nodeProp },
           { match: n => Editor.isBlock(editor, n) }
         );
 
-        if (type === "list-item") {
+        if (format === "list-item") {
           const list = { type: "bulleted-list", children: [] };
           Transforms.wrapNodes(editor, list, {
             match: n => n.type === "list-item"
@@ -107,27 +150,7 @@ export const withShortcuts = editor => {
         return;
       }
 
-      let matchArr;
-      let regex;
-      let format;
-
-      BINARY_SHORTCUTS_REGEX.map((regexStr, index) => {
-        if (format) {
-          return;
-        }
-
-        regex = new RegExp(regexStr, "g");
-
-        if (regex.test(beforeText)) {
-          format = BINARY_SHORTCUTS[index];
-        }
-      });
-
-      if (format) {
-        matchArr = beforeText.match(regex);
-      }
-
-      if (matchArr) {
+      if (UNARY_SHORTCUTS.includes(format)) {
         const targetTextWithMdTag = matchArr[matchArr.length - 1];
         const chilrenText =
           children[anchor.path[0]].children[anchor.path[1]].text;
