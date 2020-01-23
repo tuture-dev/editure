@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSlate } from "slate-react";
-import { Transforms, Editor } from "slate";
+import { Transforms, Editor, Element } from "slate";
 
 const CodeBlockElement = props => {
   const [lang, setLang] = useState("");
@@ -11,12 +11,9 @@ const CodeBlockElement = props => {
 
     Transforms.setNodes(
       editor,
+      { lang: event.target.value },
       {
-        type: "code-block",
-        lang: event.target.value
-      },
-      {
-        match: n => Editor.isBlock(editor, n)
+        match: n => Element.matches(n, { type: "code-block" })
       }
     );
   }
@@ -26,10 +23,10 @@ const CodeBlockElement = props => {
       <select value={lang} onChange={handleChange}>
         <option value="markup">HTML</option>
         <option value="css">CSS</option>
-        <option value="js">JavaScript</option>
+        <option value="javascript">JavaScript</option>
       </select>
       <pre>
-        <code className={`language-${lang}`}>{props.children}</code>
+        <code>{props.children}</code>
       </pre>
     </div>
   );

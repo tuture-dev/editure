@@ -8,6 +8,7 @@ import { Slate, Editable, withReact } from "slate-react";
 import isHotkey from "is-hotkey";
 import { withHistory } from "slate-history";
 import { css } from "emotion";
+import Prism from "prismjs";
 
 import CustomEditor, {
   withLinks,
@@ -47,16 +48,16 @@ const defaultValue = [
   {
     children: [
       {
-        text: "Hail Tuture!\nHail Tuture!"
+        text: "Hail Tuture!"
       }
     ]
   },
   {
     type: "code-block",
-    lang: "markup",
+    lang: "javascript",
     children: [
       {
-        text: "<p>hello world</p>\n<p>hello tuture</p>"
+        children: [{ text: "console.log('hello world')" }]
       }
     ]
   }
@@ -136,33 +137,134 @@ const App = () => {
       case "strikethrough":
         return <StrikethroughMark {...props} />;
 
+      case "prism-token": {
+        const { children, attributes, leaf } = props;
+        return (
+          <span {...attributes} className={leaf.className}>
+            {children}
+          </span>
+        );
+      }
+
       default:
         return <DefaultMark {...props} />;
     }
   }, []);
 
-  // const decorate = useCallback(
-  //   ([node, path]) => {
-  //     const ranges = [];
+  const decorate = useCallback(([node, path]) => {
+    const decorations = [];
+    const isCodeBlock = Element.matches(node, { type: "code-block" });
+    console.log("isCodeBlock", isCodeBlock, node);
 
-  //     const isCodeBlock = Element.matches(node, { type: "code-block" });
-  //     console.log("isCodeBlock", isCodeBlock, node);
+    if (isCodeBlock) {
+      const grammarName = node.lang;
+      const grammar = Prism.languages[grammarName];
 
-  //     if (isCodeBlock) {
-  //       const grammarName = node.lang;
-  //       const { text } = node.children[0];
-  //       const grammar = Prism.languages[grammarName];
-  //       const tokens = Prism.tokenize(text, grammar)
+      console.log("grammar", grammar);
 
-  //       if (!grammar) {
-  //         return [];
-  //       }
-  //     }
+      if (!grammar) {
+        return [];
+      }
 
-  //     return ranges;
-  //   },
-  //   [search]
-  // );
+      const texts = node.children.map(item => item.children[0].text);
+      const blockText = texts.join("\n");
+      const tokens = Prism.tokenize(blockText, grammar);
+
+      console.log("blockText", blockText, tokens);
+
+      let textStart = 0;
+      let textEnd = 0;
+
+      texts.forEach(text => {
+        textEnd = textStart + text.length;
+
+        let offset = 0;
+
+        function processToken(token, accu) {
+          accu = accu || "";
+
+          console.log("token, accu", token);
+
+          if (typeof token === "string") {
+            if (accu) {
+              const decoration = createDecoration({
+                text,
+                textStart,
+                textEnd,
+                start: offset,
+                end: offset + token.length,
+                className: `prism-token token ${accu}`
+              });
+
+              console.log("createDecoration", decoration);
+
+              if (decoration) {
+                decorations.push(decoration);
+              }
+            }
+
+            offset += token.length;
+          } else {
+            accu = `${accu} ${token.type} ${token.alias || ""}`;
+
+            if (typeof token.content === "string") {
+              const decoration = createDecoration({
+                text,
+                textStart,
+                textEnd,
+                start: offset,
+                end: offset + token.content.length,
+                className: `prism-token token ${accu}`
+              });
+
+              if (decoration) {
+                decorations.push(decoration);
+              }
+
+              offset += token.content.length;
+            } else {
+              for (let i = 0; i < token.content.length; i += 1) {
+                processToken(token.content[i], accu);
+              }
+            }
+          }
+        }
+
+        tokens.forEach(processToken);
+        textStart = textEnd + 1;
+      });
+
+      function createDecoration({
+        text,
+        textStart,
+        textEnd,
+        start,
+        end,
+        className
+      }) {
+        if (start >= textEnd || end <= textStart) {
+          return null;
+        }
+
+        start = Math.max(start, textStart);
+        end = Math.min(end, textEnd);
+
+        start -= textStart;
+        end -= textStart;
+
+        return {
+          anchor: { path, offset: start },
+          focus: { path, offset: end },
+          className,
+          type: "prism-token"
+        };
+      }
+    }
+
+    console.log("decorations", decorations);
+
+    return decorations;
+  }, []);
 
   console.log("editor", editor);
 
@@ -269,6 +371,7 @@ const App = () => {
           />
         </Toolbar>
         <Editable
+          decorate={decorate}
           renderElement={renderElement}
           renderLeaf={renderLeaf}
           spellCheck
