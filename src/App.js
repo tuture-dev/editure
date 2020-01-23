@@ -45,7 +45,6 @@ import "material-icons/iconfont/material-icons.css";
 
 const defaultValue = [
   {
-    type: "block-quote",
     children: [
       {
         text: "Hail Tuture!\nHail Tuture!"

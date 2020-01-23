@@ -12,15 +12,18 @@ export const toggleBlockquoteElement = editor => {
   const isActive = isBlockquoteActive(editor);
 
   if (isActive) {
-    Transforms.setNodes(
-      editor,
-      {
-        type: null
-      },
-      {
-        match: n => Editor.isBlock(editor, n)
+    Transforms.unwrapNodes(editor, {
+      match: n => {
+        if (
+          Editor.isBlock(editor, n) &&
+          Element.matches(n, { type: "block-quote" })
+        ) {
+          return true;
+        }
+
+        return false;
       }
-    );
+    });
   } else {
     Transforms.wrapNodes(
       editor,

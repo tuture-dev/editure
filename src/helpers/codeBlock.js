@@ -1,4 +1,4 @@
-import { Transforms, Editor } from "slate";
+import { Transforms, Editor, Element } from "slate";
 
 export const isCodeBlockActive = editor => {
   const [match] = Editor.nodes(editor, {
@@ -12,15 +12,18 @@ export const toggleCodeBlockElement = editor => {
   const isActive = isCodeBlockActive(editor);
 
   if (isActive) {
-    Transforms.setNodes(
-      editor,
-      {
-        type: null
-      },
-      {
-        match: n => Editor.isBlock(editor, n)
+    Transforms.unwrapNodes(editor, {
+      match: n => {
+        if (
+          Editor.isBlock(editor, n) &&
+          Element.matches(n, { type: "code-block" })
+        ) {
+          return true;
+        }
+
+        return false;
       }
-    );
+    });
   } else {
     Transforms.wrapNodes(
       editor,
