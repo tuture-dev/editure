@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 
 // Import the Slate editor factory.
-import { createEditor, Transforms } from "slate";
+import { createEditor, Transforms, Editor, Element, Text } from "slate";
 
 // Import the Slate components and React plugin.
 import { Slate, Editable, withReact } from "slate-react";
@@ -45,9 +45,19 @@ import "material-icons/iconfont/material-icons.css";
 
 const defaultValue = [
   {
+    type: "block-quote",
     children: [
       {
-        text: "Hail Tuture!"
+        text: "Hail Tuture!\nHail Tuture!"
+      }
+    ]
+  },
+  {
+    type: "code-block",
+    lang: "markup",
+    children: [
+      {
+        text: "<p>hello world</p>\n<p>hello tuture</p>"
       }
     ]
   }
@@ -62,6 +72,7 @@ const App = () => {
     []
   );
   const [value, setValue] = useState(defaultValue);
+  const [search, setSearch] = useState();
 
   const renderElement = useCallback(props => {
     switch (props.element.type) {
@@ -130,6 +141,31 @@ const App = () => {
         return <DefaultMark {...props} />;
     }
   }, []);
+
+  // const decorate = useCallback(
+  //   ([node, path]) => {
+  //     const ranges = [];
+
+  //     const isCodeBlock = Element.matches(node, { type: "code-block" });
+  //     console.log("isCodeBlock", isCodeBlock, node);
+
+  //     if (isCodeBlock) {
+  //       const grammarName = node.lang;
+  //       const { text } = node.children[0];
+  //       const grammar = Prism.languages[grammarName];
+  //       const tokens = Prism.tokenize(text, grammar)
+
+  //       if (!grammar) {
+  //         return [];
+  //       }
+  //     }
+
+  //     return ranges;
+  //   },
+  //   [search]
+  // );
+
+  console.log("editor", editor);
 
   return (
     <div

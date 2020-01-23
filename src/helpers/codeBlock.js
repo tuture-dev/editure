@@ -11,13 +11,25 @@ export const isCodeBlockActive = editor => {
 export const toggleCodeBlockElement = editor => {
   const isActive = isCodeBlockActive(editor);
 
-  Transforms.setNodes(
-    editor,
-    {
-      type: isActive ? null : "code-block"
-    },
-    {
-      match: n => Editor.isBlock(editor, n)
-    }
-  );
+  if (isActive) {
+    Transforms.setNodes(
+      editor,
+      {
+        type: null
+      },
+      {
+        match: n => Editor.isBlock(editor, n)
+      }
+    );
+  } else {
+    Transforms.wrapNodes(
+      editor,
+      {
+        type: "code-block"
+      },
+      {
+        match: n => Editor.isBlock(editor, n)
+      }
+    );
+  }
 };

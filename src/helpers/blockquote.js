@@ -1,4 +1,4 @@
-import { Transforms, Editor } from "slate";
+import { Transforms, Editor, Element } from "slate";
 
 export const isBlockquoteActive = editor => {
   const [match] = Editor.nodes(editor, {
@@ -11,13 +11,25 @@ export const isBlockquoteActive = editor => {
 export const toggleBlockquoteElement = editor => {
   const isActive = isBlockquoteActive(editor);
 
-  Transforms.setNodes(
-    editor,
-    {
-      type: isActive ? null : "block-quote"
-    },
-    {
-      match: n => Editor.isBlock(editor, n)
-    }
-  );
+  if (isActive) {
+    Transforms.setNodes(
+      editor,
+      {
+        type: null
+      },
+      {
+        match: n => Editor.isBlock(editor, n)
+      }
+    );
+  } else {
+    Transforms.wrapNodes(
+      editor,
+      {
+        type: "block-quote"
+      },
+      {
+        match: n => Editor.isBlock(editor, n)
+      }
+    );
+  }
 };
