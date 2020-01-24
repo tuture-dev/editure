@@ -4,9 +4,9 @@ import { Transforms, Editor, Element } from "slate";
 
 const CodeBlockElement = props => {
   const { element } = props;
-  const { lang: defaultLang = "" } = element;
+  const { lang: defaultLang = "Plain Text" } = element;
 
-  const [lang, setLang] = useState(defaultLang || "");
+  const [lang, setLang] = useState(defaultLang);
   const editor = useSlate();
 
   function handleChange(event) {
@@ -23,7 +23,8 @@ const CodeBlockElement = props => {
 
   return (
     <div {...props.attributes}>
-      <select value={lang} onChange={handleChange}>
+      <select contentEditable={false} value={lang} onChange={handleChange}>
+        <option value="text">Plain Text</option>
         <option value="markup">HTML</option>
         <option value="css">CSS</option>
         <option value="javascript">JavaScript</option>
