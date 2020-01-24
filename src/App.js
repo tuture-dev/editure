@@ -53,7 +53,7 @@ const MARK_HOTKEYS = {
   "mod+b": "bold",
   "mod+i": "italic",
   "mod+u": "underline",
-  "mod+`": "code",
+  "ctrl+`": "code",
   "mod+shift+`": "strikethrough"
 };
 
@@ -222,6 +222,7 @@ const App = () => {
           autoFocus
           onKeyDown={event => {
             for (const hotkey in MARK_HOTKEYS) {
+              console.log("mark", event.key);
               if (isHotkey(hotkey, event)) {
                 event.preventDefault();
                 const mark = MARK_HOTKEYS[hotkey];
