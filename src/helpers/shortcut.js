@@ -14,9 +14,10 @@ const UNARY_SHORTCUTS = [
   "underline"
 ];
 const BINARY_SHORTCUTS = [
-  "list-item",
-  "list-item",
-  "list-item",
+  "bulleted-list",
+  "bulleted-list",
+  "bulleted-list",
+  "numbered-list",
   "block-quote",
   "heading-one",
   "heading-two",
@@ -39,6 +40,7 @@ const SHORTCUTS_REGEX = [
   "^\\*$",
   "^-$",
   "^\\+$",
+  "^[0-9]\\.$",
   "^>$",
   "^#$",
   "^##$",
@@ -134,14 +136,18 @@ export const withShortcuts = editor => {
           nodeProp = { ...nodeProp, lang: targetLang };
         }
 
+        if (format === "bulleted-list" || format === "numbered-list") {
+          nodeProp = { ...nodeProp, type: "list-item" };
+        }
+
         Transforms.setNodes(
           editor,
           { ...nodeProp },
           { match: n => Editor.isBlock(editor, n) }
         );
 
-        if (format === "list-item") {
-          const list = { type: "bulleted-list", children: [] };
+        if (format === "bulleted-list" || format === "numbered-list") {
+          const list = { type: format, children: [] };
           Transforms.wrapNodes(editor, list, {
             match: n => n.type === "list-item"
           });
