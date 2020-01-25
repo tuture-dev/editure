@@ -1,14 +1,4 @@
-import { Transforms, Editor } from "slate";
-
-export const isHrActive = editor => {
-  const [match] = Editor.nodes(editor, {
-    match: n => n.type === "hr"
-  });
-
-  return !!match;
-};
-
-export const withHr = editor => {
+export default function withHr(editor) {
   const { isVoid } = editor;
 
   editor.isVoid = element => {
@@ -16,14 +6,4 @@ export const withHr = editor => {
   };
 
   return editor;
-};
-
-export const insertHr = editor => {
-  const text = "";
-  const hr = { type: "hr", children: [{ text }] };
-  Transforms.insertNodes(editor, hr);
-};
-
-export const removeHr = editor => {
-  Transforms.removeNodes(editor, { match: n => n.type === "hr" });
-};
+}

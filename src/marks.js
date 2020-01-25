@@ -16,7 +16,7 @@ export const toggleMark = (editor, format) => {
   }
 };
 
-export default function Leaf({ attributes, children, leaf }) {
+export default ({ attributes, children, leaf }) => {
   if (leaf.bold) {
     children = <strong>{children}</strong>;
   }
@@ -30,9 +30,7 @@ export default function Leaf({ attributes, children, leaf }) {
   }
 
   if (leaf.strikethrough) {
-    children = (
-      <span style={{ textDecoration: "line-through" }}>{children}</span>
-    );
+    children = <span style={{ textDecoration: "line-through" }}>{children}</span>;
   }
 
   if (leaf.underline) {
@@ -44,4 +42,4 @@ export default function Leaf({ attributes, children, leaf }) {
       {children}
     </span>
   );
-}
+};
