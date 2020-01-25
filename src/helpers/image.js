@@ -2,6 +2,8 @@ import { Transforms, Editor } from "slate";
 import imageExtensions from "image-extensions";
 import isUrl from "is-url";
 
+import { IMAGE } from "../constants";
+
 export const withImages = editor => {
   const { insertData, isVoid } = editor;
 
@@ -39,7 +41,7 @@ export const withImages = editor => {
 
 export const isImageActive = editor => {
   const [match] = Editor.nodes(editor, {
-    match: n => n.type === "image"
+    match: n => n.type === IMAGE
   });
 
   return !!match;
@@ -61,12 +63,12 @@ export const toggleImageElement = editor => {
 
 export const insertImage = (editor, url) => {
   const text = { text: "" };
-  const image = { type: "image", url, children: [text] };
+  const image = { type: IMAGE, url, children: [text] };
   Transforms.insertNodes(editor, image);
 };
 
 export const removeImage = editor => {
-  Transforms.removeNodes(editor, { match: n => n.type === "image" });
+  Transforms.removeNodes(editor, { match: n => n.type === IMAGE });
 };
 
 const isImageUrl = url => {

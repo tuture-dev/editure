@@ -1,11 +1,13 @@
 import { Transforms, Editor, Range } from "slate";
 import isUrl from "is-url";
 
+import { LINK } from "../constants";
+
 export const withLinks = editor => {
   const { insertData, insertText, isInline } = editor;
 
   editor.isInline = element => {
-    return element.type === "link" ? true : isInline(element);
+    return element.type === LINK ? true : isInline(element);
   };
 
   editor.insertText = text => {
@@ -31,7 +33,7 @@ export const withLinks = editor => {
 
 export const isLinkActive = editor => {
   const [match] = Editor.nodes(editor, {
-    match: n => n.type === "link"
+    match: n => n.type === LINK
   });
 
   return !!match;
@@ -56,7 +58,7 @@ export const unwrapLink = editor => {
     return;
   }
 
-  Transforms.unwrapNodes(editor, { match: n => n.type === "link" });
+  Transforms.unwrapNodes(editor, { match: n => n.type === LINK });
 };
 
 export const wrapLink = (editor, url) => {
@@ -71,7 +73,7 @@ export const wrapLink = (editor, url) => {
   const { selection } = editor;
   const isCollapsed = selection && Range.isCollapsed(selection);
   const link = {
-    type: "link",
+    type: LINK,
     url,
     children: isCollapsed ? [{ text: url }] : []
   };

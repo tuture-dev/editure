@@ -13,6 +13,25 @@ import Prism from "prismjs";
 import CustomEditor, { customPlugins } from "./helpers";
 import Element, { isBlockActive, toggleBlock } from "./blocks";
 import Leaf, { toggleMark } from "./marks";
+import {
+  BOLD,
+  ITALIC,
+  UNDERLINE,
+  CODE,
+  STRIKETHROUGH,
+  PARAGRAPH,
+  H1,
+  H2,
+  H3,
+  H4,
+  CODE_BLOCK,
+  LINK,
+  IMAGE,
+  BLOCK_QUOTE,
+  BULLETED_LIST,
+  NUMBERED_LIST,
+  HR
+} from "./constants";
 import { Toolbar, MarkButton, BlockButton } from "./components";
 
 import "./App.css";
@@ -29,26 +48,26 @@ const defaultValue = [
 ];
 
 const MARK_HOTKEYS = {
-  "mod+b": "bold",
-  "mod+i": "italic",
-  "mod+u": "underline",
-  "mod+`": "code",
-  "mod+shift+`": "strikethrough"
+  "mod+b": BOLD,
+  "mod+i": ITALIC,
+  "mod+u": UNDERLINE,
+  "mod+`": CODE,
+  "mod+shift+`": STRIKETHROUGH
 };
 
 const BLOCK_HOTKEYS = {
-  "mod+0": "paragraph",
-  "mod+1": "heading-one",
-  "mod+2": "heading-two",
-  "mod+3": "heading-three",
-  "mod+4": "heading-four",
-  "mod+shift+c": "code-block",
-  "mod+k": "link",
-  "mod+shift+i": "image",
-  "mod+shift+u": "block-quote",
-  "mod+alt+u": "bulleted-list",
-  "mod+alt+o": "numbered-list",
-  "mod+alt+-": "hr"
+  "mod+0": PARAGRAPH,
+  "mod+1": H1,
+  "mod+2": H2,
+  "mod+3": H3,
+  "mod+4": H4,
+  "mod+shift+c": CODE_BLOCK,
+  "mod+k": LINK,
+  "mod+shift+i": IMAGE,
+  "mod+shift+u": BLOCK_QUOTE,
+  "mod+alt+u": BULLETED_LIST,
+  "mod+alt+o": NUMBERED_LIST,
+  "mod+alt+-": HR
 };
 
 const plugins = [withReact, withHistory, ...customPlugins];
@@ -67,7 +86,7 @@ const App = () => {
     ([node, path]) => {
       const decorations = [];
 
-      if (!isBlockActive(editor, "code-block")) {
+      if (!isBlockActive(editor, CODE_BLOCK)) {
         return decorations;
       }
 
@@ -185,28 +204,28 @@ const App = () => {
           setValue(value);
         }}>
         <Toolbar>
-          <MarkButton format="bold" icon="format_bold" title="加粗" />
-          <MarkButton format="italic" icon="format_italic" title="斜体" />
-          <MarkButton format="underline" icon="format_underlined" title="下划线" />
-          <MarkButton format="strikethrough" icon="format_strikethrough" title="删除线" />
-          <MarkButton format="code" icon="code" title="内联代码" />
-          <BlockButton format="link" icon="link" title="添加链接" />
-          <BlockButton format="heading-one" icon="looks_one" title="一级标题" />
-          <BlockButton format="heading-two" icon="looks_two" title="二级标题" />
-          <BlockButton format="block-quote" icon="format_quote" title="引用" />
-          <BlockButton format="code-block" icon="attach_money" title="代码块" />
+          <MarkButton format={BOLD} icon="format_bold" title="加粗" />
+          <MarkButton format={ITALIC} icon="format_italic" title="斜体" />
+          <MarkButton format={UNDERLINE} icon="format_underlined" title="下划线" />
+          <MarkButton format={STRIKETHROUGH} icon="format_strikethrough" title="删除线" />
+          <MarkButton format={CODE} icon="code" title="内联代码" />
+          <BlockButton format={LINK} icon="link" title="添加链接" />
+          <BlockButton format={H1} icon="looks_one" title="一级标题" />
+          <BlockButton format={H2} icon="looks_two" title="二级标题" />
+          <BlockButton format={BLOCK_QUOTE} icon="format_quote" title="引用" />
+          <BlockButton format={CODE_BLOCK} icon="attach_money" title="代码块" />
           <BlockButton
-            format="numbered-list"
+            format={NUMBERED_LIST}
             icon="format_list_numbered"
             title="有序列表"
           />
           <BlockButton
-            format="bulleted-list"
+            format={BULLETED_LIST}
             icon="format_list_bulleted"
             title="无序列表"
           />
-          <BlockButton format="image" icon="image" title="图片" />
-          <BlockButton format="hr" icon="remove" title="分割线" />
+          <BlockButton format={IMAGE} icon="image" title="图片" />
+          <BlockButton format={HR} icon="remove" title="分割线" />
         </Toolbar>
         <Editable
           decorate={decorate}
@@ -239,10 +258,10 @@ const App = () => {
                 CustomEditor.isCodeBlockActive(editor)
               ) {
                 event.preventDefault();
-                let type = "block-quote";
+                let type = BLOCK_QUOTE;
 
                 if (CustomEditor.isCodeBlockActive(editor)) {
-                  type = "code-block";
+                  type = CODE_BLOCK;
                 }
 
                 const match = Editor.above(editor, {

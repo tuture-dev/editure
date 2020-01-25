@@ -5,8 +5,23 @@ import { Editor, Transforms, Element } from "slate";
 import { useSelected, useFocused } from "slate-react";
 
 import { languages, enumPrismLangToLanguage } from "./utils/code";
+import {
+  H1,
+  H2,
+  H3,
+  H4,
+  CODE_BLOCK,
+  NUMBERED_LIST,
+  BULLETED_LIST,
+  PARAGRAPH,
+  LIST_ITEM,
+  BLOCK_QUOTE,
+  LINK,
+  IMAGE,
+  HR
+} from "./constants";
 
-const LIST_TYPES = ["numbered-list", "bulleted-list"];
+const LIST_TYPES = [NUMBERED_LIST, BULLETED_LIST];
 
 const CodeBlockElement = props => {
   const { element } = props;
@@ -22,7 +37,7 @@ const CodeBlockElement = props => {
       editor,
       { lang: event.target.value },
       {
-        match: n => Element.matches(n, { type: "code-block" })
+        match: n => Element.matches(n, { type: CODE_BLOCK })
       }
     );
   }
@@ -104,7 +119,7 @@ export const toggleBlock = (editor, format) => {
   });
 
   Transforms.setNodes(editor, {
-    type: isActive ? "paragraph" : isList ? "list-item" : format
+    type: isActive ? PARAGRAPH : isList ? LIST_ITEM : format
   });
 
   if (!isActive && isList) {
@@ -117,34 +132,34 @@ export default props => {
   const { attributes, children, element } = props;
 
   switch (element.type) {
-    case "block-quote":
+    case BLOCK_QUOTE:
       return <blockquote {...attributes}>{children}</blockquote>;
-    case "bulleted-list":
+    case BULLETED_LIST:
       return <ul {...attributes}>{children}</ul>;
-    case "heading-one":
+    case H1:
       return <h1 {...attributes}>{children}</h1>;
-    case "heading-two":
+    case H2:
       return <h2 {...attributes}>{children}</h2>;
-    case "heading-three":
+    case H3:
       return <h3 {...attributes}>{children}</h3>;
-    case "heading-four":
+    case H4:
       return <h4 {...attributes}>{children}</h4>;
-    case "list-item":
+    case LIST_ITEM:
       return <li {...attributes}>{children}</li>;
-    case "numbered-list":
+    case NUMBERED_LIST:
       return <ol {...attributes}>{children}</ol>;
-    case "link":
+    case CODE_BLOCK:
+      return <CodeBlockElement {...props} />;
+    case IMAGE:
+      return <ImageElement {...props} />;
+    case HR:
+      return <HrElement {...props} />;
+    case LINK:
       return (
         <a {...attributes} href={element.url}>
           {children}
         </a>
       );
-    case "code-block":
-      return <CodeBlockElement {...props} />;
-    case "image":
-      return <ImageElement {...props} />;
-    case "hr":
-      return <HrElement {...props} />;
     default:
       return <p {...attributes}>{children}</p>;
   }

@@ -2,22 +2,42 @@ import { Range, Editor, Transforms, Point } from "slate";
 
 import { toggleMark } from "../marks";
 import { isBlockActive, toggleBlock } from "../blocks";
+import {
+  BOLD,
+  ITALIC,
+  UNDERLINE,
+  CODE,
+  STRIKETHROUGH,
+  H1,
+  H2,
+  H3,
+  H4,
+  H5,
+  H6,
+  CODE_BLOCK,
+  BLOCK_QUOTE,
+  BULLETED_LIST,
+  NUMBERED_LIST,
+  HR,
+  LIST_ITEM,
+  PARAGRAPH
+} from "../constants";
 
-const MARK_SHORTCUTS = ["code", "bold", "italic", "strikethrough", "underline"];
+const MARK_SHORTCUTS = [CODE, BOLD, ITALIC, STRIKETHROUGH, UNDERLINE];
 const BLOCK_SHORTCUTS = [
-  "bulleted-list",
-  "bulleted-list",
-  "bulleted-list",
-  "numbered-list",
-  "block-quote",
-  "heading-one",
-  "heading-two",
-  "heading-three",
-  "heading-four",
-  "heading-five",
-  "heading-six",
-  "code-block",
-  "hr"
+  BULLETED_LIST,
+  BULLETED_LIST,
+  BULLETED_LIST,
+  NUMBERED_LIST,
+  BLOCK_QUOTE,
+  H1,
+  H2,
+  H3,
+  H4,
+  H5,
+  H6,
+  CODE_BLOCK,
+  HR
 ];
 
 const SHORTCUTS = [...MARK_SHORTCUTS, ...BLOCK_SHORTCUTS];
@@ -138,7 +158,7 @@ function handleBlockShortcut(editor, shortcut) {
   Transforms.select(editor, lineRange);
   Transforms.delete(editor);
 
-  if (format === "code-block") {
+  if (format === CODE_BLOCK) {
     const targetTextWithMdTag = matchArr[matchArr.length - 1];
     const targetTextArr = regex.exec(targetTextWithMdTag);
     const targetLang = targetTextArr[1];
@@ -146,16 +166,16 @@ function handleBlockShortcut(editor, shortcut) {
     nodeProp = { ...nodeProp, lang: targetLang };
   }
 
-  if (format === "bulleted-list" || format === "numbered-list") {
-    nodeProp = { ...nodeProp, type: "list-item" };
+  if (format === BULLETED_LIST || format === NUMBERED_LIST) {
+    nodeProp = { ...nodeProp, type: LIST_ITEM };
   }
 
   Transforms.setNodes(editor, { ...nodeProp }, { match: n => Editor.isBlock(editor, n) });
 
-  if (format === "bulleted-list" || format === "numbered-list") {
+  if (format === BULLETED_LIST || format === NUMBERED_LIST) {
     const list = { type: format, children: [] };
     Transforms.wrapNodes(editor, list, {
-      match: n => n.type === "list-item"
+      match: n => n.type === LIST_ITEM
     });
   }
 }
@@ -183,7 +203,7 @@ export default function withShortcuts(editor) {
   };
 
   editor.insertBreak = () => {
-    for (const format of ["bulleted-list", "numbered-list"]) {
+    for (const format of [BULLETED_LIST, NUMBERED_LIST]) {
       if (isBlockActive(editor, format)) {
         const { anchor } = editor.selection;
         const match = Editor.above(editor, {
@@ -236,12 +256,12 @@ export default function withShortcuts(editor) {
         const [block, path] = match;
         const start = Editor.start(editor, path);
 
-        if (block.type !== "paragraph" && Point.equals(selection.anchor, start)) {
-          Transforms.setNodes(editor, { type: "paragraph" });
+        if (block.type !== PARAGRAPH && Point.equals(selection.anchor, start)) {
+          Transforms.setNodes(editor, { type: PARAGRAPH });
 
-          if (block.type === "list-item") {
+          if (block.type === LIST_ITEM) {
             Transforms.unwrapNodes(editor, {
-              match: n => n.type === "bulleted-list"
+              match: n => n.type === BULLETED_LIST
             });
           }
 
