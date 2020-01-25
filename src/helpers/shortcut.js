@@ -1,10 +1,6 @@
 import { Range, Editor, Transforms, Point } from "slate";
 
-import { toggleCodeMark } from "./code";
-import { toggleBoldMark } from "./bold";
-import { toggleItalicMark } from "./italic";
-import { toggleStrikethroughMark } from "./strikethrough";
-import { toggleUnderlineMark } from "./underline";
+import { toggleMark } from "../marks";
 
 const UNARY_SHORTCUTS = {
   "*": "list-item",
@@ -36,38 +32,6 @@ const BINARY_SHORTCUTS_REGEX = [
   "~~([^~]+)~~",
   "<u>([^(<u>)|(</u>)]+)</u>"
 ];
-
-const toggleMark = (editor, format) => {
-  switch (format) {
-    case "code": {
-      toggleCodeMark(editor);
-      break;
-    }
-
-    case "bold": {
-      toggleBoldMark(editor);
-      break;
-    }
-
-    case "italic": {
-      toggleItalicMark(editor);
-      break;
-    }
-
-    case "strikethrough": {
-      toggleStrikethroughMark(editor);
-      break;
-    }
-
-    case "underline": {
-      toggleUnderlineMark(editor);
-      break;
-    }
-
-    default: {
-    }
-  }
-};
 
 export const withShortcuts = editor => {
   const { deleteBackward, insertText } = editor;
