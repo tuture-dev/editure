@@ -1,72 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSlate } from "slate-react";
-import { Transforms, Editor, Element } from "slate";
+import { Transforms, Element } from "slate";
 
-const languages = [
-  "Plain Text",
-  "Bash",
-  "Basic",
-  "C",
-  "C++",
-  "C#",
-  "CSS",
-  "Dart",
-  "Diff",
-  "Dockerfile",
-  "Erlang",
-  "Git",
-  "Go",
-  "GraphQL",
-  "Groovy",
-  "HTML",
-  "HTTP",
-  "Java",
-  "JavaScript",
-  "JSON",
-  "JSX",
-  "KaTeX",
-  "Kotlin",
-  "Less",
-  "Makefile",
-  "Markdown",
-  "MATLAB",
-  "Nginx",
-  "Objective-C",
-  "Pascal",
-  "Perl",
-  "PHP",
-  "PowerShell",
-  "Protobuf",
-  "Python",
-  "R",
-  "Ruby",
-  "Rust",
-  "Scala",
-  "Shell",
-  "SQL",
-  "PL/SQL",
-  "Swift",
-  "TypeScript",
-  "VB.net",
-  "Velocity",
-  "XML",
-  "YAML",
-  "sTeX",
-  "LaTeX",
-  "SystemVerilog",
-  "Tcl",
-  "Verilog",
-  "Vue",
-  "Lua"
-];
-
-const mapOptionToValue = optionLang => {
-  let optionValue = optionLang
-    .toLocaleLowerCase()
-    .replace(/(\-)|(\/)|(\.)/g, "");
-
-  return optionValue;
-};
+import { languages, enumPrismLangToLanguage } from "../utils/code";
 
 const CodeBlockElement = props => {
   const { element } = props;
@@ -87,11 +23,20 @@ const CodeBlockElement = props => {
     );
   }
 
+  const selectValue =
+    enumPrismLangToLanguage[enumPrismLangToLanguage[lang.toLocaleLowerCase()]];
+
   return (
     <div {...props.attributes}>
-      <select contentEditable={false} value={lang} onChange={handleChange}>
-        {languages.map(lang => (
-          <option value={mapOptionToValue(lang)}>{lang}</option>
+      <select
+        contentEditable={false}
+        value={selectValue}
+        onChange={handleChange}
+      >
+        {languages.map(language => (
+          <option key={language} value={enumPrismLangToLanguage[language]}>
+            {language}
+          </option>
         ))}
       </select>
       <pre>
