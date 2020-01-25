@@ -4,11 +4,12 @@ import { useSlate } from "slate-react";
 import Icon from "./Icon";
 import Button from "./Button";
 
-const MarkButton = ({ format = "", icon, isMarkActive, toggleMark }) => {
+const MarkButton = ({ format = "", icon, title, isMarkActive, toggleMark }) => {
   const editor = useSlate();
 
   return (
     <Button
+      title={title}
       active={isMarkActive(editor, format)}
       onMouseDown={event => {
         event.preventDefault();

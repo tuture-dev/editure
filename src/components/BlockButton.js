@@ -4,11 +4,18 @@ import { useSlate } from "slate-react";
 import Icon from "./Icon";
 import Button from "./Button";
 
-const BlockButton = ({ format = "", icon, toggleBlock, isBlockActive }) => {
+const BlockButton = ({
+  format = "",
+  title,
+  icon,
+  toggleBlock,
+  isBlockActive
+}) => {
   const editor = useSlate();
 
   return (
     <Button
+      title={title}
       active={isBlockActive(editor, format)}
       onMouseDown={event => {
         event.preventDefault();

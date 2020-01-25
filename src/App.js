@@ -286,84 +286,98 @@ const App = () => {
           <MarkButton
             format="bold"
             icon="format_bold"
+            title="加粗"
             isMarkActive={CustomEditor.isBoldMarkActive}
             toggleMark={CustomEditor.toggleBoldMark}
           />
           <MarkButton
             format="italic"
             icon="format_italic"
+            title="斜体"
             isMarkActive={CustomEditor.isItalicMarkActive}
             toggleMark={CustomEditor.toggleItalicMark}
           />
           <MarkButton
             format="underline"
             icon="format_underlined"
+            title="下划线"
             isMarkActive={CustomEditor.isUnderlineMarkActive}
             toggleMark={CustomEditor.toggleUnderlineMark}
           />
           <MarkButton
             format="strikethrough"
             icon="format_strikethrough"
+            title="删除线"
             isMarkActive={CustomEditor.isStrikethroughMarkActive}
             toggleMark={CustomEditor.toggleStrikethroughMark}
           />
           <MarkButton
             format="code"
             icon="code"
+            title="内联代码"
             isMarkActive={CustomEditor.isCodeMarkActive}
             toggleMark={CustomEditor.toggleCodeMark}
           />
           <BlockButton
             format="link"
             icon="link"
+            title="添加链接"
             isBlockActive={CustomEditor.isLinkActive}
             toggleBlock={CustomEditor.toggleLinkElement}
           />
           <BlockButton
             format="heading-one"
             icon="looks_one"
+            title="一级标题"
             isBlockActive={CustomEditor.isHeadingActive}
             toggleBlock={CustomEditor.toggleHeading}
           />
           <BlockButton
             format="heading-two"
             icon="looks_two"
+            title="二级标题"
             isBlockActive={CustomEditor.isHeadingActive}
             toggleBlock={CustomEditor.toggleHeading}
           />
           <BlockButton
             format="block-quote"
             icon="format_quote"
+            title="引用"
             isBlockActive={CustomEditor.isBlockquoteActive}
             toggleBlock={CustomEditor.toggleBlockquoteElement}
           />
           <BlockButton
             format="code-block"
             icon="attach_money"
+            title="代码块"
             isBlockActive={CustomEditor.isCodeBlockActive}
             toggleBlock={CustomEditor.toggleCodeBlockElement}
           />
           <BlockButton
             format="numbered-list"
             icon="format_list_numbered"
+            title="有序列表"
             isBlockActive={CustomEditor.isNumberedListActive}
             toggleBlock={CustomEditor.toggleNumberedListElement}
           />
           <BlockButton
             format="bulleted-list"
             icon="format_list_bulleted"
+            title="无序列表"
             isBlockActive={CustomEditor.isBulletedListActive}
             toggleBlock={CustomEditor.toggleBulletedListElement}
           />
           <BlockButton
             format="image"
             icon="image"
+            title="图片"
             isBlockActive={CustomEditor.isImageActive}
             toggleBlock={CustomEditor.toggleImageElement}
           />
           <BlockButton
             format="hr"
             icon="remove"
+            title="分割线"
             isBlockActive={CustomEditor.isHrActive}
             toggleBlock={CustomEditor.insertHr}
           />
