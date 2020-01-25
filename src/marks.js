@@ -39,5 +39,9 @@ export default function Leaf({ attributes, children, leaf }) {
     children = <u>{children}</u>;
   }
 
-  return <span {...attributes}>{children}</span>;
+  return (
+    <span {...attributes} className={leaf.prismToken ? leaf.className : ""}>
+      {children}
+    </span>
+  );
 }

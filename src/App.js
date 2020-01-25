@@ -241,7 +241,7 @@ const App = () => {
           anchor: { path, offset: start },
           focus: { path, offset: end },
           className,
-          type: "prism-token"
+          prismToken: true
         };
       }
     }
