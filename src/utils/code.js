@@ -118,11 +118,11 @@ const bimapPrismLangandLanguage = (prismLangObj, index) => {
   const language = languages[index];
 
   enumPrismLangToLanguage[language] = prismLangObj.key;
-  prismLangObj.value.map(prismLang => {
+  prismLangObj.value.forEach(prismLang => {
     enumPrismLangToLanguage[prismLang] = language;
   });
 };
 
-prismLangArr.map(bimapPrismLangandLanguage);
+prismLangArr.forEach(bimapPrismLangandLanguage);
 
 export { languages, enumPrismLangToLanguage };

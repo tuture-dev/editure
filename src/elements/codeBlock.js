@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState } from "react";
 import { useSlate } from "slate-react";
 import { Transforms, Element } from "slate";
 

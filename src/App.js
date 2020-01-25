@@ -1,11 +1,11 @@
 import React, { useMemo, useState, useCallback } from "react";
 
 // Import the Slate editor factory.
-import { createEditor, Transforms, Editor, Element, Text } from "slate";
+import { createEditor, Transforms, Editor, Element } from "slate";
 
 // Import the Slate components and React plugin.
 import { Slate, Editable, withReact } from "slate-react";
-import isHotkey, { compareHotkey } from "is-hotkey";
+import isHotkey from "is-hotkey";
 import { withHistory } from "slate-history";
 import { css } from "emotion";
 import Prism from "prismjs";
@@ -34,14 +34,7 @@ import {
   HeadingFourElement,
   HrElement
 } from "./elements";
-import {
-  DefaultMark,
-  CodeMark,
-  BoldMark,
-  ItalicMark,
-  UnderlineMark,
-  StrikethroughMark
-} from "./marks";
+import Leaf, { toggleMark } from "./marks";
 import { Toolbar, MarkButton, BlockButton } from "./components";
 
 import "./App.css";
@@ -56,6 +49,28 @@ const defaultValue = [
     ]
   }
 ];
+
+const MARK_HOTKEYS = {
+  "mod+b": "bold",
+  "mod+i": "italic",
+  "mod+u": "underline",
+  "ctrl+`": "code",
+  "mod+shift+`": "strikethrough"
+};
+
+const BLOCK_HOTKEYS = {
+  "mod+0": "paragraph",
+  "mod+1": "heading-one",
+  "mod+2": "heading-two",
+  "mod+3": "heading-three",
+  "mod+4": "heading-four",
+  "mod+shift+c": "code-block",
+  "mod+shift+i": "image",
+  "mod+shift+u": "block-quote",
+  "mod+alt+u": "bulleted-list",
+  "mod+alt+o": "numbered-list",
+  "mod+alt+-": "hr"
+};
 
 const plugins = [
   withReact,
@@ -75,7 +90,6 @@ const App = () => {
     []
   );
   const [value, setValue] = useState(defaultValue);
-  const [search, setSearch] = useState();
 
   const renderElement = useCallback(props => {
     switch (props.element.type) {
@@ -123,36 +137,7 @@ const App = () => {
     }
   }, []);
 
-  const renderLeaf = useCallback(props => {
-    switch (props.leaf.type) {
-      case "code":
-        return <CodeMark {...props} />;
-
-      case "bold":
-        return <BoldMark {...props} />;
-
-      case "italic":
-        return <ItalicMark {...props} />;
-
-      case "underline":
-        return <UnderlineMark {...props} />;
-
-      case "strikethrough":
-        return <StrikethroughMark {...props} />;
-
-      case "prism-token": {
-        const { children, attributes, leaf } = props;
-        return (
-          <span {...attributes} className={leaf.className}>
-            {children}
-          </span>
-        );
-      }
-
-      default:
-        return <DefaultMark {...props} />;
-    }
-  }, []);
+  const renderLeaf = useCallback(props => <Leaf {...props} />, []);
 
   const decorate = useCallback(([node, path]) => {
     const decorations = [];
@@ -261,10 +246,9 @@ const App = () => {
       }
     }
 
+    console.log("decorations", decorations);
     return decorations;
   }, []);
-
-  console.log("editor", editor);
 
   return (
     <div
@@ -283,41 +267,19 @@ const App = () => {
         }}
       >
         <Toolbar>
-          <MarkButton
-            format="bold"
-            icon="format_bold"
-            title="加粗"
-            isMarkActive={CustomEditor.isBoldMarkActive}
-            toggleMark={CustomEditor.toggleBoldMark}
-          />
-          <MarkButton
-            format="italic"
-            icon="format_italic"
-            title="斜体"
-            isMarkActive={CustomEditor.isItalicMarkActive}
-            toggleMark={CustomEditor.toggleItalicMark}
-          />
+          <MarkButton format="bold" icon="format_bold" title="加粗" />
+          <MarkButton format="italic" icon="format_italic" title="斜体" />
           <MarkButton
             format="underline"
             icon="format_underlined"
             title="下划线"
-            isMarkActive={CustomEditor.isUnderlineMarkActive}
-            toggleMark={CustomEditor.toggleUnderlineMark}
           />
           <MarkButton
             format="strikethrough"
             icon="format_strikethrough"
             title="删除线"
-            isMarkActive={CustomEditor.isStrikethroughMarkActive}
-            toggleMark={CustomEditor.toggleStrikethroughMark}
           />
-          <MarkButton
-            format="code"
-            icon="code"
-            title="内联代码"
-            isMarkActive={CustomEditor.isCodeMarkActive}
-            toggleMark={CustomEditor.toggleCodeMark}
-          />
+          <MarkButton format="code" icon="code" title="内联代码" />
           <BlockButton
             format="link"
             icon="link"
@@ -389,6 +351,15 @@ const App = () => {
           spellCheck
           autoFocus
           onKeyDown={event => {
+            console.log("editor", editor);
+            for (const hotkey in MARK_HOTKEYS) {
+              if (isHotkey(hotkey, event)) {
+                event.preventDefault();
+                const mark = MARK_HOTKEYS[hotkey];
+                toggleMark(editor, mark);
+              }
+            }
+
             if (isHotkey("mod+0", event)) {
               event.preventDefault();
 
@@ -464,7 +435,6 @@ const App = () => {
               }
             }
 
-            console.log("event.key", event.key);
             // 删除，在代码块/引用里面按 mod+delete 或者 shift + command + up
             // 应该删除代码块/引用中当前行之前的内容
             if (isHotkey("mod+backspace", event)) {
@@ -545,36 +515,6 @@ const App = () => {
               event.preventDefault();
 
               CustomEditor.insertHr(editor);
-            }
-
-            if (isHotkey("mod+b", event)) {
-              event.preventDefault();
-
-              CustomEditor.toggleBoldMark(editor);
-            }
-
-            if (isHotkey("ctrl+`", event)) {
-              event.preventDefault();
-
-              CustomEditor.toggleCodeMark(editor);
-            }
-
-            if (isHotkey("mod+i", event)) {
-              event.preventDefault();
-
-              CustomEditor.toggleItalicMark(editor);
-            }
-
-            if (isHotkey("mod+u", event)) {
-              event.preventDefault();
-
-              CustomEditor.toggleUnderlineMark(editor);
-            }
-
-            if (isHotkey("ctrl+shift+`", event)) {
-              event.preventDefault();
-
-              CustomEditor.toggleStrikethroughMark(editor);
             }
           }}
         />
