@@ -5,7 +5,7 @@ import { createEditor, Transforms, Editor, Element, Text } from "slate";
 
 // Import the Slate components and React plugin.
 import { Slate, Editable, withReact } from "slate-react";
-import isHotkey from "is-hotkey";
+import isHotkey, { compareHotkey } from "is-hotkey";
 import { withHistory } from "slate-history";
 import { css } from "emotion";
 import Prism from "prismjs";
@@ -426,6 +426,7 @@ const App = () => {
               CustomEditor.toggleCodeBlockElement(editor);
             }
 
+            // soft break
             if (
               event.key === "Enter" &&
               (CustomEditor.isCodeBlockActive(editor) ||
@@ -434,6 +435,90 @@ const App = () => {
               event.preventDefault();
 
               Transforms.insertText(editor, "\n");
+            }
+
+            // 全选，在代码块/引用里面按 mod+a 或者 shift + command + up
+            // 应该选择代码块/引用内的内容
+            if (isHotkey("mod+a", event) || isHotkey("mod+shift+up", event)) {
+              if (
+                CustomEditor.isBlockquoteActive(editor) ||
+                CustomEditor.isCodeBlockActive(editor)
+              ) {
+                event.preventDefault();
+                let type = "block-quote";
+
+                if (CustomEditor.isCodeBlockActive(editor)) {
+                  type = "code-block";
+                }
+
+                const match = Editor.above(editor, {
+                  match: n => Element.matches(n, { type })
+                });
+
+                const path = match[1];
+
+                const anchor = Editor.start(editor, path);
+                const focus = Editor.end(editor, path);
+                const range = { anchor, focus };
+                Transforms.select(editor, range);
+              }
+            }
+
+            console.log("event.key", event.key);
+            // 删除，在代码块/引用里面按 mod+delete 或者 shift + command + up
+            // 应该删除代码块/引用中当前行之前的内容
+            if (isHotkey("mod+backspace", event)) {
+              if (
+                CustomEditor.isBlockquoteActive(editor) ||
+                CustomEditor.isCodeBlockActive(editor)
+              ) {
+                event.preventDefault();
+                let type = "block-quote";
+
+                if (CustomEditor.isCodeBlockActive(editor)) {
+                  type = "code-block";
+                }
+
+                // 具体就是遍历此代码块/引用的  children 数组
+                // 找到最近的一个 \n 字符，然后删除此 \n 之后的字符到光标此时选中的字符
+                const { selection, children } = editor;
+                const { anchor } = selection;
+                const { path, offset } = anchor;
+
+                for (let i = 0; i <= anchor.path[1]; i++) {
+                  const nowSelectionText =
+                    children[path[0]].children[i].text || "";
+
+                  const sliceOffset =
+                    i === anchor.path[1] ? offset : nowSelectionText.length;
+
+                  if (nowSelectionText.slice(0, sliceOffset).includes("\n")) {
+                    const enterLocation = nowSelectionText.lastIndexOf("\n");
+
+                    const focus = {
+                      path: [path[0], i],
+                      offset: enterLocation + 1
+                    };
+                    const range = { anchor: focus, focus: anchor };
+                    Transforms.select(editor, range);
+                    Transforms.delete(editor);
+                  } else if (i === 0) {
+                    const range = {
+                      anchor: { path: [path[0], 0], offset: 0 },
+                      focus: anchor
+                    };
+                    Transforms.select(editor, range);
+                    Transforms.delete(editor);
+                  }
+                }
+
+                // const path = match[1];
+
+                // const anchor = Editor.start(editor, path);
+                // const focus = Editor.end(editor, path);
+                // const range = { anchor, focus };
+                // Transforms.select(editor, range);
+              }
             }
 
             if (isHotkey("mod+k", event)) {
