@@ -34,14 +34,7 @@ import {
   HeadingFourElement,
   HrElement
 } from "./elements";
-import {
-  DefaultMark,
-  CodeMark,
-  BoldMark,
-  ItalicMark,
-  UnderlineMark,
-  StrikethroughMark
-} from "./marks";
+import Leaf, { toggleMark } from "./marks";
 import { Toolbar, MarkButton, BlockButton } from "./components";
 
 import "./App.css";
@@ -65,6 +58,28 @@ const defaultValue = [
     ]
   }
 ];
+
+const MARK_HOTKEYS = {
+  "mod+b": "bold",
+  "mod+i": "italic",
+  "mod+u": "underline",
+  "ctrl+`": "code",
+  "mod+shift+`": "strikethrough"
+};
+
+const BLOCK_HOTKEYS = {
+  "mod+0": "paragraph",
+  "mod+1": "heading-one",
+  "mod+2": "heading-two",
+  "mod+3": "heading-three",
+  "mod+4": "heading-four",
+  "mod+shift+c": "code-block",
+  "mod+shift+i": "image",
+  "mod+shift+u": "block-quote",
+  "mod+alt+u": "bulleted-list",
+  "mod+alt+o": "numbered-list",
+  "mod+alt+-": "hr"
+};
 
 const plugins = [
   withReact,
@@ -132,36 +147,7 @@ const App = () => {
     }
   }, []);
 
-  const renderLeaf = useCallback(props => {
-    switch (props.leaf.type) {
-      case "code":
-        return <CodeMark {...props} />;
-
-      case "bold":
-        return <BoldMark {...props} />;
-
-      case "italic":
-        return <ItalicMark {...props} />;
-
-      case "underline":
-        return <UnderlineMark {...props} />;
-
-      case "strikethrough":
-        return <StrikethroughMark {...props} />;
-
-      case "prism-token": {
-        const { children, attributes, leaf } = props;
-        return (
-          <span {...attributes} className={leaf.className}>
-            {children}
-          </span>
-        );
-      }
-
-      default:
-        return <DefaultMark {...props} />;
-    }
-  }, []);
+  const renderLeaf = useCallback(props => <Leaf {...props} />, []);
 
   const decorate = useCallback(([node, path]) => {
     const decorations = [];
@@ -297,36 +283,11 @@ const App = () => {
         }}
       >
         <Toolbar>
-          <MarkButton
-            format="bold"
-            icon="format_bold"
-            isMarkActive={CustomEditor.isBoldMarkActive}
-            toggleMark={CustomEditor.toggleBoldMark}
-          />
-          <MarkButton
-            format="italic"
-            icon="format_italic"
-            isMarkActive={CustomEditor.isItalicMarkActive}
-            toggleMark={CustomEditor.toggleItalicMark}
-          />
-          <MarkButton
-            format="underline"
-            icon="format_underlined"
-            isMarkActive={CustomEditor.isUnderlineMarkActive}
-            toggleMark={CustomEditor.toggleUnderlineMark}
-          />
-          <MarkButton
-            format="strikethrough"
-            icon="format_strikethrough"
-            isMarkActive={CustomEditor.isStrikethroughMarkActive}
-            toggleMark={CustomEditor.toggleStrikethroughMark}
-          />
-          <MarkButton
-            format="code"
-            icon="code"
-            isMarkActive={CustomEditor.isCodeMarkActive}
-            toggleMark={CustomEditor.toggleCodeMark}
-          />
+          <MarkButton format="bold" icon="format_bold" />
+          <MarkButton format="italic" icon="format_italic" />
+          <MarkButton format="underline" icon="format_underlined" />
+          <MarkButton format="strikethrough" icon="format_strikethrough" />
+          <MarkButton format="code" icon="code" />
           <BlockButton
             format="link"
             icon="link"
@@ -389,6 +350,15 @@ const App = () => {
           spellCheck
           autoFocus
           onKeyDown={event => {
+            for (const hotkey in MARK_HOTKEYS) {
+              console.log("mark", event.key);
+              if (isHotkey(hotkey, event)) {
+                event.preventDefault();
+                const mark = MARK_HOTKEYS[hotkey];
+                toggleMark(editor, mark);
+              }
+            }
+
             if (isHotkey("mod+0", event)) {
               event.preventDefault();
 
@@ -470,36 +440,6 @@ const App = () => {
               event.preventDefault();
 
               CustomEditor.insertHr(editor);
-            }
-
-            if (isHotkey("mod+b", event)) {
-              event.preventDefault();
-
-              CustomEditor.toggleBoldMark(editor);
-            }
-
-            if (isHotkey("ctrl+`", event)) {
-              event.preventDefault();
-
-              CustomEditor.toggleCodeMark(editor);
-            }
-
-            if (isHotkey("mod+i", event)) {
-              event.preventDefault();
-
-              CustomEditor.toggleItalicMark(editor);
-            }
-
-            if (isHotkey("mod+u", event)) {
-              event.preventDefault();
-
-              CustomEditor.toggleUnderlineMark(editor);
-            }
-
-            if (isHotkey("ctrl+shift+`", event)) {
-              event.preventDefault();
-
-              CustomEditor.toggleStrikethroughMark(editor);
             }
           }}
         />
