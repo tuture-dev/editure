@@ -9,7 +9,7 @@ import { withHistory } from "slate-history";
 import { css } from "emotion";
 
 import { CODE_BLOCK } from "./constants";
-import { customPlugins } from "./helpers";
+import customPlugins from "./plugins";
 import Leaf from "./marks";
 import Element, { isBlockActive } from "./blocks";
 import createHotKeysHandler from "./hotkeys";
