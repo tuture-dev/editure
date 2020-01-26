@@ -2,6 +2,7 @@ import { Range, Editor, Transforms, Point } from "slate";
 
 import { toggleMark } from "../marks";
 import { isBlockActive, toggleBlock } from "../blocks";
+import { getBeforeText } from "../utils";
 import {
   BOLD,
   ITALIC,
@@ -64,16 +65,7 @@ const SHORTCUTS_REGEX = [
 ];
 
 function detectShortcut(editor) {
-  const { anchor } = editor.selection;
-  const match = Editor.above(editor, {
-    match: n => Editor.isBlock(editor, n)
-  });
-
-  const path = match ? match[1] : [];
-  const start = Editor.start(editor, path);
-  const range = { anchor, focus: start };
-  const beforeText = Editor.string(editor, range);
-
+  const { beforeText, range } = getBeforeText(editor);
   const shortcut = { lineRange: range };
 
   for (const index in SHORTCUTS_REGEX) {
@@ -81,12 +73,9 @@ function detectShortcut(editor) {
     if (regex.test(beforeText)) {
       shortcut.format = SHORTCUTS[index];
       shortcut.regex = regex;
+      shortcut.matchArr = beforeText.match(shortcut.regex);
       break;
     }
-  }
-
-  if (shortcut.format) {
-    shortcut.matchArr = beforeText.match(shortcut.regex);
   }
 
   return shortcut;
@@ -164,6 +153,11 @@ function handleBlockShortcut(editor, shortcut) {
     const targetLang = targetTextArr[1];
 
     nodeProp = { ...nodeProp, lang: targetLang };
+
+    // 在底部插入空行
+    const currentSelection = editor.selection;
+    Editor.insertBreak(editor);
+    Transforms.setSelection(editor, currentSelection);
   }
 
   if (format === BULLETED_LIST || format === NUMBERED_LIST) {
@@ -203,19 +197,18 @@ export default function withShortcuts(editor) {
   };
 
   editor.insertBreak = () => {
+    // 检测是否为代码块触发条件
+    const shortcut = detectShortcut(editor);
+    if (shortcut.format === CODE_BLOCK) {
+      handleBlockShortcut(editor, shortcut);
+      return;
+    }
+
     for (const format of [BULLETED_LIST, NUMBERED_LIST]) {
       if (isBlockActive(editor, format)) {
-        const { anchor } = editor.selection;
-        const match = Editor.above(editor, {
-          match: n => Editor.isBlock(editor, n)
-        });
+        const { beforeText } = getBeforeText(editor);
 
-        const path = match ? match[1] : [];
-        const start = Editor.start(editor, path);
-        const range = { anchor, focus: start };
-        const beforeText = Editor.string(editor, range);
-
-        // 如果为空，退出无序列表
+        // 如果为空，则退出
         if (!beforeText) {
           toggleBlock(editor, format);
         } else {

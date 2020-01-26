@@ -1,6 +1,7 @@
 import { Transforms, Editor, Element } from "slate";
 import isHotkey from "is-hotkey";
 
+import { getBeforeText } from "./utils";
 import { toggleMark } from "./marks";
 import { toggleBlock, isBlockActive } from "./blocks";
 import {
@@ -45,6 +46,30 @@ const BLOCK_HOTKEYS = {
   "mod+alt+o": NUMBERED_LIST,
   "mod+alt+-": HR
 };
+
+function handleSoftBreak(editor, event) {
+  event.preventDefault();
+
+  const { insertBreak, deleteBackward } = editor;
+  if (isBlockActive(editor, BLOCK_QUOTE)) {
+    const { beforeText } = getBeforeText(editor);
+
+    if (!beforeText.split("\n").slice(-1)[0]) {
+      // 如果最后一行为空，退出块状引用
+      deleteBackward();
+      insertBreak();
+      toggleBlock(editor, BLOCK_QUOTE);
+    } else {
+      // 还是软换行
+      Transforms.insertText(editor, "\n");
+    }
+  } else if (isBlockActive(editor, CODE_BLOCK)) {
+    // 代码块始终软换行
+    Transforms.insertText(editor, "\n");
+  } else {
+    insertBreak();
+  }
+}
 
 function handleSelectAll(editor, event) {
   if (isBlockActive(editor, BLOCK_QUOTE) || isBlockActive(editor, CODE_BLOCK)) {
@@ -103,6 +128,29 @@ function handleDeleteLine(editor, event) {
   }
 }
 
+function handleExitBlock(editor, event) {
+  if (isBlockActive(editor, CODE_BLOCK) || isBlockActive(editor, BLOCK_QUOTE)) {
+    event.preventDefault();
+
+    const match = Editor.above(editor, {
+      match: n =>
+        Element.matches(n, {
+          type: isBlockActive(editor, CODE_BLOCK) ? CODE_BLOCK : BLOCK_QUOTE
+        })
+    });
+
+    const path = match[1];
+    const focus = Editor.end(editor, path);
+    const range = { anchor: focus, focus };
+    Transforms.select(editor, range);
+    Transforms.collapse(editor, {
+      edge: "end"
+    });
+    Editor.insertBreak(editor);
+    toggleBlock(editor, isBlockActive(editor, CODE_BLOCK) ? CODE_BLOCK : BLOCK_QUOTE);
+  }
+}
+
 export default function createHotKeysHandler(editor) {
   return event => {
     for (const hotkey in MARK_HOTKEYS) {
@@ -110,6 +158,7 @@ export default function createHotKeysHandler(editor) {
         event.preventDefault();
         const mark = MARK_HOTKEYS[hotkey];
         toggleMark(editor, mark);
+        return;
       }
     }
 
@@ -118,6 +167,7 @@ export default function createHotKeysHandler(editor) {
         event.preventDefault();
         const mark = BLOCK_HOTKEYS[hotkey];
         toggleBlock(editor, mark);
+        return;
       }
     }
 
@@ -125,12 +175,23 @@ export default function createHotKeysHandler(editor) {
     // 应该选择代码块/引用内的内容
     if (isHotkey("mod+a", event) || isHotkey("mod+shift+up", event)) {
       handleSelectAll(editor, event);
+      return;
     }
 
     // 删除，在代码块/引用里面按 mod+delete 或者 shift + command + up
     // 应该删除代码块/引用中当前行之前的内容
     if (isHotkey("mod+backspace", event)) {
       handleDeleteLine(editor, event);
+      return;
+    }
+
+    if (isHotkey("mod+enter", event)) {
+      handleExitBlock(editor, event);
+      return;
+    }
+
+    if (event.key === "Enter") {
+      handleSoftBreak(editor, event);
     }
   };
 }
