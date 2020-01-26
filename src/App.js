@@ -40,10 +40,7 @@ const App = () => {
 
   const renderElement = useCallback(Element, []);
   const renderLeaf = useCallback(Leaf, []);
-  const decorate = useCallback(
-    args => (isBlockActive(editor, CODE_BLOCK) ? highlight(args) : []),
-    [editor]
-  );
+  const decorate = useCallback(args => highlight(args), [editor]);
 
   const hotKeyHandler = createHotKeysHandler(editor);
 
