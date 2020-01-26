@@ -44,6 +44,8 @@ const App = () => {
 
   const hotKeyHandler = createHotKeysHandler(editor);
 
+  console.log("editor", editor);
+
   return (
     <div
       className={css`

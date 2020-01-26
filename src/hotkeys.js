@@ -21,7 +21,8 @@ import {
   BLOCK_QUOTE,
   BULLETED_LIST,
   NUMBERED_LIST,
-  HR
+  HR,
+  LIST_ITEM
 } from "./constants";
 
 const MARK_HOTKEYS = {
@@ -68,6 +69,17 @@ function handleSoftBreak(editor, event) {
     Transforms.insertText(editor, "\n");
   } else {
     insertBreak();
+  }
+}
+
+function handleTabKey(editor, event) {
+  if (isBlockActive(editor, LIST_ITEM)) {
+  } else if (isBlockActive(editor, CODE_BLOCK)) {
+    event.preventDefault();
+    Transforms.insertText(editor, "  ");
+  } else {
+    event.preventDefault();
+    Transforms.insertText(editor, "\t");
   }
 }
 
@@ -192,6 +204,11 @@ export default function createHotKeysHandler(editor) {
 
     if (event.key === "Enter") {
       handleSoftBreak(editor, event);
+    }
+
+    console.log("event", event.key);
+    if (event.key === "Tab") {
+      handleTabKey(editor, event);
     }
   };
 }
