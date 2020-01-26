@@ -156,6 +156,11 @@ function handleBlockShortcut(editor, shortcut) {
     const targetLang = targetTextArr[1];
 
     nodeProp = { ...nodeProp, lang: targetLang };
+
+    // 在底部插入空行
+    const currentSelection = editor.selection;
+    Editor.insertBreak(editor);
+    Transforms.setSelection(editor, currentSelection);
   }
 
   if (format === BULLETED_LIST || format === NUMBERED_LIST) {
