@@ -73,12 +73,9 @@ function detectShortcut(editor) {
     if (regex.test(beforeText)) {
       shortcut.format = SHORTCUTS[index];
       shortcut.regex = regex;
+      shortcut.matchArr = beforeText.match(shortcut.regex);
       break;
     }
-  }
-
-  if (shortcut.format) {
-    shortcut.matchArr = beforeText.match(shortcut.regex);
   }
 
   return shortcut;
@@ -200,6 +197,13 @@ export default function withShortcuts(editor) {
   };
 
   editor.insertBreak = () => {
+    // 检测是否为代码块触发条件
+    const shortcut = detectShortcut(editor);
+    if (shortcut.format === CODE_BLOCK) {
+      handleBlockShortcut(editor, shortcut);
+      return;
+    }
+
     for (const format of [BULLETED_LIST, NUMBERED_LIST]) {
       if (isBlockActive(editor, format)) {
         const { beforeText } = getBeforeText(editor);
