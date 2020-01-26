@@ -128,11 +128,26 @@ function handleDeleteLine(editor, event) {
   }
 }
 
-function handleExitCodeBlock(editor, event) {
-  if (isBlockActive(editor, CODE_BLOCK)) {
+function handleExitBlock(editor, event) {
+  if (isBlockActive(editor, CODE_BLOCK) || isBlockActive(editor, BLOCK_QUOTE)) {
     event.preventDefault();
+
+    const match = Editor.above(editor, {
+      match: n =>
+        Element.matches(n, {
+          type: isBlockActive(editor, CODE_BLOCK) ? CODE_BLOCK : BLOCK_QUOTE
+        })
+    });
+
+    const path = match[1];
+    const focus = Editor.end(editor, path);
+    const range = { anchor: focus, focus };
+    Transforms.select(editor, range);
+    Transforms.collapse(editor, {
+      edge: "end"
+    });
     Editor.insertBreak(editor);
-    toggleBlock(editor, CODE_BLOCK);
+    toggleBlock(editor, isBlockActive(editor, CODE_BLOCK) ? CODE_BLOCK : BLOCK_QUOTE);
   }
 }
 
@@ -171,7 +186,7 @@ export default function createHotKeysHandler(editor) {
     }
 
     if (isHotkey("mod+enter", event)) {
-      handleExitCodeBlock(editor, event);
+      handleExitBlock(editor, event);
       return;
     }
 
