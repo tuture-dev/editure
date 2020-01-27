@@ -16,7 +16,13 @@ const ImageButton = () => {
   };
 
   return (
-    <Button title="图片" onClick={() => inputFile.current.click()}>
+    <Button
+      title="图片"
+      onMouseDown={event => {
+        event.preventDefault();
+
+        inputFile.current.click();
+      }}>
       <input
         type="file"
         ref={inputFile}

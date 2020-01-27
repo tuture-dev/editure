@@ -1,5 +1,5 @@
 import React from "react";
-import { Editor, Transforms } from "slate";
+import { Editor, Transforms, Element } from "slate";
 import { useSlate } from "slate-react";
 
 import Icon from "./Icon";
@@ -10,7 +10,8 @@ import { getBeforeText } from "../utils";
 const HrButton = () => {
   const editor = useSlate();
 
-  const onClick = () => {
+  const onMouseDown = event => {
+    event.preventDefault();
     const { beforeText } = getBeforeText(editor);
 
     if (beforeText) {
@@ -27,7 +28,7 @@ const HrButton = () => {
   };
 
   return (
-    <Button title="分割线" onClick={onClick}>
+    <Button title="分割线" onMouseDown={onMouseDown}>
       <Icon>remove</Icon>
     </Button>
   );
