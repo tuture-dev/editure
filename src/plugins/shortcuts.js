@@ -164,7 +164,20 @@ function handleBlockShortcut(editor, shortcut) {
     nodeProp = { ...nodeProp, type: LIST_ITEM };
   }
 
-  Transforms.setNodes(editor, { ...nodeProp }, { match: n => Editor.isBlock(editor, n) });
+  if (format === HR) {
+    const text = { text: "" };
+    Transforms.removeNodes(editor, {
+      match: n => n.children && !n.children[0].text
+    });
+    Transforms.insertNodes(editor, { type: HR, children: [text] });
+    Transforms.insertNodes(editor, { children: [text] });
+  } else {
+    Transforms.setNodes(
+      editor,
+      { ...nodeProp },
+      { match: n => Editor.isBlock(editor, n) }
+    );
+  }
 
   if (format === BULLETED_LIST || format === NUMBERED_LIST) {
     const list = { type: format, children: [] };

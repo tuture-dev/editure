@@ -5,6 +5,7 @@ import Menu from "./Menu";
 import MarkButton from "./MarkButton";
 import BlockButton from "./BlockButton";
 import ImageButton from "./ImageButton";
+import HrButton from "./HrButton";
 import {
   BOLD,
   ITALIC,
@@ -17,8 +18,7 @@ import {
   LINK,
   BLOCK_QUOTE,
   BULLETED_LIST,
-  NUMBERED_LIST,
-  HR
+  NUMBERED_LIST
 } from "../constants";
 
 const Toolbar = React.forwardRef(({ className, ...props }, ref) => (
@@ -48,7 +48,7 @@ const Toolbar = React.forwardRef(({ className, ...props }, ref) => (
     <BlockButton format={NUMBERED_LIST} icon="format_list_numbered" title="有序列表" />
     <BlockButton format={BULLETED_LIST} icon="format_list_bulleted" title="无序列表" />
     <ImageButton />
-    <BlockButton format={HR} icon="remove" title="分割线" />
+    <HrButton />
   </Menu>
 ));
 
