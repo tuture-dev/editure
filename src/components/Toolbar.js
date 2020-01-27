@@ -4,6 +4,7 @@ import { cx, css } from "emotion";
 import Menu from "./Menu";
 import MarkButton from "./MarkButton";
 import BlockButton from "./BlockButton";
+import ImageButton from "./ImageButton";
 import {
   BOLD,
   ITALIC,
@@ -14,7 +15,6 @@ import {
   H2,
   CODE_BLOCK,
   LINK,
-  IMAGE,
   BLOCK_QUOTE,
   BULLETED_LIST,
   NUMBERED_LIST,
@@ -47,7 +47,7 @@ const Toolbar = React.forwardRef(({ className, ...props }, ref) => (
     <BlockButton format={CODE_BLOCK} icon="attach_money" title="代码块" />
     <BlockButton format={NUMBERED_LIST} icon="format_list_numbered" title="有序列表" />
     <BlockButton format={BULLETED_LIST} icon="format_list_bulleted" title="无序列表" />
-    <BlockButton format={IMAGE} icon="image" title="图片" />
+    <ImageButton />
     <BlockButton format={HR} icon="remove" title="分割线" />
   </Menu>
 ));

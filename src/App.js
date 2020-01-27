@@ -8,13 +8,13 @@ import { Slate, Editable, withReact } from "slate-react";
 import { withHistory } from "slate-history";
 import { css } from "emotion";
 
-import { CODE_BLOCK } from "./constants";
 import customPlugins from "./plugins";
 import Leaf from "./marks";
-import Element, { isBlockActive } from "./blocks";
+import Element from "./blocks";
 import createHotKeysHandler from "./hotkeys";
 import { Toolbar } from "./components";
 import highlight from "./utils/highlight";
+import { createDropListener } from "./utils/image";
 
 import "./App.css";
 import "material-icons/iconfont/material-icons.css";
@@ -40,7 +40,7 @@ const App = () => {
 
   const renderElement = useCallback(Element, []);
   const renderLeaf = useCallback(Leaf, []);
-  const decorate = useCallback(args => highlight(args), [editor]);
+  const decorate = useCallback(args => highlight(args), []);
 
   const hotKeyHandler = createHotKeysHandler(editor);
 
@@ -59,6 +59,7 @@ const App = () => {
           renderElement={renderElement}
           renderLeaf={renderLeaf}
           onKeyDown={hotKeyHandler}
+          onDrop={createDropListener(editor)}
           spellCheck
           autoFocus
         />

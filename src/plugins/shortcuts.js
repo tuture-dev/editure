@@ -70,7 +70,7 @@ function detectShortcut(editor) {
 
   for (const index in SHORTCUTS_REGEX) {
     const regex = new RegExp(SHORTCUTS_REGEX[index], "g");
-    if (regex.test(beforeText)) {
+    if (beforeText && regex.test(beforeText)) {
       shortcut.format = SHORTCUTS[index];
       shortcut.regex = regex;
       shortcut.matchArr = beforeText.match(shortcut.regex);

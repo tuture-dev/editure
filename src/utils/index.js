@@ -1,6 +1,10 @@
 import { Editor } from "slate";
 
 export const getBeforeText = editor => {
+  if (!editor.selection) {
+    return {};
+  }
+
   const { anchor } = editor.selection;
   const match = Editor.above(editor, {
     match: n => Editor.isBlock(editor, n)

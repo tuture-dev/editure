@@ -8,7 +8,6 @@
     "@testing-library/user-event": "^7.1.2",
     "customize-cra": "^0.9.1",
     "emotion": "^10.0.27",
-    "image-extensions": "^1.1.0",
     "is-hotkey": "^0.1.6",
     "is-url": "^1.2.4",
     "material-icons": "^0.3.1",
