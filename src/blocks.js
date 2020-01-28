@@ -11,6 +11,7 @@ import {
   H3,
   H4,
   CODE_BLOCK,
+  CODE_LINE,
   NUMBERED_LIST,
   BULLETED_LIST,
   PARAGRAPH,
@@ -56,9 +57,7 @@ const CodeBlockElement = props => {
           </option>
         ))}
       </select>
-      <pre>
-        <div>{props.children}</div>
-      </pre>
+      <div>{props.children}</div>
     </div>
   );
 };
@@ -120,9 +119,20 @@ export const toggleBlock = (editor, format) => {
     split: true
   });
 
-  Transforms.setNodes(editor, {
-    type: isActive ? PARAGRAPH : isList ? LIST_ITEM : format
-  });
+  if (format === CODE_BLOCK) {
+    const text = { text: "" };
+    const codeLineNode = { type: CODE_LINE, children: [text] };
+    const node = { type: format, children: [text] };
+
+    Transforms.setNodes(editor, codeLineNode);
+    Transforms.wrapNodes(editor, node, {
+      match: n => n.type === CODE_LINE
+    });
+  } else {
+    Transforms.setNodes(editor, {
+      type: isActive ? PARAGRAPH : isList ? LIST_ITEM : format
+    });
+  }
 
   if (!isActive && isList) {
     const block = { type: format, children: [] };
@@ -169,6 +179,8 @@ export default props => {
       return <li {...attributes}>{children}</li>;
     case CODE_BLOCK:
       return <CodeBlockElement {...props} />;
+    case CODE_LINE:
+      return <pre {...attributes}>{children}</pre>;
     case IMAGE:
       return <ImageElement {...props} />;
     case HR:

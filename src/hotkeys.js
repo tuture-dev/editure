@@ -50,10 +50,9 @@ const BLOCK_HOTKEYS = {
 };
 
 function handleSoftBreak(editor, event) {
-  event.preventDefault();
-
   const { insertBreak, deleteBackward } = editor;
   if (isBlockActive(editor, BLOCK_QUOTE)) {
+    event.preventDefault();
     const { beforeText } = getBeforeText(editor);
 
     if (!beforeText.split("\n").slice(-1)[0]) {
@@ -65,11 +64,6 @@ function handleSoftBreak(editor, event) {
       // 还是软换行
       Transforms.insertText(editor, "\n");
     }
-  } else if (isBlockActive(editor, CODE_BLOCK)) {
-    // 代码块始终软换行
-    Transforms.insertText(editor, "\n");
-  } else {
-    insertBreak();
   }
 }
 
@@ -132,35 +126,18 @@ function handleDeleteLine(editor, event) {
 
   // 具体就是遍历此代码块/引用的  children 数组
   // 找到最近的一个 \n 字符，然后删除此 \n 之后的字符到光标此时选中的字符
-  const { selection, children } = editor;
+  const { selection } = editor;
   const { anchor } = selection;
-  const { path, offset } = anchor;
+  const { path } = anchor;
 
-  for (let i = 0; i <= anchor.path[1]; i++) {
-    const nowSelectionText =
-      getChildrenText(children, [path[0], i, ...path.slice(2)]) || "";
+  event.preventDefault();
 
-    const sliceOffset = i === anchor.path[1] ? offset : nowSelectionText.length;
+  const deletePath = path.slice(0, path.length - 1);
+  const start = Editor.start(editor, deletePath);
+  const end = Editor.end(editor, deletePath);
 
-    if (nowSelectionText.slice(0, sliceOffset).includes("\n")) {
-      const enterLocation = nowSelectionText.lastIndexOf("\n");
-
-      const focus = {
-        path: [path[0], i, ...path.slice(2)],
-        offset: enterLocation + 1
-      };
-      const range = { anchor: focus, focus: anchor };
-      Transforms.select(editor, range);
-      Transforms.delete(editor);
-    } else if (i === 0) {
-      const range = {
-        anchor: { path: [path[0], 0, ...path.slice(2)], offset: 0 },
-        focus: anchor
-      };
-      Transforms.select(editor, range);
-      Transforms.delete(editor);
-    }
-  }
+  Transforms.select(editor, { anchor: start, focus: end });
+  Transforms.delete(editor);
 }
 
 function handleExitBlock(editor, event) {
