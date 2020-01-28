@@ -133,9 +133,8 @@ function handleTabKey(editor, event) {
 }
 
 function handleShiftTabKey(editor, event) {
+  event.preventDefault();
   if (isBlockActive(editor, BULLETED_LIST) || isBlockActive(editor, NUMBERED_LIST)) {
-    event.preventDefault();
-
     const type = isBlockActive(editor, BULLETED_LIST) ? BULLETED_LIST : NUMBERED_LIST;
     const [node, _] = Editor.above(editor, {
       match: n => n.type === type
