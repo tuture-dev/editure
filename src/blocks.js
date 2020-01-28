@@ -154,7 +154,7 @@ export default props => {
           className={css`
             padding-left: ${(element.level || 0) * 2 + 2}em;
           `}>
-          >{children}
+          {children}
         </ol>
       );
     case H1:

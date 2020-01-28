@@ -97,7 +97,7 @@ function handleTabKey(editor, event) {
       Transforms.wrapNodes(
         editor,
         {
-          type: BULLETED_LIST,
+          type,
           level: level + 1 > 8 ? 8 : level + 1
         },
         {

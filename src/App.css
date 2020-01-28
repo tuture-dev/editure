@@ -6,6 +6,11 @@ textarea {
   background: #eee;
 }
 
+* {
+  margin: 0;
+  line-height: 24px;
+}
+
 body {
   margin: 0;
 }
@@ -68,8 +73,4 @@ input {
 input:focus {
   outline: 0;
   border-color: blue;
-}
-
-[data-slate-editor] > * + * {
-  margin-top: 1em;
 }
