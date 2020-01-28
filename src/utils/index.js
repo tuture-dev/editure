@@ -13,3 +13,12 @@ export const getBeforeText = editor => {
 
   return { beforeText, range };
 };
+
+export const getChildrenText = (children, path) => {
+  let childrenItem = "";
+  for (const pathItem of path) {
+    childrenItem = children[pathItem].children;
+  }
+
+  return childrenItem.text;
+};

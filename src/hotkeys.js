@@ -1,7 +1,7 @@
 import { Transforms, Editor, Element, Node, Text } from "slate";
 import isHotkey from "is-hotkey";
 
-import { getBeforeText } from "./utils";
+import { getBeforeText, getChildrenText } from "./utils";
 import { toggleMark } from "./marks";
 import { toggleBlock, isBlockActive } from "./blocks";
 import {
@@ -98,7 +98,7 @@ function handleTabKey(editor, event) {
         editor,
         {
           type,
-          level: level + 1 > 8 ? 8 : level + 1
+          level: Math.min(level + 1, 8)
         },
         {
           macth: n => n.type === LIST_ITEM
@@ -110,7 +110,7 @@ function handleTabKey(editor, event) {
       Transforms.setNodes(
         editor,
         {
-          level: level + 1 > 8 ? 8 : level + 1
+          level: Math.min(level + 1, 8)
         },
         {
           match: n => n.type === type
@@ -141,15 +141,49 @@ function handleShiftTabKey(editor, event) {
     });
     const { level = 0 } = node;
 
-    Transforms.setNodes(
-      editor,
-      {
-        level: level - 1 < 0 ? 0 : level - 1
-      },
-      {
+    // 如果此 list-item 所属列表中元素个数大于1，
+    // 就要考虑将此元素单独提取出来，成为一个列表
+    if (node && node.children.length > 1) {
+      Transforms.liftNodes(editor, {
+        match: n => n.type === LIST_ITEM
+      });
+
+      Transforms.wrapNodes(
+        editor,
+        {
+          type,
+          level: Math.max(level - 1, 0)
+        },
+        {
+          macth: n => n.type === LIST_ITEM
+        }
+      );
+    } else {
+      // 设置层级
+      Transforms.setNodes(
+        editor,
+        {
+          level: Math.max(level - 1, 0)
+        },
+        {
+          match: n => n.type === type
+        }
+      );
+
+      // 判断如果此时回退层级和之前的同类型列表的 level 一致，就合并进此同类型列表
+      const [node, _] = Editor.previous(editor, {
         match: n => n.type === type
+      });
+
+      if (node) {
+        const { level: previousLevel = 0 } = node;
+        if (previousLevel === Math.max(level - 1, 0)) {
+          Transforms.mergeNodes(editor, {
+            match: n => n.type === type
+          });
+        }
       }
-    );
+    }
   }
 }
 
@@ -184,8 +218,12 @@ function handleDeleteLine(editor, event) {
   const { anchor } = selection;
   const { path, offset } = anchor;
 
+  console.log("path", path);
+
   for (let i = 0; i <= anchor.path[1]; i++) {
-    const nowSelectionText = children[path[0]].children[i].text || "";
+    const nowSelectionText = getChildrenText(children, [path[0], i, path.slice(2)]) || "";
+
+    console.log("");
 
     const sliceOffset = i === anchor.path[1] ? offset : nowSelectionText.length;
 
