@@ -1,4 +1,4 @@
-import { Transforms, Editor, Point } from "slate";
+import { Transforms, Editor, Point, Range } from "slate";
 
 import { isBlockActive } from "../blocks";
 import { LIST_ITEM, BULLETED_LIST, NUMBERED_LIST, PARAGRAPH } from "../constants";
@@ -109,13 +109,29 @@ export const withList = editor => {
         const [block, path] = match;
         const start = Editor.start(editor, path);
 
-        if (block.type !== PARAGRAPH && Point.equals(selection.anchor, start)) {
-          Transforms.setNodes(editor, { type: PARAGRAPH });
+        if (
+          block.type !== PARAGRAPH &&
+          Point.equals(selection.anchor, start) &&
+          isBlockActive(editor, LIST_ITEM)
+        ) {
+          const type = isBlockActive(editor, BULLETED_LIST)
+            ? BULLETED_LIST
+            : NUMBERED_LIST;
 
-          if (block.type === LIST_ITEM) {
-            Transforms.unwrapNodes(editor, {
-              match: n => n.type === BULLETED_LIST
+          const [node, _] = Editor.above(editor, {
+            match: n => n.type === type
+          });
+
+          const { level = 0 } = node;
+
+          if (level === 0) {
+            Transforms.liftNodes(editor, {
+              match: n => n.type === LIST_ITEM
             });
+
+            Transforms.setNodes(editor, { type: PARAGRAPH });
+          } else {
+            decreaseItemDepth(editor);
           }
 
           return;
