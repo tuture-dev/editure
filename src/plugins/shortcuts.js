@@ -55,16 +55,16 @@ const SHORTCUTS_REGEX = [
   "^-$",
   "^\\+$",
   "^[0-9]\\.$",
-  "^>$",
-  "^:::([a-zA-Z]*)$",
-  "^#$",
-  "^##$",
-  "^###$",
-  "^####$",
-  "^#####$",
-  "^######$",
-  "^```([a-zA-Z]*)$",
-  "^---$"
+  "^\\s*>$",
+  "^\\s*:::\\s*([a-zA-Z]*)$",
+  "^\\s*#$",
+  "^\\s*##$",
+  "^\\s*###$",
+  "^\\s*####$",
+  "^\\s*#####$",
+  "^\\s*######$",
+  "^\\s*```\\s*([a-zA-Z]*)$",
+  "^\\s*---$"
 ];
 
 function detectShortcut(editor) {
@@ -210,10 +210,13 @@ export default function withShortcuts(editor) {
 
     if (text === " " && selection && Range.isCollapsed(selection)) {
       const shortcut = detectShortcut(editor);
+      const { format } = shortcut;
 
-      if (BLOCK_SHORTCUTS.includes(shortcut.format)) {
+      if ([NOTE, CODE_BLOCK, HR].includes(format)) {
+        insertText(text);
+      } else if (BLOCK_SHORTCUTS.includes(format)) {
         handleBlockShortcut(editor, shortcut);
-      } else if (MARK_SHORTCUTS.includes(shortcut.format)) {
+      } else if (MARK_SHORTCUTS.includes(format)) {
         handleMarkShortcut(editor, shortcut);
       } else {
         insertText(text);
@@ -227,7 +230,7 @@ export default function withShortcuts(editor) {
   editor.insertBreak = () => {
     // 检测是否为代码块触发条件
     const shortcut = detectShortcut(editor);
-    if (shortcut.format === CODE_BLOCK) {
+    if ([CODE_BLOCK, NOTE, HR].includes(shortcut.format)) {
       handleBlockShortcut(editor, shortcut);
       return;
     }
