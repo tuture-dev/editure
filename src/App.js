@@ -8,7 +8,6 @@ import { Slate, Editable, withReact } from "slate-react";
 import { withHistory } from "slate-history";
 import { css } from "emotion";
 
-import { CODE_BLOCK } from "./constants";
 import customPlugins from "./plugins";
 import Leaf from "./marks";
 import Element, { isBlockActive } from "./blocks";
@@ -21,11 +20,8 @@ import "material-icons/iconfont/material-icons.css";
 
 const defaultValue = [
   {
-    children: [
-      {
-        text: "Hail Tuture!"
-      }
-    ]
+    type: "paragraph",
+    children: [{ text: "A line of text in a paragraph." }]
   }
 ];
 

@@ -136,12 +136,9 @@ function handleDeleteLine(editor, event) {
   const { anchor } = selection;
   const { path, offset } = anchor;
 
-  console.log("path", path);
-
   for (let i = 0; i <= anchor.path[1]; i++) {
-    const nowSelectionText = getChildrenText(children, [path[0], i, path.slice(2)]) || "";
-
-    console.log("");
+    const nowSelectionText =
+      getChildrenText(children, [path[0], i, ...path.slice(2)]) || "";
 
     const sliceOffset = i === anchor.path[1] ? offset : nowSelectionText.length;
 
@@ -149,7 +146,7 @@ function handleDeleteLine(editor, event) {
       const enterLocation = nowSelectionText.lastIndexOf("\n");
 
       const focus = {
-        path: [path[0], i],
+        path: [path[0], i, ...path.slice(2)],
         offset: enterLocation + 1
       };
       const range = { anchor: focus, focus: anchor };
@@ -157,7 +154,7 @@ function handleDeleteLine(editor, event) {
       Transforms.delete(editor);
     } else if (i === 0) {
       const range = {
-        anchor: { path: [path[0], 0], offset: 0 },
+        anchor: { path: [path[0], 0, ...path.slice(2)], offset: 0 },
         focus: anchor
       };
       Transforms.select(editor, range);

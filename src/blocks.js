@@ -57,7 +57,7 @@ const CodeBlockElement = props => {
         ))}
       </select>
       <pre>
-        <code lang={`language-${lang}`}>{props.children}</code>
+        <div>{props.children}</div>
       </pre>
     </div>
   );

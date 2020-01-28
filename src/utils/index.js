@@ -15,10 +15,12 @@ export const getBeforeText = editor => {
 };
 
 export const getChildrenText = (children, path) => {
-  let childrenItem = "";
-  for (const pathItem of path) {
-    childrenItem = children[pathItem].children;
+  console.log("children", children, path);
+  let childrenItem = children;
+  for (let i = 0; i < path.length - 1; i++) {
+    console.log("i", i, childrenItem);
+    childrenItem = childrenItem[path[i]].children;
   }
 
-  return childrenItem.text;
+  return childrenItem[0].text;
 };
