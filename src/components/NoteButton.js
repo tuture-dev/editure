@@ -36,7 +36,10 @@ const NoteButton = () => {
             border-right-color: #ddd;
             border-bottom-color: #ddd;
           `}
-          onClick={() => setShowDropList(false)}>
+          onMouseDown={e => {
+            e.preventDefault();
+            setShowDropList(false);
+          }}>
           <ul
             className={css`
               margin: 0;
@@ -56,7 +59,7 @@ const NoteButton = () => {
                       background: #f1f1f1;
                     }
                   `}>
-                  <span onClick={e => handleClickItem(e, level)}>{level}</span>
+                  <span onMouseDown={e => handleClickItem(e, level)}>{level}</span>
                 </li>
               );
             })}
