@@ -14,6 +14,14 @@ export const palette = {
   danger: { border: "#d9534f", background: "#fcf1f2" }
 };
 
+export const icons = {
+  primary: { content: "\f055", color: "#6f42c1" },
+  success: { content: "\f058", color: "#5cb85c" },
+  info: { content: "\f05a", color: "#428bca" },
+  warning: { content: "\f056", color: "#f0ad4e" },
+  danger: { content: "\f056", color: "#d9534f" }
+};
+
 export const insertNote = (editor, level) => {
   const { beforeText } = getBeforeText(editor);
 

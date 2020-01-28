@@ -5,7 +5,7 @@ import { Editor, Transforms, Element } from "slate";
 import { useSelected, useFocused } from "slate-react";
 
 import { languages, enumPrismLangToLanguage } from "./utils/code";
-import { palette, levels } from "./utils/note";
+import { palette, icons, levels } from "./utils/note";
 import {
   H1,
   H2,
@@ -135,14 +135,30 @@ const NoteElement = props => {
     border: 1px solid #eee;
     border-left-width: 5px;
     border-radius: 0px;
+    &::before {
+      font-family: "FontAwesome";
+      font-size: larger;
+      left: 15px;
+      position: absolute;
+      top: 13px;
+    }
   `;
   const noteStyle = css`
     border-left-color: ${palette[realLevel].border};
     background-color: ${palette[realLevel].background};
   `;
+  const iconStyle =
+    realLevel === "default"
+      ? ""
+      : css`
+    &::before {
+      content: "${icons[realLevel].content}";
+      color: ${icons[realLevel].color};
+    }
+  `;
 
   return (
-    <div {...attributes} className={cx(baseStyle, noteStyle)}>
+    <div {...attributes} className={cx(baseStyle, noteStyle, iconStyle)}>
       {children}
     </div>
   );
