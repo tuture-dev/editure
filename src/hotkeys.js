@@ -49,24 +49,6 @@ const BLOCK_HOTKEYS = {
   "mod+alt+-": HR
 };
 
-function handleSoftBreak(editor, event) {
-  const { insertBreak, deleteBackward } = editor;
-  if (isBlockActive(editor, BLOCK_QUOTE)) {
-    event.preventDefault();
-    const { beforeText } = getBeforeText(editor);
-
-    if (!beforeText.split("\n").slice(-1)[0]) {
-      // 如果最后一行为空，退出块状引用
-      deleteBackward();
-      insertBreak();
-      toggleBlock(editor, BLOCK_QUOTE);
-    } else {
-      // 还是软换行
-      Transforms.insertText(editor, "\n");
-    }
-  }
-}
-
 function handleTabKey(editor, event) {
   const { beforeText } = getBeforeText(editor);
 
@@ -200,10 +182,6 @@ export default function createHotKeysHandler(editor) {
     if (isHotkey("mod+enter", event)) {
       handleExitBlock(editor, event);
       return;
-    }
-
-    if (event.key === "Enter") {
-      handleSoftBreak(editor, event);
     }
 
     if (isHotkey("shift+tab", event)) {

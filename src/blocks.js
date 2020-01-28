@@ -119,19 +119,39 @@ export const toggleBlock = (editor, format) => {
     split: true
   });
 
-  if (format === CODE_BLOCK) {
-    const text = { text: "" };
-    const codeLineNode = { type: CODE_LINE, children: [text] };
-    const node = { type: format, children: [text] };
+  switch (format) {
+    case CODE_BLOCK: {
+      const text = { text: "" };
+      const codeLineNode = { type: CODE_LINE, children: [text] };
+      const node = { type: format, children: [text] };
 
-    Transforms.setNodes(editor, codeLineNode);
-    Transforms.wrapNodes(editor, node, {
-      match: n => n.type === CODE_LINE
-    });
-  } else {
-    Transforms.setNodes(editor, {
-      type: isActive ? PARAGRAPH : isList ? LIST_ITEM : format
-    });
+      Transforms.setNodes(editor, codeLineNode);
+      Transforms.wrapNodes(editor, node, {
+        match: n => n.type === CODE_LINE
+      });
+
+      break;
+    }
+
+    case BLOCK_QUOTE: {
+      console.log("format", format);
+      const text = { text: "" };
+      const blockquoteLineNode = { type: PARAGRAPH, children: [text] };
+      const node = { type: format, children: [text] };
+
+      Transforms.setNodes(editor, blockquoteLineNode);
+      Transforms.wrapNodes(editor, node, {
+        match: n => n.type === PARAGRAPH
+      });
+
+      break;
+    }
+
+    default: {
+      Transforms.setNodes(editor, {
+        type: isActive ? PARAGRAPH : isList ? LIST_ITEM : format
+      });
+    }
   }
 
   if (!isActive && isList) {
