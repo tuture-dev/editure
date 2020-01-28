@@ -17,6 +17,7 @@ import {
   H6,
   CODE_BLOCK,
   BLOCK_QUOTE,
+  NOTE,
   BULLETED_LIST,
   NUMBERED_LIST,
   HR,
@@ -31,6 +32,7 @@ const BLOCK_SHORTCUTS = [
   BULLETED_LIST,
   NUMBERED_LIST,
   BLOCK_QUOTE,
+  NOTE,
   H1,
   H2,
   H3,
@@ -54,6 +56,7 @@ const SHORTCUTS_REGEX = [
   "^\\+$",
   "^[0-9]\\.$",
   "^>$",
+  "^:::([a-zA-Z]*)$",
   "^#$",
   "^##$",
   "^###$",
@@ -153,6 +156,18 @@ function handleBlockShortcut(editor, shortcut) {
     const targetLang = targetTextArr[1];
 
     nodeProp = { ...nodeProp, lang: targetLang };
+
+    // 在底部插入空行
+    const currentSelection = editor.selection;
+    Editor.insertBreak(editor);
+    Transforms.setSelection(editor, currentSelection);
+  }
+
+  if (format === NOTE) {
+    const targetTextWithMdTag = matchArr[matchArr.length - 1];
+    const level = regex.exec(targetTextWithMdTag)[1];
+
+    nodeProp = { ...nodeProp, level };
 
     // 在底部插入空行
     const currentSelection = editor.selection;
