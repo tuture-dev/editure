@@ -21,6 +21,8 @@ import {
   HR
 } from "./constants";
 
+const listStyleType = ["disc", "circle", "square"];
+
 const LIST_TYPES = [NUMBERED_LIST, BULLETED_LIST];
 
 const CodeBlockElement = props => {
@@ -135,7 +137,26 @@ export default props => {
     case BLOCK_QUOTE:
       return <blockquote {...attributes}>{children}</blockquote>;
     case BULLETED_LIST:
-      return <ul {...attributes}>{children}</ul>;
+      return (
+        <ul
+          {...attributes}
+          className={css`
+            padding-left: ${(element.level || 0) * 2 + 2}em;
+            list-style-type: ${listStyleType[element.level % 3]};
+          `}>
+          {children}
+        </ul>
+      );
+    case NUMBERED_LIST:
+      return (
+        <ol
+          {...attributes}
+          className={css`
+            padding-left: ${(element.level || 0) * 2 + 2}em;
+          `}>
+          >{children}
+        </ol>
+      );
     case H1:
       return <h1 {...attributes}>{children}</h1>;
     case H2:
@@ -146,8 +167,6 @@ export default props => {
       return <h4 {...attributes}>{children}</h4>;
     case LIST_ITEM:
       return <li {...attributes}>{children}</li>;
-    case NUMBERED_LIST:
-      return <ol {...attributes}>{children}</ol>;
     case CODE_BLOCK:
       return <CodeBlockElement {...props} />;
     case IMAGE:

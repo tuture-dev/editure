@@ -1,4 +1,4 @@
-import { Transforms, Editor, Element } from "slate";
+import { Transforms, Editor, Element, Node, Text } from "slate";
 import isHotkey from "is-hotkey";
 
 import { getBeforeText } from "./utils";
@@ -73,13 +73,84 @@ function handleSoftBreak(editor, event) {
 }
 
 function handleTabKey(editor, event) {
-  if (isBlockActive(editor, LIST_ITEM)) {
+  const { beforeText } = getBeforeText(editor);
+
+  if (
+    !beforeText.length &&
+    (isBlockActive(editor, BULLETED_LIST) || isBlockActive(editor, NUMBERED_LIST))
+  ) {
+    event.preventDefault();
+
+    const type = isBlockActive(editor, BULLETED_LIST) ? BULLETED_LIST : NUMBERED_LIST;
+
+    const [node, _] = Editor.above(editor, {
+      match: n => n.type === type
+    });
+    const { level = 0 } = node;
+
+    // 如果此时 ul 中 li 大于 1 个，那么分出此时的 li，将其变成  ul > li
+    if (node && node.children.length > 1) {
+      Transforms.liftNodes(editor, {
+        match: n => n.type === LIST_ITEM
+      });
+
+      Transforms.wrapNodes(
+        editor,
+        {
+          type: BULLETED_LIST,
+          level: level + 1 > 8 ? 8 : level + 1
+        },
+        {
+          macth: n => n.type === LIST_ITEM
+        }
+      );
+    } else {
+      const type = isBlockActive(editor, BULLETED_LIST) ? BULLETED_LIST : NUMBERED_LIST;
+
+      Transforms.setNodes(
+        editor,
+        {
+          level: level + 1 > 8 ? 8 : level + 1
+        },
+        {
+          match: n => n.type === type
+        }
+      );
+    }
+  } else if (
+    beforeText.length &&
+    (isBlockActive(editor, BULLETED_LIST) || isBlockActive(editor, NUMBERED_LIST))
+  ) {
+    event.preventDefault();
+    Transforms.insertText(editor, "\t");
   } else if (isBlockActive(editor, CODE_BLOCK)) {
     event.preventDefault();
     Transforms.insertText(editor, "  ");
   } else {
     event.preventDefault();
     Transforms.insertText(editor, "\t");
+  }
+}
+
+function handleShiftTabKey(editor, event) {
+  if (isBlockActive(editor, BULLETED_LIST) || isBlockActive(editor, NUMBERED_LIST)) {
+    event.preventDefault();
+
+    const type = isBlockActive(editor, BULLETED_LIST) ? BULLETED_LIST : NUMBERED_LIST;
+    const [node, _] = Editor.above(editor, {
+      match: n => n.type === type
+    });
+    const { level = 0 } = node;
+
+    Transforms.setNodes(
+      editor,
+      {
+        level: level - 1 < 0 ? 0 : level - 1
+      },
+      {
+        match: n => n.type === type
+      }
+    );
   }
 }
 
@@ -206,8 +277,12 @@ export default function createHotKeysHandler(editor) {
       handleSoftBreak(editor, event);
     }
 
+    if (isHotkey("shift+tab", event)) {
+      handleShiftTabKey(editor, event);
+    }
+
     console.log("event", event.key);
-    if (event.key === "Tab") {
+    if (isHotkey("tab", event)) {
       handleTabKey(editor, event);
     }
   };
