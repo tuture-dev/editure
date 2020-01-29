@@ -12,6 +12,7 @@ import {
   H3,
   H4,
   CODE_BLOCK,
+  CODE_LINE,
   NUMBERED_LIST,
   BULLETED_LIST,
   PARAGRAPH,
@@ -22,6 +23,11 @@ import {
   IMAGE,
   HR
 } from "./constants";
+import { wrapCodeBlock, handleActiveCodeBlock } from "./plugins/codeBlock";
+import { wrapBlockquote, handleActiveBlockquote } from "./plugins/blockquote";
+
+const bulletedListStyleType = ["disc", "circle", "square"];
+const numberedListStyleType = ["decimal", "lower-alpha", "lower-roman"];
 
 const LIST_TYPES = [NUMBERED_LIST, BULLETED_LIST];
 
@@ -73,9 +79,7 @@ const CodeBlockElement = props => {
           </option>
         ))}
       </select>
-      <pre>
-        <code lang={`language-${lang}`}>{props.children}</code>
-      </pre>
+      <div>{props.children}</div>
     </div>
   );
 };
@@ -181,7 +185,7 @@ export const detectBlockFormat = (editor, formats = BLOCK_TYPES) => {
   return null;
 };
 
-export const toggleBlock = (editor, format) => {
+export const toggleBlock = (editor, format, props, type) => {
   const isActive = isBlockActive(editor, format);
   const isList = LIST_TYPES.includes(format);
 
@@ -190,9 +194,33 @@ export const toggleBlock = (editor, format) => {
     split: true
   });
 
-  Transforms.setNodes(editor, {
-    type: isActive ? PARAGRAPH : isList ? LIST_ITEM : format
-  });
+  switch (format) {
+    case CODE_BLOCK: {
+      if (isActive) {
+        handleActiveCodeBlock(editor, type);
+      } else {
+        wrapCodeBlock(editor, props);
+      }
+
+      break;
+    }
+
+    case BLOCK_QUOTE: {
+      if (isActive) {
+        handleActiveBlockquote(editor, type);
+      } else {
+        wrapBlockquote(editor);
+      }
+
+      break;
+    }
+
+    default: {
+      Transforms.setNodes(editor, {
+        type: isActive ? PARAGRAPH : isList ? LIST_ITEM : format
+      });
+    }
+  }
 
   if (!isActive && isList) {
     const block = { type: format, children: [] };
@@ -207,7 +235,27 @@ export default props => {
     case BLOCK_QUOTE:
       return <blockquote {...attributes}>{children}</blockquote>;
     case BULLETED_LIST:
-      return <ul {...attributes}>{children}</ul>;
+      return (
+        <ul
+          {...attributes}
+          className={css`
+            padding-left: ${(element.level || 0) * 2 + 2}em;
+            list-style-type: ${bulletedListStyleType[element.level % 3]};
+          `}>
+          {children}
+        </ul>
+      );
+    case NUMBERED_LIST:
+      return (
+        <ol
+          {...attributes}
+          className={css`
+            padding-left: ${(element.level || 0) * 2 + 2}em;
+            list-style-type: ${numberedListStyleType[element.level % 3]};
+          `}>
+          {children}
+        </ol>
+      );
     case H1:
       return <h1 {...attributes}>{children}</h1>;
     case H2:
@@ -218,10 +266,10 @@ export default props => {
       return <h4 {...attributes}>{children}</h4>;
     case LIST_ITEM:
       return <li {...attributes}>{children}</li>;
-    case NUMBERED_LIST:
-      return <ol {...attributes}>{children}</ol>;
     case CODE_BLOCK:
       return <CodeBlockElement {...props} />;
+    case CODE_LINE:
+      return <pre {...attributes}>{children}</pre>;
     case NOTE:
       return <NoteElement {...props} />;
     case IMAGE:

@@ -13,6 +13,7 @@ export const H6 = "heading-six";
 export const PARAGRAPH = "paragraph";
 export const BLOCK_QUOTE = "block-quote";
 export const CODE_BLOCK = "code-block";
+export const CODE_LINE = "code-line";
 export const NOTE = "note";
 export const LINK = "link";
 export const IMAGE = "image";
@@ -20,3 +21,7 @@ export const BULLETED_LIST = "bulleted-list";
 export const NUMBERED_LIST = "numbered-list";
 export const LIST_ITEM = "list-item";
 export const HR = "hr";
+
+export const TOOL_BUTTON = "tool-button";
+export const HOT_KEY = "hot-key";
+export const SHORT_CUTS = "short-cuts";

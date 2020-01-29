@@ -1,5 +1,7 @@
 import React from "react";
 import { Editor } from "slate";
+import { isBlockActive } from "./blocks";
+import { CODE_BLOCK } from "./constants";
 
 export const isMarkActive = (editor, format) => {
   const marks = Editor.marks(editor);
@@ -8,6 +10,10 @@ export const isMarkActive = (editor, format) => {
 
 export const toggleMark = (editor, format) => {
   const isActive = isMarkActive(editor, format);
+
+  if (isBlockActive(editor, CODE_BLOCK)) {
+    return;
+  }
 
   if (isActive) {
     Editor.removeMark(editor, format);

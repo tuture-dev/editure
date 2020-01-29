@@ -21,11 +21,8 @@ import "material-icons/iconfont/material-icons.css";
 
 const defaultValue = [
   {
-    children: [
-      {
-        text: "Hail Tuture!"
-      }
-    ]
+    type: "paragraph",
+    children: [{ text: "A line of text in a paragraph." }]
   }
 ];
 
@@ -43,6 +40,8 @@ const App = () => {
   const decorate = useCallback(args => highlight(args), []);
 
   const hotKeyHandler = createHotKeysHandler(editor);
+
+  console.log("editor", editor);
 
   return (
     <div

@@ -1,9 +1,10 @@
-import { Transforms, Editor, Element } from "slate";
+import { Transforms, Editor, Element, Node, Text } from "slate";
 import isHotkey from "is-hotkey";
 
-import { getBeforeText } from "./utils";
+import { getBeforeText, getChildrenText } from "./utils";
 import { toggleMark } from "./marks";
-import { toggleBlock, detectBlockFormat } from "./blocks";
+import { toggleBlock, isBlockActive, detectBlockFormat } from "./blocks";
+import { decreaseItemDepth, increaseItemDepth } from "./plugins/list";
 import {
   BOLD,
   ITALIC,
@@ -22,6 +23,7 @@ import {
   BULLETED_LIST,
   NUMBERED_LIST,
   HR,
+  SHORT_CUTS,
   NOTE
 } from "./constants";
 
@@ -48,27 +50,35 @@ const BLOCK_HOTKEYS = {
   "mod+alt+-": HR
 };
 
-function handleSoftBreak(editor, event) {
-  event.preventDefault();
+function handleTabKey(editor, event) {
+  const { beforeText } = getBeforeText(editor);
 
-  const { insertBreak, deleteBackward } = editor;
-  if (detectBlockFormat(editor, [BLOCK_QUOTE])) {
-    const { beforeText } = getBeforeText(editor);
+  if (
+    !beforeText.length &&
+    (isBlockActive(editor, BULLETED_LIST) || isBlockActive(editor, NUMBERED_LIST))
+  ) {
+    event.preventDefault();
 
-    if (!beforeText.split("\n").slice(-1)[0]) {
-      // 如果最后一行为空，退出块状引用
-      deleteBackward();
-      insertBreak();
-      toggleBlock(editor, BLOCK_QUOTE);
-    } else {
-      // 还是软换行
-      Transforms.insertText(editor, "\n");
-    }
-  } else if (detectBlockFormat(editor, [CODE_BLOCK, NOTE])) {
-    // 代码块始终软换行
-    Transforms.insertText(editor, "\n");
+    increaseItemDepth(editor);
+  } else if (
+    beforeText.length &&
+    (isBlockActive(editor, BULLETED_LIST) || isBlockActive(editor, NUMBERED_LIST))
+  ) {
+    event.preventDefault();
+    Transforms.insertText(editor, "\t");
+  } else if (isBlockActive(editor, CODE_BLOCK)) {
+    event.preventDefault();
+    Transforms.insertText(editor, "  ");
   } else {
-    insertBreak();
+    event.preventDefault();
+    Transforms.insertText(editor, "\t");
+  }
+}
+
+function handleShiftTabKey(editor, event) {
+  event.preventDefault();
+  if (isBlockActive(editor, BULLETED_LIST) || isBlockActive(editor, NUMBERED_LIST)) {
+    decreaseItemDepth(editor);
   }
 }
 
@@ -90,39 +100,70 @@ function handleSelectAll(editor, event) {
   }
 }
 
+function handleSelectLeftAll(editor, event) {
+  if (isBlockActive(editor, BLOCK_QUOTE) || isBlockActive(editor, CODE_BLOCK)) {
+    event.preventDefault();
+    let type = BLOCK_QUOTE;
+
+    if (isBlockActive(editor, CODE_BLOCK)) {
+      type = CODE_BLOCK;
+    }
+
+    const { selection } = editor;
+    const { anchor } = selection;
+
+    const match = Editor.above(editor, {
+      match: n => Element.matches(n, { type })
+    });
+
+    const path = match[1];
+
+    const start = Editor.start(editor, path);
+    const range = { anchor: start, focus: anchor };
+    Transforms.select(editor, range);
+  }
+}
+
+function handleSelectRightAll(editor, event) {
+  if (isBlockActive(editor, BLOCK_QUOTE) || isBlockActive(editor, CODE_BLOCK)) {
+    event.preventDefault();
+    let type = BLOCK_QUOTE;
+
+    if (isBlockActive(editor, CODE_BLOCK)) {
+      type = CODE_BLOCK;
+    }
+
+    const { selection } = editor;
+    const { anchor } = selection;
+
+    const match = Editor.above(editor, {
+      match: n => Element.matches(n, { type })
+    });
+
+    const path = match[1];
+
+    const end = Editor.end(editor, path);
+    const range = { anchor, focus: end };
+    Transforms.select(editor, range);
+  }
+}
+
 function handleDeleteLine(editor, event) {
   event.preventDefault();
 
   // 具体就是遍历此代码块/引用的  children 数组
   // 找到最近的一个 \n 字符，然后删除此 \n 之后的字符到光标此时选中的字符
-  const { selection, children } = editor;
+  const { selection } = editor;
   const { anchor } = selection;
-  const { path, offset } = anchor;
+  const { path } = anchor;
 
-  for (let i = 0; i <= anchor.path[1]; i++) {
-    const nowSelectionText = children[path[0]].children[i].text || "";
+  event.preventDefault();
 
-    const sliceOffset = i === anchor.path[1] ? offset : nowSelectionText.length;
+  const deletePath = path.slice(0, path.length - 1);
+  const start = Editor.start(editor, deletePath);
 
-    if (nowSelectionText.slice(0, sliceOffset).includes("\n")) {
-      const enterLocation = nowSelectionText.lastIndexOf("\n");
-
-      const focus = {
-        path: [path[0], i],
-        offset: enterLocation + 1
-      };
-      const range = { anchor: focus, focus: anchor };
-      Transforms.select(editor, range);
-      Transforms.delete(editor);
-    } else if (i === 0) {
-      const range = {
-        anchor: { path: [path[0], 0], offset: 0 },
-        focus: anchor
-      };
-      Transforms.select(editor, range);
-      Transforms.delete(editor);
-    }
-  }
+  Transforms.select(editor, { anchor: start, focus: anchor });
+  Transforms.delete(editor);
 }
 
 function handleExitBlock(editor, event) {
@@ -142,7 +183,8 @@ function handleExitBlock(editor, event) {
       edge: "end"
     });
     Editor.insertBreak(editor);
-    toggleBlock(editor, format);
+
+    toggleBlock(editor, format, {}, SHORT_CUTS);
   }
 }
 
@@ -168,8 +210,18 @@ export default function createHotKeysHandler(editor) {
 
     // 全选，在代码块/引用里面按 mod+a 或者 shift + command + up
     // 应该选择代码块/引用内的内容
-    if (isHotkey("mod+a", event) || isHotkey("mod+shift+up", event)) {
+    if (isHotkey("mod+a", event)) {
       handleSelectAll(editor, event);
+      return;
+    }
+
+    if (isHotkey("mod+shift+up", event)) {
+      handleSelectLeftAll(editor, event);
+      return;
+    }
+
+    if (isHotkey("mod+shift+down", event)) {
+      handleSelectRightAll(editor, event);
       return;
     }
 
@@ -185,8 +237,12 @@ export default function createHotKeysHandler(editor) {
       return;
     }
 
-    if (event.key === "Enter") {
-      handleSoftBreak(editor, event);
+    if (isHotkey("shift+tab", event)) {
+      handleShiftTabKey(editor, event);
+    }
+
+    if (isHotkey("tab", event)) {
+      handleTabKey(editor, event);
     }
   };
 }
