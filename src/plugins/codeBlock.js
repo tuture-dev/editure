@@ -9,6 +9,7 @@ import {
   SHORT_CUTS
 } from "../constants";
 import { isBlockActive } from "../blocks";
+import { getLineText } from "../utils";
 
 export const wrapCodeBlock = (editor, props) => {
   const text = { text: "" };
@@ -100,16 +101,19 @@ export const withCodeBlock = editor => {
           Point.equals(selection.anchor, start) &&
           isBlockActive(editor, CODE_LINE)
         ) {
-          const [node, _] = Editor.above(editor, {
+          const [node, path] = Editor.above(editor, {
             match: n => n.type === CODE_BLOCK
           });
 
+          const { wholeLineText } = getLineText(editor);
           const { children = [] } = node;
 
-          if (children.length === 1) {
+          if (children.length === 1 && !wholeLineText) {
             unwrapCodeBlock(editor);
             return;
-          } else {
+          } else if (children.length === 1 && wholeLineText) {
+            return;
+          } else if (children.length > 1) {
             Transforms.mergeNodes(editor);
             return;
           }
