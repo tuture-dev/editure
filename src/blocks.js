@@ -129,8 +129,22 @@ const ImageElement = props => {
 
 const NoteElement = props => {
   const { attributes, children, element } = props;
-  const { level } = element;
-  const realLevel = levels.includes(level) ? level : "default";
+  const { level: defaultLevel = "default" } = element;
+
+  const [level, setLevel] = useState(defaultLevel);
+  const editor = useSlate();
+
+  function handleChange(event) {
+    setLevel(event.target.value);
+
+    Transforms.setNodes(
+      editor,
+      { level: event.target.value },
+      {
+        match: n => n.type === NOTE
+      }
+    );
+  }
 
   const baseStyle = css`
     margin-top: 20px;
@@ -149,22 +163,29 @@ const NoteElement = props => {
     }
   `;
   const noteStyle = css`
-    border-left-color: ${palette[realLevel].border};
-    background-color: ${palette[realLevel].background};
+    border-left-color: ${palette[level].border};
+    background-color: ${palette[level].background};
   `;
   const iconStyle =
-    realLevel === "default"
+    level === "default"
       ? ""
       : css`
     &::before {
-      content: "${icons[realLevel].content}";
-      color: ${icons[realLevel].color};
+      content: "${icons[level].content}";
+      color: ${icons[level].color};
     }
   `;
 
   return (
     <div {...attributes} className={cx(baseStyle, noteStyle, iconStyle)}>
-      {children}
+      <select contentEditable={false} value={level} onChange={handleChange}>
+        {levels.map(level => (
+          <option key={level} value={level}>
+            {level}
+          </option>
+        ))}
+      </select>
+      <div>{children}</div>
     </div>
   );
 };
