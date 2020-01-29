@@ -2,7 +2,7 @@ import { Range, Editor, Transforms, Point } from "slate";
 
 import { toggleMark } from "../marks";
 import { isBlockActive, toggleBlock } from "../blocks";
-import { getBeforeText } from "../utils";
+import { getBeforeText, getChildrenText } from "../utils";
 import {
   BOLD,
   ITALIC,
@@ -73,12 +73,18 @@ function detectShortcut(editor) {
   const shortcut = { lineRange: range };
 
   for (const index in SHORTCUTS_REGEX) {
-    const regex = new RegExp(SHORTCUTS_REGEX[index], "g");
+    const regex = new RegExp(SHORTCUTS_REGEX[index]);
     if (beforeText && regex.test(beforeText)) {
-      shortcut.format = SHORTCUTS[index];
-      shortcut.regex = regex;
-      shortcut.matchArr = beforeText.match(shortcut.regex);
-      break;
+      const matchArr = beforeText.match(regex);
+
+      if (matchArr.index + matchArr[0].length === beforeText.length) {
+        const newRegex = new RegExp(SHORTCUTS_REGEX[index], "g");
+
+        shortcut.format = SHORTCUTS[index];
+        shortcut.regex = newRegex;
+        shortcut.matchArr = beforeText.match(newRegex);
+        break;
+      }
     }
   }
 
@@ -91,7 +97,7 @@ function handleMarkShortcut(editor, shortcut) {
   const { matchArr, regex, format } = shortcut;
 
   const targetTextWithMdTag = matchArr[matchArr.length - 1];
-  const chilrenText = children[anchor.path[0]].children[anchor.path[1]].text;
+  const chilrenText = getChildrenText(children, anchor.path);
 
   // 删除逻辑
   const deleteRangeStartOffset = chilrenText.length - targetTextWithMdTag.length;
@@ -207,7 +213,12 @@ export default function withShortcuts(editor) {
       } else if (BLOCK_SHORTCUTS.includes(format)) {
         handleBlockShortcut(editor, shortcut);
       } else if (MARK_SHORTCUTS.includes(format)) {
-        handleMarkShortcut(editor, shortcut);
+        // 在代码块里面不允许进行 mark 操作
+        if (isBlockActive(editor, CODE_BLOCK)) {
+          insertText(text);
+        } else {
+          handleMarkShortcut(editor, shortcut);
+        }
       } else {
         insertText(text);
       }
