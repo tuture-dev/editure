@@ -103,6 +103,54 @@ function handleSelectAll(editor, event) {
   }
 }
 
+function handleSelectLeftAll(editor, event) {
+  if (isBlockActive(editor, BLOCK_QUOTE) || isBlockActive(editor, CODE_BLOCK)) {
+    event.preventDefault();
+    let type = BLOCK_QUOTE;
+
+    if (isBlockActive(editor, CODE_BLOCK)) {
+      type = CODE_BLOCK;
+    }
+
+    const { selection } = editor;
+    const { anchor } = selection;
+
+    const match = Editor.above(editor, {
+      match: n => Element.matches(n, { type })
+    });
+
+    const path = match[1];
+
+    const start = Editor.start(editor, path);
+    const range = { anchor: start, focus: anchor };
+    Transforms.select(editor, range);
+  }
+}
+
+function handleSelectRightAll(editor, event) {
+  if (isBlockActive(editor, BLOCK_QUOTE) || isBlockActive(editor, CODE_BLOCK)) {
+    event.preventDefault();
+    let type = BLOCK_QUOTE;
+
+    if (isBlockActive(editor, CODE_BLOCK)) {
+      type = CODE_BLOCK;
+    }
+
+    const { selection } = editor;
+    const { anchor } = selection;
+
+    const match = Editor.above(editor, {
+      match: n => Element.matches(n, { type })
+    });
+
+    const path = match[1];
+
+    const end = Editor.end(editor, path);
+    const range = { anchor, focus: end };
+    Transforms.select(editor, range);
+  }
+}
+
 function handleDeleteLine(editor, event) {
   event.preventDefault();
 
@@ -116,9 +164,8 @@ function handleDeleteLine(editor, event) {
 
   const deletePath = path.slice(0, path.length - 1);
   const start = Editor.start(editor, deletePath);
-  const end = Editor.end(editor, deletePath);
 
-  Transforms.select(editor, { anchor: start, focus: end });
+  Transforms.select(editor, { anchor: start, focus: anchor });
   Transforms.delete(editor);
 }
 
@@ -173,8 +220,18 @@ export default function createHotKeysHandler(editor) {
 
     // 全选，在代码块/引用里面按 mod+a 或者 shift + command + up
     // 应该选择代码块/引用内的内容
-    if (isHotkey("mod+a", event) || isHotkey("mod+shift+up", event)) {
+    if (isHotkey("mod+a", event)) {
       handleSelectAll(editor, event);
+      return;
+    }
+
+    if (isHotkey("mod+shift+up", event)) {
+      handleSelectLeftAll(editor, event);
+      return;
+    }
+
+    if (isHotkey("mod+shift+down", event)) {
+      handleSelectRightAll(editor, event);
       return;
     }
 
