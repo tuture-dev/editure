@@ -45,14 +45,3 @@ export const getLineText = editor => {
 
   return { wholeLineText, range };
 };
-
-export const getChildrenText = (children, path) => {
-  console.log("children", children, path);
-  let childrenItem = children;
-  for (let i = 0; i < path.length - 1; i++) {
-    console.log("i", i, childrenItem);
-    childrenItem = childrenItem[path[i]].children;
-  }
-
-  return childrenItem[0].text;
-};
