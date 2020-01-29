@@ -131,7 +131,9 @@ const NoteElement = props => {
   const { attributes, children, element } = props;
   const { level: defaultLevel = "default" } = element;
 
-  const [level, setLevel] = useState(defaultLevel);
+  const realLevel = levels.includes(defaultLevel) ? defaultLevel : "default";
+
+  const [level, setLevel] = useState(realLevel);
   const editor = useSlate();
 
   function handleChange(event) {
