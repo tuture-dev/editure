@@ -3,7 +3,7 @@ import isHotkey from "is-hotkey";
 
 import { getBeforeText, getChildrenText } from "./utils";
 import { toggleMark } from "./marks";
-import { toggleBlock, isBlockActive } from "./blocks";
+import { toggleBlock, isBlockActive, detectBlockFormat } from "./blocks";
 import { decreaseItemDepth, increaseItemDepth } from "./plugins/list";
 import {
   BOLD,
@@ -23,7 +23,8 @@ import {
   BULLETED_LIST,
   NUMBERED_LIST,
   HR,
-  SHORT_CUTS
+  SHORT_CUTS,
+  NOTE
 } from "./constants";
 
 const MARK_HOTKEYS = {
@@ -82,16 +83,12 @@ function handleShiftTabKey(editor, event) {
 }
 
 function handleSelectAll(editor, event) {
-  if (isBlockActive(editor, BLOCK_QUOTE) || isBlockActive(editor, CODE_BLOCK)) {
+  const format = detectBlockFormat(editor, [BLOCK_QUOTE, CODE_BLOCK]);
+  if (format) {
     event.preventDefault();
-    let type = BLOCK_QUOTE;
-
-    if (isBlockActive(editor, CODE_BLOCK)) {
-      type = CODE_BLOCK;
-    }
 
     const match = Editor.above(editor, {
-      match: n => Element.matches(n, { type })
+      match: n => Element.matches(n, { type: format })
     });
 
     const path = match[1];
@@ -170,14 +167,12 @@ function handleDeleteLine(editor, event) {
 }
 
 function handleExitBlock(editor, event) {
-  if (isBlockActive(editor, CODE_BLOCK) || isBlockActive(editor, BLOCK_QUOTE)) {
+  const format = detectBlockFormat(editor, [CODE_BLOCK, BLOCK_QUOTE, NOTE]);
+  if (format) {
     event.preventDefault();
 
     const match = Editor.above(editor, {
-      match: n =>
-        Element.matches(n, {
-          type: isBlockActive(editor, CODE_BLOCK) ? CODE_BLOCK : BLOCK_QUOTE
-        })
+      match: n => Element.matches(n, { type: format })
     });
 
     const path = match[1];
@@ -189,12 +184,7 @@ function handleExitBlock(editor, event) {
     });
     Editor.insertBreak(editor);
 
-    toggleBlock(
-      editor,
-      isBlockActive(editor, CODE_BLOCK) ? CODE_BLOCK : BLOCK_QUOTE,
-      {},
-      SHORT_CUTS
-    );
+    toggleBlock(editor, format, {}, SHORT_CUTS);
   }
 }
 

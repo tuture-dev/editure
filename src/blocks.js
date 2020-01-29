@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { css } from "emotion";
+import { css, cx } from "emotion";
 import { useSlate } from "slate-react";
 import { Editor, Transforms, Element } from "slate";
 import { useSelected, useFocused } from "slate-react";
 
 import { languages, enumPrismLangToLanguage } from "./utils/code";
+import { palette, icons, levels } from "./utils/note";
 import {
   H1,
   H2,
@@ -17,6 +18,7 @@ import {
   PARAGRAPH,
   LIST_ITEM,
   BLOCK_QUOTE,
+  NOTE,
   LINK,
   IMAGE,
   HR
@@ -28,6 +30,23 @@ const bulletedListStyleType = ["disc", "circle", "square"];
 const numberedListStyleType = ["decimal", "lower-alpha", "lower-roman"];
 
 const LIST_TYPES = [NUMBERED_LIST, BULLETED_LIST];
+
+const BLOCK_TYPES = [
+  H1,
+  H2,
+  H3,
+  H4,
+  CODE_BLOCK,
+  NUMBERED_LIST,
+  BULLETED_LIST,
+  PARAGRAPH,
+  LIST_ITEM,
+  BLOCK_QUOTE,
+  NOTE,
+  LINK,
+  IMAGE,
+  HR
+];
 
 const CodeBlockElement = props => {
   const { element } = props;
@@ -94,6 +113,8 @@ const ImageElement = props => {
           alt={element.url}
           className={css`
             display: block;
+            margin-left: auto;
+            margin-right: auto;
             max-width: 100%;
             max-height: 20em;
             box-shadow: ${selected && focused ? "0 0 0 3px #B4D5FF" : "none"};
@@ -105,12 +126,63 @@ const ImageElement = props => {
   );
 };
 
+const NoteElement = props => {
+  const { attributes, children, element } = props;
+  const { level } = element;
+  const realLevel = levels.includes(level) ? level : "default";
+
+  const baseStyle = css`
+    margin-top: 20px;
+    padding: 15px;
+    padding-left: 45px;
+    position: relative;
+    border: 1px solid #eee;
+    border-left-width: 5px;
+    border-radius: 0px;
+    &::before {
+      font-family: "FontAwesome";
+      font-size: larger;
+      left: 15px;
+      position: absolute;
+      top: 13px;
+    }
+  `;
+  const noteStyle = css`
+    border-left-color: ${palette[realLevel].border};
+    background-color: ${palette[realLevel].background};
+  `;
+  const iconStyle =
+    realLevel === "default"
+      ? ""
+      : css`
+    &::before {
+      content: "${icons[realLevel].content}";
+      color: ${icons[realLevel].color};
+    }
+  `;
+
+  return (
+    <div {...attributes} className={cx(baseStyle, noteStyle, iconStyle)}>
+      {children}
+    </div>
+  );
+};
+
 export const isBlockActive = (editor, format) => {
   const [match] = Editor.nodes(editor, {
     match: n => n.type === format
   });
 
   return !!match;
+};
+
+export const detectBlockFormat = (editor, formats = BLOCK_TYPES) => {
+  for (const format of formats) {
+    if (isBlockActive(editor, format)) {
+      return format;
+    }
+  }
+  return null;
 };
 
 export const toggleBlock = (editor, format, props, type) => {
@@ -198,6 +270,8 @@ export default props => {
       return <CodeBlockElement {...props} />;
     case CODE_LINE:
       return <pre {...attributes}>{children}</pre>;
+    case NOTE:
+      return <NoteElement {...props} />;
     case IMAGE:
       return <ImageElement {...props} />;
     case HR:
