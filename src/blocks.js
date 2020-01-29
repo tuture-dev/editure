@@ -22,6 +22,7 @@ import {
   HR
 } from "./constants";
 import { wrapCodeBlock, handleActiveCodeBlock } from "./plugins/codeBlock";
+import { wrapBlockquote, handleActiveBlockquote } from "./plugins/blockquote";
 
 const listStyleType = ["disc", "circle", "square"];
 
@@ -133,18 +134,9 @@ export const toggleBlock = (editor, format, props, type) => {
 
     case BLOCK_QUOTE: {
       if (isActive) {
-        Transforms.unwrapNodes(editor, {
-          match: n => n.type === BLOCK_QUOTE
-        });
+        handleActiveBlockquote(editor, type);
       } else {
-        const text = { text: "" };
-        const blockquoteLineNode = { type: PARAGRAPH, children: [text] };
-        const node = { type: format, children: [text] };
-
-        Transforms.setNodes(editor, blockquoteLineNode);
-        Transforms.wrapNodes(editor, node, {
-          match: n => n.type === PARAGRAPH
-        });
+        wrapBlockquote(editor);
       }
 
       break;

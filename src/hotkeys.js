@@ -251,7 +251,6 @@ export default function createHotKeysHandler(editor) {
       handleShiftTabKey(editor, event);
     }
 
-    console.log("event", event.key);
     if (isHotkey("tab", event)) {
       handleTabKey(editor, event);
     }
