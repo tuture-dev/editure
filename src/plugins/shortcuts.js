@@ -236,8 +236,10 @@ export default function withShortcuts(editor) {
     // 检测是否为代码块触发条件
     const shortcut = detectShortcut(editor);
     if ([CODE_BLOCK, NOTE, HR].includes(shortcut.format)) {
-      handleBlockShortcut(editor, shortcut);
-      return;
+      if (!isBlockActive(editor, CODE_BLOCK)) {
+        handleBlockShortcut(editor, shortcut);
+        return;
+      }
     }
 
     for (const format of [BULLETED_LIST, NUMBERED_LIST]) {
