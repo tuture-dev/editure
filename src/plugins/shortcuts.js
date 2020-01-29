@@ -211,7 +211,11 @@ export default function withShortcuts(editor) {
       if ([NOTE, CODE_BLOCK, HR].includes(format)) {
         insertText(text);
       } else if (BLOCK_SHORTCUTS.includes(format)) {
-        handleBlockShortcut(editor, shortcut);
+        if (isBlockActive(editor, CODE_BLOCK)) {
+          insertText(text);
+        } else {
+          handleBlockShortcut(editor, shortcut);
+        }
       } else if (MARK_SHORTCUTS.includes(format)) {
         // 在代码块里面不允许进行 mark 操作
         if (isBlockActive(editor, CODE_BLOCK)) {
