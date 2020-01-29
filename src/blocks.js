@@ -24,7 +24,8 @@ import {
 import { wrapCodeBlock, handleActiveCodeBlock } from "./plugins/codeBlock";
 import { wrapBlockquote, handleActiveBlockquote } from "./plugins/blockquote";
 
-const listStyleType = ["disc", "circle", "square"];
+const bulletedListStyleType = ["disc", "circle", "square"];
+const numberedListStyleType = ["decimal", "lower-alpha", "lower-roman"];
 
 const LIST_TYPES = [NUMBERED_LIST, BULLETED_LIST];
 
@@ -167,7 +168,7 @@ export default props => {
           {...attributes}
           className={css`
             padding-left: ${(element.level || 0) * 2 + 2}em;
-            list-style-type: ${listStyleType[element.level % 3]};
+            list-style-type: ${bulletedListStyleType[element.level % 3]};
           `}>
           {children}
         </ul>
@@ -178,6 +179,7 @@ export default props => {
           {...attributes}
           className={css`
             padding-left: ${(element.level || 0) * 2 + 2}em;
+            list-style-type: ${numberedListStyleType[element.level % 3]};
           `}>
           {children}
         </ol>
