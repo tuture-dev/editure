@@ -25,6 +25,7 @@ import {
 } from "./constants";
 import { wrapCodeBlock, handleActiveCodeBlock } from "./plugins/codeBlock";
 import { wrapBlockquote, handleActiveBlockquote } from "./plugins/blockquote";
+import { wrapNote, handleActiveNote } from "./plugins/note";
 
 const bulletedListStyleType = ["disc", "circle", "square"];
 const numberedListStyleType = ["decimal", "lower-alpha", "lower-roman"];
@@ -210,6 +211,16 @@ export const toggleBlock = (editor, format, props, type) => {
         handleActiveBlockquote(editor, type);
       } else {
         wrapBlockquote(editor);
+      }
+
+      break;
+    }
+
+    case NOTE: {
+      if (isActive) {
+        handleActiveNote(editor, type);
+      } else {
+        wrapNote(editor, props);
       }
 
       break;

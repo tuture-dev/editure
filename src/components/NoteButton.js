@@ -4,7 +4,9 @@ import { css } from "emotion";
 
 import Icon from "./Icon";
 import Button from "./Button";
+import { toggleBlock } from "../blocks";
 import { levels, insertNote } from "../utils/note";
+import { NOTE, TOOL_BUTTON } from "../constants";
 
 const NoteButton = () => {
   const editor = useSlate();
@@ -12,7 +14,8 @@ const NoteButton = () => {
 
   const handleClickItem = (e, level) => {
     e.preventDefault();
-    insertNote(editor, level);
+
+    toggleBlock(editor, NOTE, { level }, TOOL_BUTTON);
   };
 
   return (

@@ -1,4 +1,4 @@
-import { Transforms, Editor, Point, Range, Node } from "slate";
+import { Transforms, Editor } from "slate";
 
 import { BLOCK_QUOTE, PARAGRAPH, TOOL_BUTTON, HOT_KEY, SHORT_CUTS } from "../constants";
 import { isBlockActive, toggleBlock } from "../blocks";

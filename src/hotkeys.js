@@ -53,16 +53,13 @@ const BLOCK_HOTKEYS = {
 function handleTabKey(editor, event) {
   const { beforeText } = getBeforeText(editor);
 
-  if (
-    !beforeText.length &&
-    (isBlockActive(editor, BULLETED_LIST) || isBlockActive(editor, NUMBERED_LIST))
-  ) {
+  if (!beforeText.length && detectBlockFormat(editor, [BULLETED_LIST, NUMBERED_LIST])) {
     event.preventDefault();
 
     increaseItemDepth(editor);
   } else if (
     beforeText.length &&
-    (isBlockActive(editor, BULLETED_LIST) || isBlockActive(editor, NUMBERED_LIST))
+    detectBlockFormat(editor, [BULLETED_LIST, NUMBERED_LIST])
   ) {
     event.preventDefault();
     Transforms.insertText(editor, "\t");

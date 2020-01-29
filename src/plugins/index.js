@@ -5,6 +5,7 @@ import withShortcuts from "./shortcuts";
 import { withList } from "./list";
 import { withCodeBlock } from "./codeBlock";
 import { withBlockquote } from "./blockquote";
+import { withNote } from "./note";
 
 export default [
   withLinks,
@@ -13,5 +14,6 @@ export default [
   withShortcuts,
   withList,
   withCodeBlock,
-  withBlockquote
+  withBlockquote,
+  withNote
 ];

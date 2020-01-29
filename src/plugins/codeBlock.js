@@ -1,4 +1,4 @@
-import { Transforms, Editor, Point, Range, Node } from "slate";
+import { Transforms, Editor, Point, Range } from "slate";
 
 import {
   CODE_BLOCK,
