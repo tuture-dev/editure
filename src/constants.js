@@ -20,3 +20,7 @@ export const BULLETED_LIST = "bulleted-list";
 export const NUMBERED_LIST = "numbered-list";
 export const LIST_ITEM = "list-item";
 export const HR = "hr";
+
+export const TOOL_BUTTON = "tool-button";
+export const HOT_KEY = "hot-key";
+export const SHORT_CUTS = "short-cuts";

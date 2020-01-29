@@ -23,7 +23,7 @@ import {
   BULLETED_LIST,
   NUMBERED_LIST,
   HR,
-  LIST_ITEM
+  SHORT_CUTS
 } from "./constants";
 
 const MARK_HOTKEYS = {
@@ -141,7 +141,13 @@ function handleExitBlock(editor, event) {
       edge: "end"
     });
     Editor.insertBreak(editor);
-    toggleBlock(editor, isBlockActive(editor, CODE_BLOCK) ? CODE_BLOCK : BLOCK_QUOTE);
+
+    toggleBlock(
+      editor,
+      isBlockActive(editor, CODE_BLOCK) ? CODE_BLOCK : BLOCK_QUOTE,
+      {},
+      SHORT_CUTS
+    );
   }
 }
 

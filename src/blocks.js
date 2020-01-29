@@ -21,6 +21,7 @@ import {
   IMAGE,
   HR
 } from "./constants";
+import { wrapCodeBlock, handleActiveCodeBlock } from "./plugins/codeBlock";
 
 const listStyleType = ["disc", "circle", "square"];
 
@@ -110,7 +111,7 @@ export const isBlockActive = (editor, format) => {
   return !!match;
 };
 
-export const toggleBlock = (editor, format) => {
+export const toggleBlock = (editor, format, props, type) => {
   const isActive = isBlockActive(editor, format);
   const isList = LIST_TYPES.includes(format);
 
@@ -121,28 +122,30 @@ export const toggleBlock = (editor, format) => {
 
   switch (format) {
     case CODE_BLOCK: {
-      const text = { text: "" };
-      const codeLineNode = { type: CODE_LINE, children: [text] };
-      const node = { type: format, children: [text] };
-
-      Transforms.setNodes(editor, codeLineNode);
-      Transforms.wrapNodes(editor, node, {
-        match: n => n.type === CODE_LINE
-      });
+      if (isActive) {
+        handleActiveCodeBlock(editor, type);
+      } else {
+        wrapCodeBlock(editor, props);
+      }
 
       break;
     }
 
     case BLOCK_QUOTE: {
-      console.log("format", format);
-      const text = { text: "" };
-      const blockquoteLineNode = { type: PARAGRAPH, children: [text] };
-      const node = { type: format, children: [text] };
+      if (isActive) {
+        Transforms.unwrapNodes(editor, {
+          match: n => n.type === BLOCK_QUOTE
+        });
+      } else {
+        const text = { text: "" };
+        const blockquoteLineNode = { type: PARAGRAPH, children: [text] };
+        const node = { type: format, children: [text] };
 
-      Transforms.setNodes(editor, blockquoteLineNode);
-      Transforms.wrapNodes(editor, node, {
-        match: n => n.type === PARAGRAPH
-      });
+        Transforms.setNodes(editor, blockquoteLineNode);
+        Transforms.wrapNodes(editor, node, {
+          match: n => n.type === PARAGRAPH
+        });
+      }
 
       break;
     }

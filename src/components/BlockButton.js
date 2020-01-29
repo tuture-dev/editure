@@ -4,6 +4,7 @@ import { useSlate } from "slate-react";
 import Icon from "./Icon";
 import Button from "./Button";
 import { isBlockActive, toggleBlock } from "../blocks";
+import { TOOL_BUTTON } from "../constants";
 
 const BlockButton = ({ format = "", title, icon }) => {
   const editor = useSlate();
@@ -14,7 +15,7 @@ const BlockButton = ({ format = "", title, icon }) => {
       active={isBlockActive(editor, format)}
       onMouseDown={event => {
         event.preventDefault();
-        toggleBlock(editor, format);
+        toggleBlock(editor, format, {}, TOOL_BUTTON);
       }}>
       <Icon>{icon}</Icon>
     </Button>

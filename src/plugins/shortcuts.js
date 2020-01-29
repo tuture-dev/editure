@@ -21,7 +21,8 @@ import {
   NUMBERED_LIST,
   HR,
   LIST_ITEM,
-  PARAGRAPH
+  PARAGRAPH,
+  SHORT_CUTS
 } from "../constants";
 
 const MARK_SHORTCUTS = [CODE, BOLD, ITALIC, STRIKETHROUGH, UNDERLINE];
@@ -164,14 +165,7 @@ function handleBlockShortcut(editor, shortcut) {
     nodeProp = { ...nodeProp, type: LIST_ITEM };
   }
 
-  Transforms.setNodes(editor, { ...nodeProp }, { match: n => Editor.isBlock(editor, n) });
-
-  if (format === BULLETED_LIST || format === NUMBERED_LIST) {
-    const list = { type: format, children: [] };
-    Transforms.wrapNodes(editor, list, {
-      match: n => n.type === LIST_ITEM
-    });
-  }
+  toggleBlock(editor, format, nodeProp);
 }
 
 export default function withShortcuts(editor) {
@@ -249,7 +243,11 @@ export default function withShortcuts(editor) {
         const [block, path] = match;
         const start = Editor.start(editor, path);
 
-        if (block.type !== PARAGRAPH && Point.equals(selection.anchor, start)) {
+        if (
+          block.type !== PARAGRAPH &&
+          Point.equals(selection.anchor, start) &&
+          isBlockActive(editor, CODE_BLOCK)
+        ) {
           Transforms.setNodes(editor, { type: PARAGRAPH });
 
           if (block.type === LIST_ITEM) {
