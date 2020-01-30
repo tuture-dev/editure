@@ -1,7 +1,7 @@
-import React, { useMemo, useState, useCallback } from "react";
+import React, { useMemo, useState, useCallback, useReducer } from "react";
 
 // Import the Slate editor factory.
-import { createEditor } from "slate";
+import { createEditor, Editor } from "slate";
 
 // Import the Slate components and React plugin.
 import { Slate, Editable, withReact } from "slate-react";
@@ -12,9 +12,11 @@ import customPlugins from "./plugins";
 import Leaf from "./marks";
 import Element from "./blocks";
 import createHotKeysHandler from "./hotkeys";
-import { Toolbar } from "./components";
+import { Toolbar, EditLink, HoverLink } from "./components";
 import highlight from "./utils/highlight";
 import { createDropListener } from "./utils/image";
+import { updateLastSelection } from "./utils/selection";
+import { linkReducer } from "./utils/link";
 
 import "./App.css";
 import "material-icons/iconfont/material-icons.css";
@@ -22,7 +24,11 @@ import "material-icons/iconfont/material-icons.css";
 const defaultValue = [
   {
     type: "paragraph",
-    children: [{ text: "A line of text in a paragraph." }]
+    children: [
+      { text: "there is a " },
+      { text: "link", link: true, url: "https://tuture.co" },
+      { text: " in the paragraph." }
+    ]
   }
 ];
 
@@ -41,7 +47,20 @@ const App = () => {
 
   const hotKeyHandler = createHotKeysHandler(editor);
 
+  const [linkStatus, linkDispatch] = useReducer(linkReducer, {
+    isEditing: false,
+    text: "",
+    url: ""
+  });
+
   console.log("editor", editor);
+  updateLastSelection(editor.selection);
+  if (editor.selection) {
+    const [match] = Editor.nodes(editor, { at: editor.selection });
+    if (match) {
+      console.log("match", match);
+    }
+  }
 
   return (
     <div
@@ -52,14 +71,16 @@ const App = () => {
         background-color: #fff;
       `}>
       <Slate editor={editor} value={value} onChange={value => setValue(value)}>
-        <Toolbar />
+        <Toolbar linkDispatch={linkDispatch} />
+        <HoverLink dispatch={linkDispatch} />
+        <EditLink link={linkStatus} dispatch={linkDispatch} />
         <Editable
           decorate={decorate}
           renderElement={renderElement}
           renderLeaf={renderLeaf}
           onKeyDown={hotKeyHandler}
+          // onClick={() => updateLastSelection(editor.selection)}
           onDrop={createDropListener(editor)}
-          spellCheck
           autoFocus
         />
       </Slate>

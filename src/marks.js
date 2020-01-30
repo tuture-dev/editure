@@ -1,7 +1,18 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { Editor } from "slate";
+
 import { isBlockActive } from "./blocks";
 import { CODE_BLOCK } from "./constants";
+
+const Link = ({ attributes, children, url }) => {
+  return (
+    <Fragment>
+      <a {...attributes} href={url || "#"}>
+        {children}
+      </a>
+    </Fragment>
+  );
+};
 
 export const isMarkActive = (editor, format) => {
   const marks = Editor.marks(editor);
@@ -41,6 +52,14 @@ export default ({ attributes, children, leaf }) => {
 
   if (leaf.underline) {
     children = <u>{children}</u>;
+  }
+
+  if (leaf.link) {
+    children = (
+      <Link {...attributes} url={leaf.url}>
+        {children}
+      </Link>
+    );
   }
 
   return (

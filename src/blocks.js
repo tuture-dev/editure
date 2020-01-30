@@ -276,12 +276,6 @@ export default props => {
       return <ImageElement {...props} />;
     case HR:
       return <HrElement {...props} />;
-    case LINK:
-      return (
-        <a {...attributes} href={element.url}>
-          {children}
-        </a>
-      );
     default:
       return <p {...attributes}>{children}</p>;
   }

@@ -3,6 +3,7 @@ export const ITALIC = "italic";
 export const UNDERLINE = "underline";
 export const CODE = "code";
 export const STRIKETHROUGH = "strikethrough";
+export const LINK = "link";
 
 export const H1 = "heading-one";
 export const H2 = "heading-two";
@@ -15,7 +16,6 @@ export const BLOCK_QUOTE = "block-quote";
 export const CODE_BLOCK = "code-block";
 export const CODE_LINE = "code-line";
 export const NOTE = "note";
-export const LINK = "link";
 export const IMAGE = "image";
 export const BULLETED_LIST = "bulleted-list";
 export const NUMBERED_LIST = "numbered-list";

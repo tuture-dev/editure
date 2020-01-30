@@ -2,6 +2,7 @@ import { Transforms, Editor, Range } from "slate";
 import isUrl from "is-url";
 
 import { LINK } from "../constants";
+import { isMarkActive, toggleMark } from "../marks";
 
 export const withLinks = editor => {
   const { insertData, insertText, isInline } = editor;
@@ -31,28 +32,6 @@ export const withLinks = editor => {
   return editor;
 };
 
-export const isLinkActive = editor => {
-  const [match] = Editor.nodes(editor, {
-    match: n => n.type === LINK
-  });
-
-  return !!match;
-};
-
-export const toggleLinkElement = editor => {
-  if (isLinkActive(editor)) {
-    unwrapLink(editor);
-  } else {
-    const url = window.prompt("输入链接");
-
-    if (!url) {
-      return;
-    }
-
-    wrapLink(editor, url);
-  }
-};
-
 export const unwrapLink = editor => {
   if (!editor.selection) {
     return;
@@ -66,7 +45,7 @@ export const wrapLink = (editor, url) => {
     return;
   }
 
-  if (isLinkActive(editor)) {
+  if (isMarkActive(editor, LINK)) {
     unwrapLink(editor);
   }
 
