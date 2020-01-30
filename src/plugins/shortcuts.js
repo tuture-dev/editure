@@ -26,7 +26,7 @@ import {
   SHORT_CUTS
 } from "../constants";
 
-const MARK_SHORTCUTS = [CODE, BOLD, ITALIC, STRIKETHROUGH, UNDERLINE];
+const MARK_SHORTCUTS = [CODE, BOLD, ITALIC, STRIKETHROUGH];
 const BLOCK_SHORTCUTS = [
   BULLETED_LIST,
   BULLETED_LIST,
@@ -50,8 +50,7 @@ const MARK_SHORTCUTS_REGEX = [
   "`([^`]+)`",
   "\\*\\*([^\\*]+)\\*\\*",
   "\\*([^\\*]+)\\*",
-  "~~([^~]+)~~",
-  "<u>([^(<u>)|(</u>)]+)</u>"
+  "~~([^~]+)~~"
 ];
 
 const BLOCK_SHORTCUTS_REGEX = [
