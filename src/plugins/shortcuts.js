@@ -88,9 +88,10 @@ function detectMarkShortcut(editor) {
         // 对内容进行 reverse 操作，如果匹配，且 index = 0，那么说明满足触发条件
         beforeText = reverseStr(beforeText);
       }
+
       let matchArr = regex.exec(beforeText);
 
-      if (matchArr && matchArr.index === 0) {
+      if ((matchArr && matchArr.index === 0) || (format === LINK && matchArr)) {
         shortcut.format = format;
 
         if (format !== LINK) {
