@@ -46,12 +46,15 @@ const BLOCK_SHORTCUTS = [
 
 const SHORTCUTS = [...MARK_SHORTCUTS, ...BLOCK_SHORTCUTS];
 
-const SHORTCUTS_REGEX = [
+const MARK_SHORTCUTS_REGEX = [
   "`([^`]+)`",
   "\\*\\*([^\\*]+)\\*\\*",
   "\\*([^\\*]+)\\*",
   "~~([^~]+)~~",
-  "<u>([^(<u>)|(</u>)]+)</u>",
+  "<u>([^(<u>)|(</u>)]+)</u>"
+];
+
+const BLOCK_SHORTCUTS_REGEX = [
   "^\\*$",
   "^-$",
   "^\\+$",
@@ -68,21 +71,31 @@ const SHORTCUTS_REGEX = [
   "^\\s*---$"
 ];
 
-function detectShortcut(editor) {
+function reverseStr(str = "") {
+  return str
+    .split("")
+    .reverse()
+    .join("");
+}
+
+function detectMarkShortcut(editor) {
   const { beforeText, range } = getBeforeText(editor);
   const shortcut = { lineRange: range };
 
-  for (const index in SHORTCUTS_REGEX) {
-    const regex = new RegExp(SHORTCUTS_REGEX[index]);
+  for (const index in MARK_SHORTCUTS_REGEX) {
+    const regex = new RegExp(MARK_SHORTCUTS_REGEX[index], "g");
     if (beforeText && regex.test(beforeText)) {
-      const matchArr = beforeText.match(regex);
+      const regex = new RegExp(MARK_SHORTCUTS_REGEX[index], "g");
 
-      if (matchArr.index + matchArr[0].length === beforeText.length) {
-        const newRegex = new RegExp(SHORTCUTS_REGEX[index], "g");
+      // 对内容进行 reverse 操作，如果匹配，且 index = 0，那么说明满足触发条件
+      const reversedBeforeText = reverseStr(beforeText);
+      const matchArr = regex.exec(reversedBeforeText);
 
-        shortcut.format = SHORTCUTS[index];
-        shortcut.regex = newRegex;
-        shortcut.matchArr = beforeText.match(newRegex);
+      if (matchArr && matchArr.index === 0) {
+        const [matchStrWithMdTag, matchStr] = matchArr;
+
+        shortcut.format = MARK_SHORTCUTS[index];
+        shortcut.matchArr = [reverseStr(matchStrWithMdTag), reverseStr(matchStr)];
         break;
       }
     }
@@ -91,12 +104,52 @@ function detectShortcut(editor) {
   return shortcut;
 }
 
+function deleteBlockShortcut(editor) {
+  const { beforeText, range } = getBeforeText(editor);
+  const shortcut = { lineRange: range };
+
+  for (const index in BLOCK_SHORTCUTS_REGEX) {
+    const regex = new RegExp(BLOCK_SHORTCUTS_REGEX[index]);
+    if (beforeText && regex.test(beforeText)) {
+      const regex = new RegExp(BLOCK_SHORTCUTS_REGEX[index], "g");
+      const matchArr = regex.exec(beforeText);
+
+      console.log("matchArr", matchArr);
+
+      if (matchArr.index + matchArr[0].length === beforeText.length) {
+        const [matchStrWithMdTag, matchStr] = matchArr;
+
+        shortcut.format = BLOCK_SHORTCUTS[index];
+        shortcut.matchArr = matchArr;
+        break;
+      }
+    }
+  }
+
+  return shortcut;
+}
+
+function detectShortcut(editor) {
+  // 首先检测是否是 mark shortuct
+  const markShortcut = detectMarkShortcut(editor);
+
+  console.log("markShortcut", markShortcut);
+
+  // 如果不是 mark，那么检测是否是 block shortcuts
+  if (!markShortcut.format) {
+    const blockShortcut = deleteBlockShortcut(editor);
+    return blockShortcut;
+  }
+
+  return markShortcut;
+}
+
 function handleMarkShortcut(editor, shortcut) {
   const { insertText, children } = editor;
   const { anchor } = editor.selection;
-  const { matchArr, regex, format } = shortcut;
+  const { matchArr, format } = shortcut;
 
-  const targetTextWithMdTag = matchArr[matchArr.length - 1];
+  const targetTextWithMdTag = matchArr[0];
   const chilrenText = getChildrenText(children, anchor.path);
 
   // 删除逻辑
@@ -111,8 +164,7 @@ function handleMarkShortcut(editor, shortcut) {
   Transforms.delete(editor);
 
   // 插入新的内容
-  const targetTextArr = regex.exec(targetTextWithMdTag);
-  const targetInsertText = targetTextArr[1];
+  const targetInsertText = matchArr[1];
   insertText(targetInsertText);
 
   // 开始对新内容进行标注
@@ -158,9 +210,7 @@ function handleBlockShortcut(editor, shortcut) {
   Transforms.delete(editor);
 
   if (format === CODE_BLOCK) {
-    const targetTextWithMdTag = matchArr[matchArr.length - 1];
-    const targetTextArr = regex.exec(targetTextWithMdTag);
-    const targetLang = targetTextArr[1];
+    const targetLang = matchArr[1];
 
     nodeProp = { ...nodeProp, lang: targetLang };
 
@@ -171,8 +221,7 @@ function handleBlockShortcut(editor, shortcut) {
   }
 
   if (format === NOTE) {
-    const targetTextWithMdTag = matchArr[matchArr.length - 1];
-    const level = regex.exec(targetTextWithMdTag)[1];
+    const level = matchArr[1];
 
     nodeProp = { ...nodeProp, level };
 
@@ -290,15 +339,9 @@ export default function withShortcuts(editor) {
         if (
           block.type !== PARAGRAPH &&
           Point.equals(selection.anchor, start) &&
-          isBlockActive(editor, CODE_BLOCK)
+          detectShortcut(editor, [H1, H2, H3, H4, H5, H6, BLOCK_QUOTE])
         ) {
           Transforms.setNodes(editor, { type: PARAGRAPH });
-
-          if (block.type === LIST_ITEM) {
-            Transforms.unwrapNodes(editor, {
-              match: n => n.type === BULLETED_LIST
-            });
-          }
 
           return;
         }
