@@ -1,3 +1,7 @@
+import { Transforms } from "slate";
+import { toggleMark } from "../marks";
+import { LINK } from "../constants";
+
 const initialState = {
   isEditing: false,
   text: "",
@@ -42,4 +46,33 @@ export const linkReducer = (state, action) => {
     default:
       return state;
   }
+};
+
+export const insertNewLink = (editor, text, url) => {
+  const { anchor } = editor.selection;
+  const focus = { ...anchor, offset: anchor.offset + text.length };
+  const range = { anchor, focus };
+
+  Transforms.insertText(editor, text);
+  Transforms.select(editor, range);
+  toggleMark(editor, LINK);
+
+  Transforms.setNodes(editor, { url }, { match: n => n.link });
+  Transforms.collapse(editor, { edge: "end" });
+
+  toggleMark(editor, LINK);
+};
+
+export const updateCurrentLink = (editor, text, url) => {
+  const { anchor } = editor.selection;
+  const { path } = anchor;
+  const focus = { path, offset: text.length };
+  const range = { anchor: { path, offset: 0 }, focus };
+
+  Transforms.select(editor, range);
+  Transforms.insertText(editor, text);
+  Transforms.setNodes(editor, { url }, { match: n => n.link });
+  Transforms.collapse(editor, { edge: "end" });
+
+  toggleMark(editor, LINK);
 };
