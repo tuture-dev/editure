@@ -82,7 +82,9 @@ const HoverLink = ({ dispatch }) => {
           border-radius: 4px;
           transition: opacity 0.75s;
         `}>
-        <a href={url}>{url}</a>
+        <a href={url} target="_blank">
+          {url}
+        </a>
         <span> </span>
         <Icon onClick={onClickEdit}>edit</Icon>
       </div>
