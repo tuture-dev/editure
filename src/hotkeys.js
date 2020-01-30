@@ -160,12 +160,15 @@ function handleDeleteLine(editor, event) {
 }
 
 function handleExitBlock(editor, event) {
-  const format = detectBlockFormat(editor, [CODE_BLOCK, NOTE]);
+  const format = detectBlockFormat(editor, [CODE_BLOCK, BLOCK_QUOTE, NOTE]);
+
+  console.log("blockquote", isBlockActive(editor, BLOCK_QUOTE));
+
   if (format) {
     event.preventDefault();
 
     const match = Editor.above(editor, {
-      match: n => Element.matches(n, { type: format })
+      match: n => n.type === format
     });
 
     const path = match[1];
@@ -175,6 +178,7 @@ function handleExitBlock(editor, event) {
     Transforms.collapse(editor, {
       edge: "end"
     });
+
     Editor.insertBreak(editor);
 
     toggleBlock(editor, format, {}, SHORT_CUTS);

@@ -66,15 +66,13 @@ export const handleActiveBlockquote = (editor, type) => {
 };
 
 export const withBlockquote = editor => {
-  const { insertBreak, deleteBackward } = editor;
+  const { insertBreak } = editor;
 
   editor.insertBreak = () => {
     if (isBlockActive(editor, BLOCK_QUOTE)) {
       const { wholeLineText } = getLineText(editor);
-      if (
-        !wholeLineText &&
-        !(isBlockActive(editor, CODE_BLOCK) || isBlockActive(editor, NOTE))
-      ) {
+
+      if (!wholeLineText) {
         // 如果最后一行为空，退出块状引用
         toggleBlock(editor, BLOCK_QUOTE, {}, SHORT_CUTS);
       } else {
