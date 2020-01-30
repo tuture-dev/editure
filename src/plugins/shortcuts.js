@@ -1,12 +1,11 @@
 import { Range, Editor, Transforms, Point } from "slate";
 
 import { toggleMark } from "../marks";
-import { isBlockActive, toggleBlock } from "../blocks";
-import { getBeforeText } from "../utils";
+import { isBlockActive, toggleBlock, detectBlockFormat } from "../blocks";
+import { getBeforeText, getChildrenText } from "../utils";
 import {
   BOLD,
   ITALIC,
-  UNDERLINE,
   CODE,
   STRIKETHROUGH,
   H1,
@@ -23,11 +22,10 @@ import {
   HR,
   LIST_ITEM,
   PARAGRAPH,
-  SHORT_CUTS,
   LINK
 } from "../constants";
 
-const MARK_SHORTCUTS = [CODE, BOLD, ITALIC, STRIKETHROUGH, UNDERLINE, LINK];
+const MARK_SHORTCUTS = [CODE, BOLD, ITALIC, STRIKETHROUGH, LINK];
 const BLOCK_SHORTCUTS = [
   BULLETED_LIST,
   BULLETED_LIST,
@@ -45,14 +43,15 @@ const BLOCK_SHORTCUTS = [
   HR
 ];
 
-const SHORTCUTS = [...MARK_SHORTCUTS, ...BLOCK_SHORTCUTS];
-
-const SHORTCUTS_REGEX = [
+const MARK_SHORTCUTS_REGEX = [
   "`([^`]+)`",
   "\\*\\*([^\\*]+)\\*\\*",
   "\\*([^\\*]+)\\*",
   "~~([^~]+)~~",
-  "<u>([^(<u>)|(</u>)]+)</u>",
+  /\[([^\\*]+)\]\(([^\\*]+)\)/
+];
+
+const BLOCK_SHORTCUTS_REGEX = [
   "^\\*$",
   "^-$",
   "^\\+$",
@@ -69,31 +68,86 @@ const SHORTCUTS_REGEX = [
   "^\\s*---$"
 ];
 
-function detectShortcut(editor) {
-  const { beforeText, range } = getBeforeText(editor);
+function reverseStr(str = "") {
+  return str
+    .split("")
+    .reverse()
+    .join("");
+}
+
+function detectMarkShortcut(editor) {
+  let { beforeText, range } = getBeforeText(editor);
   const shortcut = { lineRange: range };
 
-  for (const index in SHORTCUTS_REGEX) {
-    const regex = new RegExp(SHORTCUTS_REGEX[index]);
+  for (const index in MARK_SHORTCUTS_REGEX) {
+    const regex = new RegExp(MARK_SHORTCUTS_REGEX[index]);
     if (beforeText && regex.test(beforeText)) {
-      shortcut.format = SHORTCUTS[index];
-      shortcut.regex = regex;
-      shortcut.matchArr = beforeText.match(shortcut.regex);
-      break;
+      const format = MARK_SHORTCUTS[index];
+
+      if (format !== LINK) {
+        // 对内容进行 reverse 操作，如果匹配，且 index = 0，那么说明满足触发条件
+        beforeText = reverseStr(beforeText);
+      }
+      let matchArr = regex.exec(beforeText);
+
+      if (matchArr && matchArr.index === 0) {
+        shortcut.format = format;
+
+        if (format !== LINK) {
+          matchArr = matchArr.map(elem =>
+            typeof elem === "string" ? reverseStr(elem) : elem
+          );
+        }
+        shortcut.matchArr = matchArr;
+        break;
+      }
     }
   }
 
   return shortcut;
 }
 
+function deleteBlockShortcut(editor) {
+  const { beforeText, range } = getBeforeText(editor);
+  const shortcut = { lineRange: range };
+
+  for (const index in BLOCK_SHORTCUTS_REGEX) {
+    const regex = new RegExp(BLOCK_SHORTCUTS_REGEX[index]);
+    if (beforeText && regex.test(beforeText)) {
+      const matchArr = regex.exec(beforeText);
+
+      if (matchArr.index + matchArr[0].length === beforeText.length) {
+        shortcut.format = BLOCK_SHORTCUTS[index];
+        shortcut.matchArr = matchArr;
+        break;
+      }
+    }
+  }
+
+  return shortcut;
+}
+
+function detectShortcut(editor) {
+  // 首先检测是否是 mark shortuct
+  const markShortcut = detectMarkShortcut(editor);
+
+  // 如果不是 mark，那么检测是否是 block shortcuts
+  if (!markShortcut.format) {
+    const blockShortcut = deleteBlockShortcut(editor);
+    return blockShortcut;
+  }
+
+  return markShortcut;
+}
+
 function handleMarkShortcut(editor, shortcut) {
   const { insertText, children } = editor;
   const { anchor } = editor.selection;
-  const { matchArr, regex, format } = shortcut;
+  const { matchArr, format } = shortcut;
 
   // 删除逻辑
   const targetTextWithMdTag = matchArr[0];
-  const childrenText = children[anchor.path[0]].children[anchor.path[1]].text;
+  const childrenText = getChildrenText(children, anchor.path);
   const deleteRangeStartOffset = childrenText.length - targetTextWithMdTag.length;
   const deleteRangeEndOffset = childrenText.length;
 
@@ -148,7 +202,7 @@ function handleMarkShortcut(editor, shortcut) {
 }
 
 function handleBlockShortcut(editor, shortcut) {
-  const { matchArr, regex, format, lineRange } = shortcut;
+  const { matchArr, format, lineRange } = shortcut;
   let nodeProp = { type: format };
 
   Transforms.select(editor, lineRange);
@@ -163,7 +217,12 @@ function handleBlockShortcut(editor, shortcut) {
 
     // 在底部插入空行
     const currentSelection = editor.selection;
-    Editor.insertBreak(editor);
+    Transforms.setSelection(editor, currentSelection);
+  }
+
+  if (format === BLOCK_QUOTE) {
+    // 在底部插入空行
+    const currentSelection = editor.selection;
     Transforms.setSelection(editor, currentSelection);
   }
 
@@ -196,9 +255,18 @@ export default function withShortcuts(editor) {
       if ([NOTE, CODE_BLOCK, HR].includes(format)) {
         insertText(text);
       } else if (BLOCK_SHORTCUTS.includes(format)) {
-        handleBlockShortcut(editor, shortcut);
+        if (isBlockActive(editor, CODE_BLOCK)) {
+          insertText(text);
+        } else {
+          handleBlockShortcut(editor, shortcut);
+        }
       } else if (MARK_SHORTCUTS.includes(format)) {
-        handleMarkShortcut(editor, shortcut);
+        // 在代码块里面不允许进行 mark 操作
+        if (isBlockActive(editor, CODE_BLOCK)) {
+          insertText(text);
+        } else {
+          handleMarkShortcut(editor, shortcut);
+        }
       } else {
         insertText(text);
       }
@@ -212,7 +280,13 @@ export default function withShortcuts(editor) {
     // 检测是否为代码块触发条件
     const shortcut = detectShortcut(editor);
     if ([CODE_BLOCK, NOTE, HR].includes(shortcut.format)) {
-      handleBlockShortcut(editor, shortcut);
+      if (!detectBlockFormat(editor, [CODE_BLOCK])) {
+        handleBlockShortcut(editor, shortcut);
+        return;
+      } else {
+        insertBreak();
+      }
+
       return;
     }
 
@@ -231,8 +305,6 @@ export default function withShortcuts(editor) {
       }
     }
 
-    insertBreak();
-
     let heading;
     const [match] = Editor.nodes(editor, {
       match: n => {
@@ -246,6 +318,8 @@ export default function withShortcuts(editor) {
 
     if (match) {
       toggleBlock(editor, heading);
+    } else {
+      insertBreak();
     }
   };
 
@@ -264,15 +338,9 @@ export default function withShortcuts(editor) {
         if (
           block.type !== PARAGRAPH &&
           Point.equals(selection.anchor, start) &&
-          isBlockActive(editor, CODE_BLOCK)
+          detectBlockFormat(editor, [H1, H2, H3, H4, H5, H6])
         ) {
           Transforms.setNodes(editor, { type: PARAGRAPH });
-
-          if (block.type === LIST_ITEM) {
-            Transforms.unwrapNodes(editor, {
-              match: n => n.type === BULLETED_LIST
-            });
-          }
 
           return;
         }

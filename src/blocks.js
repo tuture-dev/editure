@@ -25,6 +25,7 @@ import {
 } from "./constants";
 import { wrapCodeBlock, handleActiveCodeBlock } from "./plugins/codeBlock";
 import { wrapBlockquote, handleActiveBlockquote } from "./plugins/blockquote";
+import { wrapNote, handleActiveNote } from "./plugins/note";
 
 const bulletedListStyleType = ["disc", "circle", "square"];
 const numberedListStyleType = ["decimal", "lower-alpha", "lower-roman"];
@@ -128,8 +129,24 @@ const ImageElement = props => {
 
 const NoteElement = props => {
   const { attributes, children, element } = props;
-  const { level } = element;
-  const realLevel = levels.includes(level) ? level : "default";
+  const { level: defaultLevel = "default" } = element;
+
+  const realLevel = levels.includes(defaultLevel) ? defaultLevel : "default";
+
+  const [level, setLevel] = useState(realLevel);
+  const editor = useSlate();
+
+  function handleChange(event) {
+    setLevel(event.target.value);
+
+    Transforms.setNodes(
+      editor,
+      { level: event.target.value },
+      {
+        match: n => n.type === NOTE
+      }
+    );
+  }
 
   const baseStyle = css`
     margin-top: 20px;
@@ -148,22 +165,29 @@ const NoteElement = props => {
     }
   `;
   const noteStyle = css`
-    border-left-color: ${palette[realLevel].border};
-    background-color: ${palette[realLevel].background};
+    border-left-color: ${palette[level].border};
+    background-color: ${palette[level].background};
   `;
   const iconStyle =
-    realLevel === "default"
+    level === "default"
       ? ""
       : css`
     &::before {
-      content: "${icons[realLevel].content}";
-      color: ${icons[realLevel].color};
+      content: "${icons[level].content}";
+      color: ${icons[level].color};
     }
   `;
 
   return (
     <div {...attributes} className={cx(baseStyle, noteStyle, iconStyle)}>
-      {children}
+      <select contentEditable={false} value={level} onChange={handleChange}>
+        {levels.map(level => (
+          <option key={level} value={level}>
+            {level}
+          </option>
+        ))}
+      </select>
+      <div>{children}</div>
     </div>
   );
 };
@@ -176,13 +200,30 @@ export const isBlockActive = (editor, format) => {
   return !!match;
 };
 
+export const getBlock = (editor, format) => {
+  const node = Editor.above(editor, {
+    match: n => n.type === format
+  });
+
+  return node;
+};
+
 export const detectBlockFormat = (editor, formats = BLOCK_TYPES) => {
+  let pathLength = -1;
+  let realFormat = null;
+
   for (const format of formats) {
     if (isBlockActive(editor, format)) {
-      return format;
+      const [_, path] = getBlock(editor, format);
+
+      if (path.length > pathLength) {
+        pathLength = path.length;
+        realFormat = format;
+      }
     }
   }
-  return null;
+
+  return realFormat;
 };
 
 export const toggleBlock = (editor, format, props, type) => {
@@ -215,6 +256,16 @@ export const toggleBlock = (editor, format, props, type) => {
       break;
     }
 
+    case NOTE: {
+      if (isActive) {
+        handleActiveNote(editor, type);
+      } else {
+        wrapNote(editor, props);
+      }
+
+      break;
+    }
+
     default: {
       Transforms.setNodes(editor, {
         type: isActive ? PARAGRAPH : isList ? LIST_ITEM : format
@@ -233,7 +284,11 @@ export default props => {
 
   switch (element.type) {
     case BLOCK_QUOTE:
-      return <blockquote {...attributes}>{children}</blockquote>;
+      return (
+        <blockquote {...attributes}>
+          <div>{children}</div>
+        </blockquote>
+      );
     case BULLETED_LIST:
       return (
         <ul

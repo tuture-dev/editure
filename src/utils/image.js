@@ -38,8 +38,6 @@ export const createInsertImageCallback = editor => {
     });
     Transforms.insertNodes(editor, image);
     Transforms.insertNodes(editor, { children: [text] });
-
-    console.log("editor", editor);
   };
 };
 

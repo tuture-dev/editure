@@ -47,12 +47,11 @@ export const getLineText = editor => {
 };
 
 export const getChildrenText = (children, path) => {
-  console.log("children", children, path);
   let childrenItem = children;
-  for (let i = 0; i < path.length - 1; i++) {
-    console.log("i", i, childrenItem);
+  let i = 0;
+  for (; i < path.length - 1; i++) {
     childrenItem = childrenItem[path[i]].children;
   }
 
-  return childrenItem[0].text;
+  return childrenItem[path[i]].text;
 };

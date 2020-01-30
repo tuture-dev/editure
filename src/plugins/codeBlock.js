@@ -1,4 +1,4 @@
-import { Transforms, Editor, Point, Range, Node } from "slate";
+import { Transforms, Editor, Point, Range } from "slate";
 
 import {
   CODE_BLOCK,
@@ -82,14 +82,14 @@ export const handleActiveCodeBlock = (editor, type) => {
 };
 
 export const withCodeBlock = editor => {
-  const { insertText, deleteBackward } = editor;
+  const { deleteBackward } = editor;
 
   editor.deleteBackward = (...args) => {
     const { selection } = editor;
 
     if (selection && Range.isCollapsed(selection)) {
       const match = Editor.above(editor, {
-        match: n => Editor.isBlock(editor, n)
+        match: n => n.type === CODE_BLOCK
       });
 
       if (match) {
@@ -101,7 +101,7 @@ export const withCodeBlock = editor => {
           Point.equals(selection.anchor, start) &&
           isBlockActive(editor, CODE_LINE)
         ) {
-          const [node, path] = Editor.above(editor, {
+          const [node, _] = Editor.above(editor, {
             match: n => n.type === CODE_BLOCK
           });
 

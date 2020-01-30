@@ -1,7 +1,7 @@
 import { Transforms, Editor, Element, Node, Text } from "slate";
 import isHotkey from "is-hotkey";
 
-import { getBeforeText, getChildrenText } from "./utils";
+import { getBeforeText } from "./utils";
 import { toggleMark } from "./marks";
 import { toggleBlock, isBlockActive, detectBlockFormat } from "./blocks";
 import { decreaseItemDepth, increaseItemDepth } from "./plugins/list";
@@ -53,16 +53,13 @@ const BLOCK_HOTKEYS = {
 function handleTabKey(editor, event) {
   const { beforeText } = getBeforeText(editor);
 
-  if (
-    !beforeText.length &&
-    (isBlockActive(editor, BULLETED_LIST) || isBlockActive(editor, NUMBERED_LIST))
-  ) {
+  if (!beforeText.length && detectBlockFormat(editor, [BULLETED_LIST, NUMBERED_LIST])) {
     event.preventDefault();
 
     increaseItemDepth(editor);
   } else if (
     beforeText.length &&
-    (isBlockActive(editor, BULLETED_LIST) || isBlockActive(editor, NUMBERED_LIST))
+    detectBlockFormat(editor, [BULLETED_LIST, NUMBERED_LIST])
   ) {
     event.preventDefault();
     Transforms.insertText(editor, "\t");
@@ -83,7 +80,7 @@ function handleShiftTabKey(editor, event) {
 }
 
 function handleSelectAll(editor, event) {
-  const format = detectBlockFormat(editor, [BLOCK_QUOTE, CODE_BLOCK]);
+  const format = detectBlockFormat(editor, [BLOCK_QUOTE, CODE_BLOCK, NOTE]);
   if (format) {
     event.preventDefault();
 
@@ -101,13 +98,9 @@ function handleSelectAll(editor, event) {
 }
 
 function handleSelectLeftAll(editor, event) {
-  if (isBlockActive(editor, BLOCK_QUOTE) || isBlockActive(editor, CODE_BLOCK)) {
+  if (detectBlockFormat(editor, [CODE_BLOCK, BLOCK_QUOTE, NOTE])) {
     event.preventDefault();
-    let type = BLOCK_QUOTE;
-
-    if (isBlockActive(editor, CODE_BLOCK)) {
-      type = CODE_BLOCK;
-    }
+    const type = detectBlockFormat(editor, [CODE_BLOCK, BLOCK_QUOTE, NOTE]);
 
     const { selection } = editor;
     const { anchor } = selection;
@@ -125,13 +118,9 @@ function handleSelectLeftAll(editor, event) {
 }
 
 function handleSelectRightAll(editor, event) {
-  if (isBlockActive(editor, BLOCK_QUOTE) || isBlockActive(editor, CODE_BLOCK)) {
+  if (detectBlockFormat(editor, [CODE_BLOCK, BLOCK_QUOTE, NOTE])) {
     event.preventDefault();
-    let type = BLOCK_QUOTE;
-
-    if (isBlockActive(editor, CODE_BLOCK)) {
-      type = CODE_BLOCK;
-    }
+    const type = detectBlockFormat(editor, [CODE_BLOCK, BLOCK_QUOTE, NOTE]);
 
     const { selection } = editor;
     const { anchor } = selection;
@@ -153,26 +142,31 @@ function handleDeleteLine(editor, event) {
 
   // 具体就是遍历此代码块/引用的  children 数组
   // 找到最近的一个 \n 字符，然后删除此 \n 之后的字符到光标此时选中的字符
-  const { selection } = editor;
+  const { selection, deleteBackward } = editor;
   const { anchor } = selection;
   const { path } = anchor;
 
-  event.preventDefault();
+  const { beforeText } = getBeforeText(editor);
 
-  const deletePath = path.slice(0, path.length - 1);
-  const start = Editor.start(editor, deletePath);
+  if (beforeText) {
+    const deletePath = path.slice(0, path.length - 1);
+    const start = Editor.start(editor, deletePath);
 
-  Transforms.select(editor, { anchor: start, focus: anchor });
-  Transforms.delete(editor);
+    Transforms.select(editor, { anchor: start, focus: anchor });
+    Transforms.delete(editor);
+  } else {
+    deleteBackward();
+  }
 }
 
 function handleExitBlock(editor, event) {
   const format = detectBlockFormat(editor, [CODE_BLOCK, BLOCK_QUOTE, NOTE]);
+
   if (format) {
     event.preventDefault();
 
     const match = Editor.above(editor, {
-      match: n => Element.matches(n, { type: format })
+      match: n => n.type === format
     });
 
     const path = match[1];
@@ -182,6 +176,7 @@ function handleExitBlock(editor, event) {
     Transforms.collapse(editor, {
       edge: "end"
     });
+
     Editor.insertBreak(editor);
 
     toggleBlock(editor, format, {}, SHORT_CUTS);
