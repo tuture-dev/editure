@@ -16,16 +16,12 @@ export const wrapNote = (editor, props) => {
 };
 
 export const unwrapNote = editor => {
-  console.log("unwrapNote");
-
   Transforms.unwrapNodes(editor, {
     match: n => n.type === NOTE
   });
 };
 
 export const exitNote = editor => {
-  console.log("exitNote");
-
   const [_, path] = Editor.above(editor, {
     match: n => n.type === PARAGRAPH
   });
@@ -59,51 +55,4 @@ export const handleActiveNote = (editor, type) => {
       break;
     }
   }
-};
-
-export const withNote = editor => {
-  const { deleteBackward } = editor;
-
-  // editor.deleteBackward = (...args) => {
-  //   console.log("noteDeleteBackward");
-  //   const { selection } = editor;
-
-  //   if (selection && Range.isCollapsed(selection)) {
-  //     const match = Editor.parent(editor, selection, {
-  //       depth: 1
-  //     });
-
-  //     if (match) {
-  //       const [block, path] = match;
-  //       const start = Editor.start(editor, path);
-
-  //       if (
-  //         block.type !== PARAGRAPH &&
-  //         Point.equals(selection.anchor, start) &&
-  //         isBlockActive(editor, NOTE)
-  //       ) {
-  //         const [node, path] = Editor.above(editor, {
-  //           match: n => n.type === NOTE
-  //         });
-
-  //         const { wholeLineText } = getLineText(editor);
-  //         const { children = [] } = node;
-
-  //         if (children.length === 1 && !wholeLineText) {
-  //           unwrapNote(editor);
-  //           return;
-  //         } else if (children.length === 1 && wholeLineText) {
-  //           return;
-  //         } else if (children.length > 1) {
-  //           Transforms.mergeNodes(editor);
-  //           return;
-  //         }
-  //       }
-  //     }
-
-  //     deleteBackward(...args);
-  //   }
-  // };
-
-  return editor;
 };

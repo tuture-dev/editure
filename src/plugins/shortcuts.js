@@ -111,8 +111,6 @@ function deleteBlockShortcut(editor) {
       const regex = new RegExp(BLOCK_SHORTCUTS_REGEX[index], "g");
       const matchArr = regex.exec(beforeText);
 
-      console.log("matchArr", matchArr);
-
       if (matchArr.index + matchArr[0].length === beforeText.length) {
         shortcut.format = BLOCK_SHORTCUTS[index];
         shortcut.matchArr = matchArr;
@@ -127,8 +125,6 @@ function deleteBlockShortcut(editor) {
 function detectShortcut(editor) {
   // 首先检测是否是 mark shortuct
   const markShortcut = detectMarkShortcut(editor);
-
-  console.log("markShortcut", markShortcut);
 
   // 如果不是 mark，那么检测是否是 block shortcuts
   if (!markShortcut.format) {

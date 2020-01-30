@@ -5,7 +5,7 @@ import { css } from "emotion";
 import Icon from "./Icon";
 import Button from "./Button";
 import { toggleBlock } from "../blocks";
-import { levels, insertNote } from "../utils/note";
+import { levels } from "../utils/note";
 import { NOTE, TOOL_BUTTON } from "../constants";
 
 const NoteButton = () => {

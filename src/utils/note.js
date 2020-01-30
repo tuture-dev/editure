@@ -21,18 +21,3 @@ export const icons = {
   warning: { content: "\f056", color: "#f0ad4e" },
   danger: { content: "\f056", color: "#d9534f" }
 };
-
-export const insertNote = (editor, level) => {
-  const { beforeText } = getBeforeText(editor);
-
-  if (beforeText) {
-    Editor.insertBreak(editor);
-  }
-
-  const text = { text: "" };
-  const note = { type: NOTE, level, children: [text] };
-  Transforms.removeNodes(editor, {
-    match: n => n.children && !n.children[0].text
-  });
-  Transforms.insertNodes(editor, note);
-};

@@ -200,13 +200,30 @@ export const isBlockActive = (editor, format) => {
   return !!match;
 };
 
+export const getBlock = (editor, format) => {
+  const node = Editor.above(editor, {
+    match: n => n.type === format
+  });
+
+  return node;
+};
+
 export const detectBlockFormat = (editor, formats = BLOCK_TYPES) => {
+  let pathLength = -1;
+  let realFormat = null;
+
   for (const format of formats) {
     if (isBlockActive(editor, format)) {
-      return format;
+      const [_, path] = getBlock(editor, format);
+
+      if (path.length > pathLength) {
+        pathLength = path.length;
+        realFormat = format;
+      }
     }
   }
-  return null;
+
+  return realFormat;
 };
 
 export const toggleBlock = (editor, format, props, type) => {

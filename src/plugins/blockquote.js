@@ -69,7 +69,9 @@ export const withBlockquote = editor => {
   const { insertBreak } = editor;
 
   editor.insertBreak = () => {
-    if (isBlockActive(editor, BLOCK_QUOTE)) {
+    const format = detectBlockFormat(editor, [CODE_BLOCK, NOTE, BLOCK_QUOTE]);
+
+    if (format === BLOCK_QUOTE) {
       const { wholeLineText } = getLineText(editor);
 
       if (!wholeLineText) {

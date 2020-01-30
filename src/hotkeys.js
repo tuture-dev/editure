@@ -162,8 +162,6 @@ function handleDeleteLine(editor, event) {
 function handleExitBlock(editor, event) {
   const format = detectBlockFormat(editor, [CODE_BLOCK, BLOCK_QUOTE, NOTE]);
 
-  console.log("blockquote", isBlockActive(editor, BLOCK_QUOTE));
-
   if (format) {
     event.preventDefault();
 
