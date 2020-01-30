@@ -17,14 +17,6 @@ const LinkButton = ({ dispatch }) => {
 
     const { selection } = editor;
 
-    console.log("selected", Editor.string(editor, selection));
-    // console.log("selection", selection);
-
-    // const [match] = Editor.nodes(editor, { at: selection });
-    // // console.log("match", match);
-    // if (match) {
-    //   dispatch(updateLinkText(match[0].text));
-    // }
     dispatch(updateLinkText(Editor.string(editor, selection)));
     dispatch(startEditLink());
   };

@@ -31,18 +31,26 @@ const EditLink = ({ link, dispatch }) => {
     Transforms.select(editor, selection);
 
     if (text) {
-      // 如果当前不是 link，则插入新的 link 文本，并加上相应的 mark
+      const { anchor } = selection;
+
       if (!isMarkActive(editor, LINK)) {
-        const { anchor } = selection;
+        // 如果当前不是 link，则插入新的 link 文本，并加上相应的 mark
         const focus = { ...anchor, offset: anchor.offset + text.length };
         const range = { anchor, focus };
+
         Transforms.insertText(editor, text);
         Transforms.select(editor, range);
         toggleMark(editor, LINK);
+      } else {
+        // 否则修改当前 link 的文本
+        const { path } = anchor;
+        const focus = { path, offset: text.length };
+        const range = { anchor: { path, offset: 0 }, focus };
+        Transforms.select(editor, range);
+        Transforms.insertText(editor, text);
       }
-      console.log("editor.selection", editor.selection);
-      console.log("setNodes", { text, url });
-      Transforms.setNodes(editor, { text, url }, { match: n => n.link });
+
+      Transforms.setNodes(editor, { url }, { match: n => n.link });
       Transforms.collapse(editor, { edge: "end" });
 
       toggleMark(editor, LINK);

@@ -55,12 +55,6 @@ const App = () => {
 
   console.log("editor", editor);
   updateLastSelection(editor.selection);
-  if (editor.selection) {
-    const [match] = Editor.nodes(editor, { at: editor.selection });
-    if (match) {
-      console.log("match", match);
-    }
-  }
 
   return (
     <div
