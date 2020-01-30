@@ -23,10 +23,11 @@ import {
   HR,
   LIST_ITEM,
   PARAGRAPH,
-  SHORT_CUTS
+  SHORT_CUTS,
+  LINK
 } from "../constants";
 
-const MARK_SHORTCUTS = [CODE, BOLD, ITALIC, STRIKETHROUGH, UNDERLINE];
+const MARK_SHORTCUTS = [CODE, BOLD, ITALIC, STRIKETHROUGH, UNDERLINE, LINK];
 const BLOCK_SHORTCUTS = [
   BULLETED_LIST,
   BULLETED_LIST,
@@ -73,7 +74,7 @@ function detectShortcut(editor) {
   const shortcut = { lineRange: range };
 
   for (const index in SHORTCUTS_REGEX) {
-    const regex = new RegExp(SHORTCUTS_REGEX[index], "g");
+    const regex = new RegExp(SHORTCUTS_REGEX[index]);
     if (beforeText && regex.test(beforeText)) {
       shortcut.format = SHORTCUTS[index];
       shortcut.regex = regex;
@@ -90,12 +91,11 @@ function handleMarkShortcut(editor, shortcut) {
   const { anchor } = editor.selection;
   const { matchArr, regex, format } = shortcut;
 
-  const targetTextWithMdTag = matchArr[matchArr.length - 1];
-  const chilrenText = children[anchor.path[0]].children[anchor.path[1]].text;
-
   // 删除逻辑
-  const deleteRangeStartOffset = chilrenText.length - targetTextWithMdTag.length;
-  const deleteRangeEndOffset = chilrenText.length;
+  const targetTextWithMdTag = matchArr[0];
+  const childrenText = children[anchor.path[0]].children[anchor.path[1]].text;
+  const deleteRangeStartOffset = childrenText.length - targetTextWithMdTag.length;
+  const deleteRangeEndOffset = childrenText.length;
 
   const deleteRangeStart = { ...anchor, offset: deleteRangeStartOffset };
   const deleteRangeEnd = { ...anchor, offset: deleteRangeEndOffset };
@@ -105,8 +105,7 @@ function handleMarkShortcut(editor, shortcut) {
   Transforms.delete(editor);
 
   // 插入新的内容
-  const targetTextArr = regex.exec(targetTextWithMdTag);
-  const targetInsertText = targetTextArr[1];
+  const targetInsertText = matchArr[1];
   insertText(targetInsertText);
 
   // 开始对新内容进行标注
@@ -125,6 +124,10 @@ function handleMarkShortcut(editor, shortcut) {
 
   Transforms.select(editor, needMarkRange);
   toggleMark(editor, format);
+
+  if (format === LINK) {
+    Transforms.setNodes(editor, { url: matchArr[2] }, { match: n => n.link });
+  }
 
   Transforms.collapse(editor, {
     edge: "end"
@@ -151,24 +154,12 @@ function handleBlockShortcut(editor, shortcut) {
   Transforms.select(editor, lineRange);
   Transforms.delete(editor);
 
-  if (format === CODE_BLOCK) {
-    const targetTextWithMdTag = matchArr[matchArr.length - 1];
-    const targetTextArr = regex.exec(targetTextWithMdTag);
-    const targetLang = targetTextArr[1];
-
-    nodeProp = { ...nodeProp, lang: targetLang };
-
-    // 在底部插入空行
-    const currentSelection = editor.selection;
-    Editor.insertBreak(editor);
-    Transforms.setSelection(editor, currentSelection);
-  }
-
-  if (format === NOTE) {
-    const targetTextWithMdTag = matchArr[matchArr.length - 1];
-    const level = regex.exec(targetTextWithMdTag)[1];
-
-    nodeProp = { ...nodeProp, level };
+  if ([CODE_BLOCK, NOTE].includes(format)) {
+    if (format === CODE_BLOCK) {
+      nodeProp = { ...nodeProp, lang: matchArr[1] };
+    } else {
+      nodeProp = { ...nodeProp, level: matchArr[1] };
+    }
 
     // 在底部插入空行
     const currentSelection = editor.selection;
