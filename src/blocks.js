@@ -267,7 +267,11 @@ export default props => {
 
   switch (element.type) {
     case BLOCK_QUOTE:
-      return <blockquote {...attributes}>{children}</blockquote>;
+      return (
+        <blockquote {...attributes}>
+          <div>{children}</div>
+        </blockquote>
+      );
     case BULLETED_LIST:
       return (
         <ul

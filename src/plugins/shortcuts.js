@@ -1,7 +1,7 @@
 import { Range, Editor, Transforms, Point } from "slate";
 
 import { toggleMark } from "../marks";
-import { isBlockActive, toggleBlock } from "../blocks";
+import { isBlockActive, toggleBlock, detectBlockFormat } from "../blocks";
 import { getBeforeText, getChildrenText } from "../utils";
 import {
   BOLD,
@@ -43,8 +43,6 @@ const BLOCK_SHORTCUTS = [
   CODE_BLOCK,
   HR
 ];
-
-const SHORTCUTS = [...MARK_SHORTCUTS, ...BLOCK_SHORTCUTS];
 
 const MARK_SHORTCUTS_REGEX = [
   "`([^`]+)`",
@@ -116,8 +114,6 @@ function deleteBlockShortcut(editor) {
       console.log("matchArr", matchArr);
 
       if (matchArr.index + matchArr[0].length === beforeText.length) {
-        const [matchStrWithMdTag, matchStr] = matchArr;
-
         shortcut.format = BLOCK_SHORTCUTS[index];
         shortcut.matchArr = matchArr;
         break;
@@ -202,7 +198,7 @@ function handleMarkShortcut(editor, shortcut) {
 }
 
 function handleBlockShortcut(editor, shortcut) {
-  const { matchArr, regex, format, lineRange } = shortcut;
+  const { matchArr, format, lineRange } = shortcut;
   let nodeProp = { type: format };
 
   Transforms.select(editor, lineRange);
@@ -215,7 +211,6 @@ function handleBlockShortcut(editor, shortcut) {
 
     // 在底部插入空行
     const currentSelection = editor.selection;
-    Editor.insertBreak(editor);
     Transforms.setSelection(editor, currentSelection);
   }
 
@@ -226,7 +221,12 @@ function handleBlockShortcut(editor, shortcut) {
 
     // 在底部插入空行
     const currentSelection = editor.selection;
-    Editor.insertBreak(editor);
+    Transforms.setSelection(editor, currentSelection);
+  }
+
+  if (format === BLOCK_QUOTE) {
+    // 在底部插入空行
+    const currentSelection = editor.selection;
     Transforms.setSelection(editor, currentSelection);
   }
 
@@ -284,10 +284,14 @@ export default function withShortcuts(editor) {
     // 检测是否为代码块触发条件
     const shortcut = detectShortcut(editor);
     if ([CODE_BLOCK, NOTE, HR].includes(shortcut.format)) {
-      if (!isBlockActive(editor, CODE_BLOCK)) {
+      if (!detectBlockFormat(editor, [CODE_BLOCK])) {
         handleBlockShortcut(editor, shortcut);
         return;
+      } else {
+        insertBreak();
       }
+
+      return;
     }
 
     for (const format of [BULLETED_LIST, NUMBERED_LIST]) {
@@ -305,8 +309,6 @@ export default function withShortcuts(editor) {
       }
     }
 
-    insertBreak();
-
     let heading;
     const [match] = Editor.nodes(editor, {
       match: n => {
@@ -320,6 +322,8 @@ export default function withShortcuts(editor) {
 
     if (match) {
       toggleBlock(editor, heading);
+    } else {
+      insertBreak();
     }
   };
 
@@ -338,7 +342,7 @@ export default function withShortcuts(editor) {
         if (
           block.type !== PARAGRAPH &&
           Point.equals(selection.anchor, start) &&
-          detectShortcut(editor, [H1, H2, H3, H4, H5, H6, BLOCK_QUOTE])
+          detectBlockFormat(editor, [H1, H2, H3, H4, H5, H6])
         ) {
           Transforms.setNodes(editor, { type: PARAGRAPH });
 

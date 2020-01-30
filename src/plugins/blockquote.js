@@ -1,7 +1,15 @@
-import { Transforms, Editor } from "slate";
+import { Transforms, Editor, Range, Node, Point } from "slate";
 
-import { BLOCK_QUOTE, PARAGRAPH, TOOL_BUTTON, HOT_KEY, SHORT_CUTS } from "../constants";
-import { isBlockActive, toggleBlock } from "../blocks";
+import {
+  BLOCK_QUOTE,
+  PARAGRAPH,
+  TOOL_BUTTON,
+  HOT_KEY,
+  SHORT_CUTS,
+  CODE_BLOCK,
+  NOTE
+} from "../constants";
+import { isBlockActive, toggleBlock, detectBlockFormat } from "../blocks";
 import { getLineText } from "../utils";
 
 export const wrapBlockquote = editor => {
@@ -63,19 +71,20 @@ export const withBlockquote = editor => {
   editor.insertBreak = () => {
     if (isBlockActive(editor, BLOCK_QUOTE)) {
       const { wholeLineText } = getLineText(editor);
-      if (!wholeLineText) {
+      if (
+        !wholeLineText &&
+        !(isBlockActive(editor, CODE_BLOCK) || isBlockActive(editor, NOTE))
+      ) {
         // 如果最后一行为空，退出块状引用
-        deleteBackward();
-        insertBreak();
         toggleBlock(editor, BLOCK_QUOTE, {}, SHORT_CUTS);
       } else {
         insertBreak();
       }
 
       return;
-    } else {
-      insertBreak();
     }
+
+    insertBreak();
   };
 
   return editor;

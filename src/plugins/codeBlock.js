@@ -23,6 +23,7 @@ export const wrapCodeBlock = (editor, props) => {
 };
 
 export const unwrapCodeBlock = editor => {
+  console.log("unwrapCodeBlock");
   const [_, path] = Editor.above(editor, {
     match: n => n.type === CODE_BLOCK
   });
@@ -46,6 +47,7 @@ export const unwrapCodeBlock = editor => {
 };
 
 export const exitCodeBlock = editor => {
+  console.log("exitCodeBlock");
   Transforms.setNodes(
     editor,
     {
@@ -82,14 +84,15 @@ export const handleActiveCodeBlock = (editor, type) => {
 };
 
 export const withCodeBlock = editor => {
-  const { insertText, deleteBackward } = editor;
+  const { deleteBackward } = editor;
 
   editor.deleteBackward = (...args) => {
+    console.log("codeblockdeleteBackward");
     const { selection } = editor;
 
     if (selection && Range.isCollapsed(selection)) {
       const match = Editor.above(editor, {
-        match: n => Editor.isBlock(editor, n)
+        match: n => n.type === CODE_BLOCK
       });
 
       if (match) {
@@ -101,12 +104,14 @@ export const withCodeBlock = editor => {
           Point.equals(selection.anchor, start) &&
           isBlockActive(editor, CODE_LINE)
         ) {
-          const [node, path] = Editor.above(editor, {
+          const [node, _] = Editor.above(editor, {
             match: n => n.type === CODE_BLOCK
           });
 
           const { wholeLineText } = getLineText(editor);
           const { children = [] } = node;
+
+          console.log("codewholeLineText", wholeLineText, children);
 
           if (children.length === 1 && !wholeLineText) {
             unwrapCodeBlock(editor);

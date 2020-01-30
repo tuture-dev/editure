@@ -1,7 +1,7 @@
 import { Transforms, Editor, Point, Range } from "slate";
 
 import { NOTE, PARAGRAPH, TOOL_BUTTON, HOT_KEY, SHORT_CUTS } from "../constants";
-import { isBlockActive, toggleBlock } from "../blocks";
+import { isBlockActive } from "../blocks";
 import { getLineText } from "../utils";
 
 export const wrapNote = (editor, props) => {
@@ -16,12 +16,16 @@ export const wrapNote = (editor, props) => {
 };
 
 export const unwrapNote = editor => {
+  console.log("unwrapNote");
+
   Transforms.unwrapNodes(editor, {
     match: n => n.type === NOTE
   });
 };
 
 export const exitNote = editor => {
+  console.log("exitNote");
+
   const [_, path] = Editor.above(editor, {
     match: n => n.type === PARAGRAPH
   });
@@ -58,47 +62,48 @@ export const handleActiveNote = (editor, type) => {
 };
 
 export const withNote = editor => {
-  const { deleteBackward, insertBreak } = editor;
+  const { deleteBackward } = editor;
 
-  editor.deleteBackward = (...args) => {
-    const { selection } = editor;
+  // editor.deleteBackward = (...args) => {
+  //   console.log("noteDeleteBackward");
+  //   const { selection } = editor;
 
-    if (selection && Range.isCollapsed(selection)) {
-      const match = Editor.above(editor, {
-        match: n => Editor.isBlock(editor, n)
-      });
+  //   if (selection && Range.isCollapsed(selection)) {
+  //     const match = Editor.parent(editor, selection, {
+  //       depth: 1
+  //     });
 
-      if (match) {
-        const [block, path] = match;
-        const start = Editor.start(editor, path);
+  //     if (match) {
+  //       const [block, path] = match;
+  //       const start = Editor.start(editor, path);
 
-        if (
-          block.type !== PARAGRAPH &&
-          Point.equals(selection.anchor, start) &&
-          isBlockActive(editor, NOTE)
-        ) {
-          const [node, path] = Editor.above(editor, {
-            match: n => n.type === NOTE
-          });
+  //       if (
+  //         block.type !== PARAGRAPH &&
+  //         Point.equals(selection.anchor, start) &&
+  //         isBlockActive(editor, NOTE)
+  //       ) {
+  //         const [node, path] = Editor.above(editor, {
+  //           match: n => n.type === NOTE
+  //         });
 
-          const { wholeLineText } = getLineText(editor);
-          const { children = [] } = node;
+  //         const { wholeLineText } = getLineText(editor);
+  //         const { children = [] } = node;
 
-          if (children.length === 1 && !wholeLineText) {
-            unwrapNote(editor);
-            return;
-          } else if (children.length === 1 && wholeLineText) {
-            return;
-          } else if (children.length > 1) {
-            Transforms.mergeNodes(editor);
-            return;
-          }
-        }
-      }
+  //         if (children.length === 1 && !wholeLineText) {
+  //           unwrapNote(editor);
+  //           return;
+  //         } else if (children.length === 1 && wholeLineText) {
+  //           return;
+  //         } else if (children.length > 1) {
+  //           Transforms.mergeNodes(editor);
+  //           return;
+  //         }
+  //       }
+  //     }
 
-      deleteBackward(...args);
-    }
-  };
+  //     deleteBackward(...args);
+  //   }
+  // };
 
   return editor;
 };

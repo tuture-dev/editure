@@ -160,7 +160,7 @@ function handleDeleteLine(editor, event) {
 }
 
 function handleExitBlock(editor, event) {
-  const format = detectBlockFormat(editor, [CODE_BLOCK, BLOCK_QUOTE, NOTE]);
+  const format = detectBlockFormat(editor, [CODE_BLOCK, NOTE]);
   if (format) {
     event.preventDefault();
 
