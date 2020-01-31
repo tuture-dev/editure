@@ -149,8 +149,9 @@ function handleMarkShortcut(editor, shortcut) {
   // 删除逻辑
   const targetTextWithMdTag = matchArr[0];
   const childrenText = getChildrenText(children, anchor.path);
-  const deleteRangeStartOffset = childrenText.length - targetTextWithMdTag.length;
-  const deleteRangeEndOffset = childrenText.length;
+  const beforeText = childrenText.slice(0, editor.selection.focus.offset);
+  const deleteRangeStartOffset = beforeText.length - targetTextWithMdTag.length;
+  const deleteRangeEndOffset = beforeText.length;
 
   const deleteRangeStart = { ...anchor, offset: deleteRangeStartOffset };
   const deleteRangeEnd = { ...anchor, offset: deleteRangeEndOffset };
