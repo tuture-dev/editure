@@ -72,7 +72,11 @@ const CodeBlockElement = props => {
     enumPrismLangToLanguage[enumPrismLangToLanguage[lang.toLocaleLowerCase()]];
 
   return (
-    <div {...props.attributes}>
+    <div
+      className={css`
+        margin-bottom: 0.5em;
+      `}
+      {...props.attributes}>
       <select contentEditable={false} value={selectValue} onChange={handleChange}>
         {languages.map(language => (
           <option key={language} value={enumPrismLangToLanguage[language]}>
@@ -80,7 +84,14 @@ const CodeBlockElement = props => {
           </option>
         ))}
       </select>
-      <div>{props.children}</div>
+      <div
+        className={css`
+          margin-top: 5px;
+          padding: 10px 20px;
+          background-color: #eee;
+        `}>
+        {props.children}
+      </div>
     </div>
   );
 };

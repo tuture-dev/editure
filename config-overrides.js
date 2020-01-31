@@ -57,9 +57,7 @@ module.exports = {
           "verilog",
           "lua"
         ],
-        plugins: ["line-numbers", "autoloader"],
-        theme: "default",
-        css: true
+        plugins: ["line-numbers", "autoloader"]
       }
     ])
   )
