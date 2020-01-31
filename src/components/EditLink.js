@@ -98,8 +98,8 @@ const EditLink = ({ link, dispatch }) => {
           className={css`
             width: 60px;
           `}
-          onClick={onCancel}>
-          取消
+          onClick={onSubmit}>
+          确定
         </button>
         <span
           className={css`
@@ -112,8 +112,8 @@ const EditLink = ({ link, dispatch }) => {
           className={css`
             width: 60px;
           `}
-          onClick={onSubmit}>
-          确定
+          onClick={onCancel}>
+          取消
         </button>
       </div>
     </Modal>

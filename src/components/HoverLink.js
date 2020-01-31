@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { css } from "emotion";
-import { Editor } from "slate";
+import { Editor, Transforms } from "slate";
 import { useSlate } from "slate-react";
 
 import Icon from "./Icon";
-import { isMarkActive } from "../marks";
+import { isMarkActive, toggleMark } from "../marks";
 import { LINK } from "../constants";
 import { startEditLink, updateLinkText, updateLinkUrl } from "../utils/link";
 
@@ -65,6 +65,28 @@ const HoverLink = ({ dispatch }) => {
     }
   };
 
+  const onDeleteLink = e => {
+    e.preventDefault();
+
+    const { selection } = editor;
+    const [match] = Editor.nodes(editor, { match: n => n.link });
+
+    // 选中当前整个链接，取消链接
+    if (match) {
+      const { path } = selection.anchor;
+      const linkRange = {
+        anchor: { path, offset: 0 },
+        focus: { path, offset: match[0].text.length }
+      };
+
+      Transforms.select(editor, linkRange);
+      toggleMark(editor, LINK);
+      Transforms.collapse(editor, {
+        edge: "focus"
+      });
+    }
+  };
+
   return (
     <Portal>
       <div
@@ -87,6 +109,8 @@ const HoverLink = ({ dispatch }) => {
         </a>
         <span> </span>
         <Icon onMouseDown={onClickEdit}>edit</Icon>
+        <span> </span>
+        <Icon onMouseDown={onDeleteLink}>delete</Icon>
       </div>
     </Portal>
   );
