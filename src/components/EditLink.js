@@ -57,12 +57,16 @@ const EditLink = ({ link, dispatch }) => {
       <input
         type="text"
         value={text}
+        placeholder="添加描述"
+        autoFocus={!text}
         onChange={e => dispatch(updateLinkText(e.target.value))}
       />
       <p>链接</p>
       <input
         type="text"
         value={url}
+        placeholder="链接地址"
+        autoFocus={text}
         onChange={e => dispatch(updateLinkUrl(e.target.value))}
       />
       <button onClick={onSubmit}>确定</button>
