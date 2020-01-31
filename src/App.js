@@ -45,7 +45,13 @@ const App = () => {
   const renderLeaf = useCallback(Leaf, []);
   const decorate = useCallback(args => highlight(args), []);
 
-  const hotKeyHandler = createHotKeysHandler(editor);
+  // 用来控制工具栏按钮的 refs
+  const buttonRefs = {
+    imageBtnRef: React.createRef(),
+    linkBtnRef: React.createRef()
+  };
+
+  const hotKeyHandler = createHotKeysHandler(editor, buttonRefs);
 
   const [linkStatus, linkDispatch] = useReducer(linkReducer, {
     isEditing: false,
@@ -65,7 +71,7 @@ const App = () => {
         background-color: #fff;
       `}>
       <Slate editor={editor} value={value} onChange={value => setValue(value)}>
-        <Toolbar linkDispatch={linkDispatch} />
+        <Toolbar linkDispatch={linkDispatch} ref={buttonRefs} />
         <HoverLink dispatch={linkDispatch} />
         <EditLink link={linkStatus} dispatch={linkDispatch} />
         <Editable

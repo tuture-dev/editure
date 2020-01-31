@@ -8,7 +8,7 @@ import { isMarkActive, toggleMark } from "../marks";
 import { LINK } from "../constants";
 import { updateLinkText, startEditLink } from "../utils/link";
 
-const LinkButton = ({ dispatch }) => {
+const LinkButton = React.forwardRef(({ dispatch }, ref) => {
   const editor = useSlate();
 
   const onClick = e => {
@@ -39,10 +39,14 @@ const LinkButton = ({ dispatch }) => {
   };
 
   return (
-    <Button title="添加链接" active={isMarkActive(editor, LINK)} onMouseDown={onClick}>
+    <Button
+      title="添加链接"
+      active={isMarkActive(editor, LINK)}
+      onMouseDown={onClick}
+      ref={ref}>
       <Icon>link</Icon>
     </Button>
   );
-};
+});
 
 export default LinkButton;

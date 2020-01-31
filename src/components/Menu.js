@@ -1,10 +1,9 @@
 import React from "react";
 import { cx, css } from "emotion";
 
-const Menu = React.forwardRef(({ className, ...props }, ref) => (
+const Menu = ({ className, ...props }) => (
   <div
     {...props}
-    ref={ref}
     className={cx(
       className,
       css`
@@ -17,6 +16,6 @@ const Menu = React.forwardRef(({ className, ...props }, ref) => (
       `
     )}
   />
-));
+);
 
 export default Menu;

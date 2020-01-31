@@ -6,9 +6,8 @@ import Icon from "./Icon";
 import Button from "./Button";
 import { uploadImage, createInsertImageCallback } from "../utils/image";
 
-const ImageButton = () => {
+const ImageButton = React.forwardRef((_, ref) => {
   const editor = useSlate();
-  const inputFile = useRef(null);
 
   const onChange = e => {
     e.persist();
@@ -21,11 +20,11 @@ const ImageButton = () => {
       onMouseDown={event => {
         event.preventDefault();
 
-        inputFile.current.click();
+        ref.current.click();
       }}>
       <input
         type="file"
-        ref={inputFile}
+        ref={ref}
         onChange={onChange}
         className={css`
           position: absolute;
@@ -40,6 +39,6 @@ const ImageButton = () => {
       <Icon>image</Icon>
     </Button>
   );
-};
+});
 
 export default ImageButton;

@@ -32,6 +32,7 @@ const MARK_HOTKEYS = {
   "mod+i": ITALIC,
   "mod+u": UNDERLINE,
   "mod+`": CODE,
+  "mod+k": LINK,
   "mod+shift+`": STRIKETHROUGH
 };
 
@@ -42,7 +43,6 @@ const BLOCK_HOTKEYS = {
   "mod+3": H3,
   "mod+4": H4,
   "mod+shift+c": CODE_BLOCK,
-  "mod+k": LINK,
   "mod+shift+i": IMAGE,
   "mod+shift+u": BLOCK_QUOTE,
   "mod+alt+u": BULLETED_LIST,
@@ -183,13 +183,22 @@ function handleExitBlock(editor, event) {
   }
 }
 
-export default function createHotKeysHandler(editor) {
+export default function createHotKeysHandler(editor, buttonRefs) {
+  const { imageBtnRef, linkBtnRef } = buttonRefs;
+
   return event => {
     for (const hotkey in MARK_HOTKEYS) {
       if (isHotkey(hotkey, event)) {
         event.preventDefault();
         const mark = MARK_HOTKEYS[hotkey];
-        toggleMark(editor, mark);
+
+        if (mark === LINK) {
+          console.log("detect hotkey for link");
+          console.log("linkBtn.current", linkBtnRef.current);
+          linkBtnRef.current.click();
+        } else {
+          toggleMark(editor, mark);
+        }
         return;
       }
     }
@@ -198,7 +207,13 @@ export default function createHotKeysHandler(editor) {
       if (isHotkey(hotkey, event)) {
         event.preventDefault();
         const mark = BLOCK_HOTKEYS[hotkey];
-        toggleBlock(editor, mark);
+
+        if (mark === IMAGE) {
+          imageBtnRef.current.click();
+        } else {
+          toggleBlock(editor, mark);
+        }
+
         return;
       }
     }
