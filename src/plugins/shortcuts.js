@@ -210,21 +210,16 @@ function handleBlockShortcut(editor, shortcut) {
   Transforms.select(editor, lineRange);
   Transforms.delete(editor);
 
-  if ([CODE_BLOCK, NOTE].includes(format)) {
+  if ([BLOCK_QUOTE, CODE_BLOCK, NOTE].includes(format)) {
     if (format === CODE_BLOCK) {
       nodeProp = { ...nodeProp, lang: matchArr[1] };
-    } else {
+    } else if (format === NOTE) {
       nodeProp = { ...nodeProp, level: matchArr[1] };
     }
 
     // 在底部插入空行
     const currentSelection = editor.selection;
-    Transforms.setSelection(editor, currentSelection);
-  }
-
-  if (format === BLOCK_QUOTE) {
-    // 在底部插入空行
-    const currentSelection = editor.selection;
+    Editor.insertBreak(editor);
     Transforms.setSelection(editor, currentSelection);
   }
 
