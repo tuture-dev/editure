@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import Modal from "react-modal";
 import { Transforms } from "slate";
 import { useSlate } from "slate-react";
@@ -30,6 +30,7 @@ const customStyles = {
 
 const EditLink = ({ link, dispatch }) => {
   const editor = useSlate();
+  const ref = useRef(null);
   const { isEditing, text, url } = link;
 
   const onSubmit = e => {
@@ -39,7 +40,7 @@ const EditLink = ({ link, dispatch }) => {
     const selection = getLastSelection();
     Transforms.select(editor, selection);
 
-    if (text) {
+    if (text || url) {
       if (!isMarkActive(editor, LINK)) {
         insertNewLink(editor, text, url);
       } else {
@@ -54,6 +55,21 @@ const EditLink = ({ link, dispatch }) => {
     e.preventDefault();
 
     dispatch(cancelEditLink());
+  };
+
+  const onKeyDown = e => {
+    if (e.keyCode === 13) {
+      onSubmit(e);
+    }
+  };
+
+  const onTextKeyDown = e => {
+    if (e.keyCode === 13) {
+      if (ref && ref.current) {
+        e.preventDefault();
+        ref.current.focus();
+      }
+    }
   };
 
   return (
@@ -74,6 +90,7 @@ const EditLink = ({ link, dispatch }) => {
         value={text}
         placeholder="添加描述"
         autoFocus={!text}
+        onKeyDown={onTextKeyDown}
         onChange={e => dispatch(updateLinkText(e.target.value))}
       />
       <p
@@ -84,10 +101,12 @@ const EditLink = ({ link, dispatch }) => {
         链接
       </p>
       <input
+        ref={ref}
         type="text"
         value={url}
         placeholder="链接地址"
         autoFocus={text}
+        onKeyDown={onKeyDown}
         onChange={e => dispatch(updateLinkUrl(e.target.value))}
       />
       <div
