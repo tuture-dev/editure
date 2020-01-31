@@ -1,17 +1,22 @@
-import React, { Fragment } from "react";
+import React from "react";
+import { css } from "emotion";
 import { Editor } from "slate";
 
 import { isBlockActive } from "./blocks";
 import { CODE_BLOCK } from "./constants";
 
 const Link = ({ attributes, children, url }) => {
-  console.log("children", children);
   return (
-    <Fragment>
-      <a {...attributes} href={url || "#"}>
-        {children}
-      </a>
-    </Fragment>
+    <a
+      className={css`
+        &:hover {
+          cursor: pointer;
+        }
+      `}
+      {...attributes}
+      href={url || "#"}>
+      {children}
+    </a>
   );
 };
 

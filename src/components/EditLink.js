@@ -54,6 +54,10 @@ const EditLink = ({ link, dispatch }) => {
   const onCancel = e => {
     e.preventDefault();
 
+    // 回到上次编辑的光标位置
+    const selection = getLastSelection();
+    Transforms.select(editor, selection);
+
     dispatch(cancelEditLink());
   };
 
