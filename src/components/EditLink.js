@@ -67,15 +67,6 @@ const EditLink = ({ link, dispatch }) => {
     }
   };
 
-  const onTextKeyDown = e => {
-    if (e.keyCode === 13) {
-      if (ref && ref.current) {
-        e.preventDefault();
-        ref.current.focus();
-      }
-    }
-  };
-
   return (
     <Modal
       isOpen={isEditing}
@@ -94,7 +85,7 @@ const EditLink = ({ link, dispatch }) => {
         value={text}
         placeholder="添加描述"
         autoFocus={!text}
-        onKeyDown={onTextKeyDown}
+        onKeyDown={onKeyDown}
         onChange={e => dispatch(updateLinkText(e.target.value))}
       />
       <p
