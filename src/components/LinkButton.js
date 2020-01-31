@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Editor, Transforms } from "slate";
 import { useSlate } from "slate-react";
 
@@ -6,7 +6,6 @@ import Icon from "./Icon";
 import Button from "./Button";
 import { isMarkActive, toggleMark } from "../marks";
 import { LINK } from "../constants";
-import { getLastSelection } from "../utils/selection";
 import { updateLinkText, startEditLink } from "../utils/link";
 
 const LinkButton = ({ dispatch }) => {
@@ -16,6 +15,24 @@ const LinkButton = ({ dispatch }) => {
     e.preventDefault();
 
     const { selection } = editor;
+
+    if (isMarkActive(editor, LINK)) {
+      const [match] = Editor.nodes(editor, { match: n => n.link });
+
+      // 选中当前整个链接，取消链接
+      if (match) {
+        const { path } = selection.anchor;
+        const linkRange = {
+          anchor: { path, offset: 0 },
+          focus: { path, offset: match[0].text.length }
+        };
+
+        Transforms.select(editor, linkRange);
+        toggleMark(editor, LINK);
+        Transforms.select(editor, selection);
+      }
+      return;
+    }
 
     dispatch(updateLinkText(Editor.string(editor, selection)));
     dispatch(startEditLink());
