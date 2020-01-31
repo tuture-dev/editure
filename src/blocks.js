@@ -74,7 +74,7 @@ const CodeBlockElement = props => {
   return (
     <div
       className={css`
-        margin-bottom: 0.5em;
+        margin-bottom: 1em;
       `}
       {...props.attributes}>
       <select contentEditable={false} value={selectValue} onChange={handleChange}>
@@ -160,8 +160,9 @@ const NoteElement = props => {
   }
 
   const baseStyle = css`
-    margin-top: 20px;
+    margin: 1em 0;
     padding: 15px;
+    padding-top: 5px;
     padding-left: 45px;
     position: relative;
     border: 1px solid #eee;
