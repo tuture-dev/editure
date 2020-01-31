@@ -1,4 +1,4 @@
-import { Transforms } from "slate";
+import { Transforms, Editor } from "slate";
 import { toggleMark } from "../marks";
 import { LINK } from "../constants";
 
@@ -12,7 +12,8 @@ const linkActionTypes = {
   START_EDIT: "start_edit",
   FINISH_EDIT: "finish_edit",
   UPDATE_TEXT: "update_text",
-  UPDATE_URL: "update_url"
+  UPDATE_URL: "update_url",
+  CANCEL_EDIT: "cancel_edit"
 };
 
 export const startEditLink = () => {
@@ -21,6 +22,10 @@ export const startEditLink = () => {
 
 export const finishEditLink = () => {
   return { type: linkActionTypes.FINISH_EDIT };
+};
+
+export const cancelEditLink = () => {
+  return { type: linkActionTypes.CANCEL_EDIT };
 };
 
 export const updateLinkText = text => {
@@ -43,6 +48,8 @@ export const linkReducer = (state, action) => {
       return { ...state, text: action.text };
     case linkActionTypes.UPDATE_URL:
       return { ...state, url: action.url };
+    case linkActionTypes.CANCEL_EDIT:
+      return { ...state, isEditing: false, url: "", text: "" };
     default:
       return state;
   }
@@ -66,11 +73,24 @@ export const insertNewLink = (editor, text, url) => {
 export const updateCurrentLink = (editor, text, url) => {
   const { anchor } = editor.selection;
   const { path } = anchor;
-  const focus = { path, offset: text.length };
-  const range = { anchor: { path, offset: 0 }, focus };
 
+  const start = Editor.start(editor, path);
+  const end = Editor.end(editor, path);
+  const range = { anchor: start, focus: end };
   Transforms.select(editor, range);
+  Transforms.delete(editor);
+
   Transforms.insertText(editor, text);
+
+  const focus = editor.selection.focus;
+  const { offset: newOffset, path: newPath } = focus;
+  const newRange = {
+    anchor: { path: newPath, offset: newOffset - text.length },
+    focus
+  };
+  Transforms.select(editor, newRange);
+  toggleMark(editor, LINK);
+
   Transforms.setNodes(editor, { url }, { match: n => n.link });
   Transforms.collapse(editor, { edge: "end" });
 

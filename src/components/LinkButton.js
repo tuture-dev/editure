@@ -16,6 +16,9 @@ const LinkButton = React.forwardRef(({ dispatch }, ref) => {
     // e.preventDefault();
 
     const { selection } = editor;
+    if (!selection) {
+      return;
+    }
 
     if (isMarkActive(editor, LINK)) {
       const [match] = Editor.nodes(editor, { match: n => n.link });
