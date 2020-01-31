@@ -306,21 +306,11 @@ export default function withShortcuts(editor) {
       }
     }
 
-    let heading;
-    const [match] = Editor.nodes(editor, {
-      match: n => {
-        if (n.type && n.type.startsWith("heading-")) {
-          heading = n.type;
-          return true;
-        }
-        return false;
-      }
-    });
+    insertBreak();
 
-    if (match) {
-      toggleBlock(editor, heading);
-    } else {
-      insertBreak();
+    const headingFormat = detectBlockFormat(editor, [H1, H2, H3, H4, H5]);
+    if (headingFormat) {
+      toggleBlock(editor, headingFormat);
     }
   };
 
