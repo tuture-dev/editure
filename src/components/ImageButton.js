@@ -17,7 +17,7 @@ const ImageButton = React.forwardRef((_, ref) => {
   return (
     <Button
       title="图片"
-      onMouseDown={event => {
+      handleMouseDown={event => {
         event.preventDefault();
 
         ref.current.click();

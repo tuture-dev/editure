@@ -13,7 +13,7 @@ const BlockButton = ({ format = "", title, icon }) => {
     <Button
       title={title}
       active={isBlockActive(editor, format)}
-      onMouseDown={event => {
+      handleMouseDown={event => {
         event.preventDefault();
         toggleBlock(editor, format, {}, TOOL_BUTTON);
       }}>

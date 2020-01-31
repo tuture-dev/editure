@@ -12,11 +12,10 @@ const MarkButton = ({ format = "", icon, title }) => {
     <Button
       title={title}
       active={isMarkActive(editor, format)}
-      onMouseDown={event => {
+      handleMouseDown={event => {
         event.preventDefault();
         toggleMark(editor, format);
-      }}
-    >
+      }}>
       <Icon>{icon}</Icon>
     </Button>
   );

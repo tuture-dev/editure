@@ -12,7 +12,8 @@ const LinkButton = React.forwardRef(({ dispatch }, ref) => {
   const editor = useSlate();
 
   const onClick = e => {
-    e.preventDefault();
+    console.log("linkButton clicked");
+    // e.preventDefault();
 
     const { selection } = editor;
 
@@ -42,7 +43,7 @@ const LinkButton = React.forwardRef(({ dispatch }, ref) => {
     <Button
       title="添加链接"
       active={isMarkActive(editor, LINK)}
-      onMouseDown={onClick}
+      handleClick={onClick}
       ref={ref}>
       <Icon>link</Icon>
     </Button>

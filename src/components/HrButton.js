@@ -28,7 +28,7 @@ const HrButton = () => {
   };
 
   return (
-    <Button title="分割线" onMouseDown={onMouseDown}>
+    <Button title="分割线" handleMouseDown={onMouseDown}>
       <Icon>remove</Icon>
     </Button>
   );
