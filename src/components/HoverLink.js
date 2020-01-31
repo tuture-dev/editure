@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { css } from "emotion";
-import { Editor, Range } from "slate";
+import { Editor } from "slate";
 import { useSlate } from "slate-react";
 
 import Icon from "./Icon";
@@ -86,7 +86,7 @@ const HoverLink = ({ dispatch }) => {
           {url}
         </a>
         <span> </span>
-        <Icon onClick={onClickEdit}>edit</Icon>
+        <Icon onMouseDown={onClickEdit}>edit</Icon>
       </div>
     </Portal>
   );

@@ -12,7 +12,8 @@ const linkActionTypes = {
   START_EDIT: "start_edit",
   FINISH_EDIT: "finish_edit",
   UPDATE_TEXT: "update_text",
-  UPDATE_URL: "update_url"
+  UPDATE_URL: "update_url",
+  CANCEL_EDIT: "cancel_edit"
 };
 
 export const startEditLink = () => {
@@ -21,6 +22,10 @@ export const startEditLink = () => {
 
 export const finishEditLink = () => {
   return { type: linkActionTypes.FINISH_EDIT };
+};
+
+export const cancelEditLink = () => {
+  return { type: linkActionTypes.CANCEL_EDIT };
 };
 
 export const updateLinkText = text => {
@@ -43,6 +48,8 @@ export const linkReducer = (state, action) => {
       return { ...state, text: action.text };
     case linkActionTypes.UPDATE_URL:
       return { ...state, url: action.url };
+    case linkActionTypes.CANCEL_EDIT:
+      return { ...state, isEditing: false, url: "", text: "" };
     default:
       return state;
   }

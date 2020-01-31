@@ -53,6 +53,7 @@ const App = () => {
     url: ""
   });
 
+  console.log("linkStatus", linkStatus);
   console.log("editor", editor);
   updateLastSelection(editor.selection);
 
