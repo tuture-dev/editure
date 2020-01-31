@@ -5,6 +5,7 @@ import { isBlockActive } from "./blocks";
 import { CODE_BLOCK } from "./constants";
 
 const Link = ({ attributes, children, url }) => {
+  console.log("children", children);
   return (
     <Fragment>
       <a {...attributes} href={url || "#"}>

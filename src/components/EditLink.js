@@ -40,7 +40,7 @@ const EditLink = ({ link, dispatch }) => {
     const selection = getLastSelection();
     Transforms.select(editor, selection);
 
-    if (text || url) {
+    if (text) {
       if (!isMarkActive(editor, LINK)) {
         insertNewLink(editor, text, url);
       } else {
