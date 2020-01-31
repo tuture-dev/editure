@@ -6,7 +6,6 @@ import { getBeforeText, getChildrenText } from "../utils";
 import {
   BOLD,
   ITALIC,
-  UNDERLINE,
   CODE,
   STRIKETHROUGH,
   H1,
@@ -23,10 +22,10 @@ import {
   HR,
   LIST_ITEM,
   PARAGRAPH,
-  SHORT_CUTS
+  LINK
 } from "../constants";
 
-const MARK_SHORTCUTS = [CODE, BOLD, ITALIC, STRIKETHROUGH];
+const MARK_SHORTCUTS = [CODE, BOLD, ITALIC, STRIKETHROUGH, LINK];
 const BLOCK_SHORTCUTS = [
   BULLETED_LIST,
   BULLETED_LIST,
@@ -48,7 +47,8 @@ const MARK_SHORTCUTS_REGEX = [
   "`([^`]+)`",
   "\\*\\*([^\\*]+)\\*\\*",
   "\\*([^\\*]+)\\*",
-  "~~([^~]+)~~"
+  "~~([^~]+)~~",
+  /\[([^\\*]+)\]\(([^\\*]+)\)/
 ];
 
 const BLOCK_SHORTCUTS_REGEX = [
@@ -76,23 +76,30 @@ function reverseStr(str = "") {
 }
 
 function detectMarkShortcut(editor) {
-  const { beforeText, range } = getBeforeText(editor);
+  let { beforeText, range } = getBeforeText(editor);
   const shortcut = { lineRange: range };
 
   for (const index in MARK_SHORTCUTS_REGEX) {
-    const regex = new RegExp(MARK_SHORTCUTS_REGEX[index], "g");
+    const regex = new RegExp(MARK_SHORTCUTS_REGEX[index]);
     if (beforeText && regex.test(beforeText)) {
-      const regex = new RegExp(MARK_SHORTCUTS_REGEX[index], "g");
+      const format = MARK_SHORTCUTS[index];
 
-      // 对内容进行 reverse 操作，如果匹配，且 index = 0，那么说明满足触发条件
-      const reversedBeforeText = reverseStr(beforeText);
-      const matchArr = regex.exec(reversedBeforeText);
+      if (format !== LINK) {
+        // 对内容进行 reverse 操作，如果匹配，且 index = 0，那么说明满足触发条件
+        beforeText = reverseStr(beforeText);
+      }
 
-      if (matchArr && matchArr.index === 0) {
-        const [matchStrWithMdTag, matchStr] = matchArr;
+      let matchArr = regex.exec(beforeText);
 
-        shortcut.format = MARK_SHORTCUTS[index];
-        shortcut.matchArr = [reverseStr(matchStrWithMdTag), reverseStr(matchStr)];
+      if ((matchArr && matchArr.index === 0) || (format === LINK && matchArr)) {
+        shortcut.format = format;
+
+        if (format !== LINK) {
+          matchArr = matchArr.map(elem =>
+            typeof elem === "string" ? reverseStr(elem) : elem
+          );
+        }
+        shortcut.matchArr = matchArr;
         break;
       }
     }
@@ -108,7 +115,6 @@ function deleteBlockShortcut(editor) {
   for (const index in BLOCK_SHORTCUTS_REGEX) {
     const regex = new RegExp(BLOCK_SHORTCUTS_REGEX[index]);
     if (beforeText && regex.test(beforeText)) {
-      const regex = new RegExp(BLOCK_SHORTCUTS_REGEX[index], "g");
       const matchArr = regex.exec(beforeText);
 
       if (matchArr.index + matchArr[0].length === beforeText.length) {
@@ -140,12 +146,11 @@ function handleMarkShortcut(editor, shortcut) {
   const { anchor } = editor.selection;
   const { matchArr, format } = shortcut;
 
-  const targetTextWithMdTag = matchArr[0];
-  const chilrenText = getChildrenText(children, anchor.path);
-
   // 删除逻辑
-  const deleteRangeStartOffset = chilrenText.length - targetTextWithMdTag.length;
-  const deleteRangeEndOffset = chilrenText.length;
+  const targetTextWithMdTag = matchArr[0];
+  const childrenText = getChildrenText(children, anchor.path);
+  const deleteRangeStartOffset = childrenText.length - targetTextWithMdTag.length;
+  const deleteRangeEndOffset = childrenText.length;
 
   const deleteRangeStart = { ...anchor, offset: deleteRangeStartOffset };
   const deleteRangeEnd = { ...anchor, offset: deleteRangeEndOffset };
@@ -175,6 +180,10 @@ function handleMarkShortcut(editor, shortcut) {
   Transforms.select(editor, needMarkRange);
   toggleMark(editor, format);
 
+  if (format === LINK) {
+    Transforms.setNodes(editor, { url: matchArr[2] }, { match: n => n.link });
+  }
+
   Transforms.collapse(editor, {
     edge: "end"
   });
@@ -200,20 +209,12 @@ function handleBlockShortcut(editor, shortcut) {
   Transforms.select(editor, lineRange);
   Transforms.delete(editor);
 
-  if (format === CODE_BLOCK) {
-    const targetLang = matchArr[1];
-
-    nodeProp = { ...nodeProp, lang: targetLang };
-
-    // 在底部插入空行
-    const currentSelection = editor.selection;
-    Transforms.setSelection(editor, currentSelection);
-  }
-
-  if (format === NOTE) {
-    const level = matchArr[1];
-
-    nodeProp = { ...nodeProp, level };
+  if ([CODE_BLOCK, NOTE].includes(format)) {
+    if (format === CODE_BLOCK) {
+      nodeProp = { ...nodeProp, lang: matchArr[1] };
+    } else {
+      nodeProp = { ...nodeProp, level: matchArr[1] };
+    }
 
     // 在底部插入空行
     const currentSelection = editor.selection;

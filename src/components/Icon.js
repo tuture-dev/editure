@@ -11,6 +11,9 @@ const Icon = React.forwardRef(({ className, ...props }, ref) => (
       css`
         font-size: 18px;
         vertical-align: text-bottom;
+        &:hover {
+          cursor: pointer;
+        }
       `
     )}
   />
