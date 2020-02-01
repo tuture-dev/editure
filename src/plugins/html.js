@@ -81,7 +81,7 @@ export const deserialize = el => {
 };
 
 export const withHtml = editor => {
-  const { insertData, isInline, isVoid } = editor;
+  const { insertData, insertText, isInline, isVoid } = editor;
 
   editor.isInline = element => {
     return element.type === LINK ? true : isInline(element);
@@ -93,15 +93,20 @@ export const withHtml = editor => {
 
   editor.insertData = data => {
     console.log("insertData", data);
-    data.types.forEach(type => {
-      console.log("type", type);
-      console.log("data", data.getData(type));
-    });
+    if (data.types.length === 1 && data.types[0] === "text/plain") {
+      const text = data.getData("text/plain");
+      console.log("text", typeof text);
+      insertText(text);
+      return;
+    }
+
     const html = data.getData("text/html");
 
     if (html) {
       const parsed = new DOMParser().parseFromString(html, "text/html");
+      console.log("parsed", parsed.body);
       const fragment = deserialize(parsed.body);
+      console.log("fragment", fragment);
       Transforms.insertFragment(editor, fragment);
       return;
     }
