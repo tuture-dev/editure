@@ -1,6 +1,6 @@
 import React from "react";
 import { css } from "emotion";
-import { Editor } from "slate";
+import { Editor, Transforms, Range } from "slate";
 
 import { isBlockActive } from "./blocks";
 import {
@@ -10,7 +10,8 @@ import {
   UNDERLINE,
   STRIKETHROUGH,
   CODE,
-  LINK
+  LINK,
+  PARAGRAPH
 } from "./constants";
 
 const MARK_TYPES = [BOLD, ITALIC, UNDERLINE, STRIKETHROUGH, CODE, LINK];
@@ -58,6 +59,20 @@ export const toggleMark = (editor, format) => {
     Editor.removeMark(editor, format);
   } else {
     Editor.addMark(editor, format, true);
+  }
+
+  const { selection, children } = editor;
+
+  if (
+    selection &&
+    Range.isCollapsed(selection) &&
+    children.length === 1 &&
+    !children[0].children[0].text
+  ) {
+    Transforms.insertNodes(editor, {
+      type: PARAGRAPH,
+      children: [{ text: "" }]
+    });
   }
 };
 

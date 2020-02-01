@@ -354,7 +354,6 @@ export default function withShortcuts(editor) {
           Point.equals(selection.anchor, start)
         ) {
           const marks = detectMarkFormat(editor);
-          console.log("mark", marks);
 
           for (const mark of marks) {
             toggleMark(editor, mark);
