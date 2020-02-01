@@ -32,7 +32,7 @@ const MARK_HOTKEYS = {
   "mod+b": BOLD,
   "mod+i": ITALIC,
   "mod+u": UNDERLINE,
-  "mod+`": CODE,
+  "ctrl+`": CODE,
   "mod+k": LINK,
   "mod+shift+`": STRIKETHROUGH
 };

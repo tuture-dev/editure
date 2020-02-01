@@ -354,6 +354,7 @@ export default function withShortcuts(editor) {
           Point.equals(selection.anchor, start)
         ) {
           const marks = detectMarkFormat(editor);
+          console.log("mark", marks);
 
           for (const mark of marks) {
             toggleMark(editor, mark);
@@ -366,11 +367,15 @@ export default function withShortcuts(editor) {
   };
 
   editor.deleteFragment = () => {
+    // 判断是否是全选删除
+    const { selection, children } = editor;
     deleteFragment();
+
     const match = Editor.above(editor, {
       match: n => n.type === LIST_ITEM
     });
 
+    // 修复删除 list 的问题
     if (match) {
       Transforms.setNodes(
         editor,
@@ -381,6 +386,41 @@ export default function withShortcuts(editor) {
           match: n => n.type === LIST_ITEM
         }
       );
+    }
+
+    // 如果是全选删除;
+    const res = selection.focus.path[0] === children.length - 1;
+    if (res) {
+      const matchNode = Editor.next(editor, {
+        match: n =>
+          n.type === PARAGRAPH || n.type === BULLETED_LIST || n.type === NUMBERED_LIST
+      });
+
+      if (matchNode && matchNode[0].type === PARAGRAPH) {
+        const [_, path] = matchNode;
+        Transforms.select(editor, path);
+        Transforms.collapse(editor, {
+          edge: "end"
+        });
+
+        Transforms.mergeNodes(editor);
+
+        return;
+      }
+
+      if (
+        matchNode &&
+        (matchNode[0].type === BULLETED_LIST || matchNode[0].type === NUMBERED_LIST)
+      ) {
+        const [node, path] = matchNode;
+
+        Transforms.select(editor, path);
+        toggleBlock(editor, node.type);
+
+        Transforms.mergeNodes(editor);
+
+        return;
+      }
     }
   };
 
