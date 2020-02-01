@@ -1,4 +1,4 @@
-import { Transforms, Editor, Point, Range } from "slate";
+import { Transforms, Editor, Point, Range, Node, Element } from "slate";
 
 import { isBlockActive } from "../blocks";
 import { LIST_ITEM, BULLETED_LIST, NUMBERED_LIST, PARAGRAPH } from "../constants";
@@ -95,24 +95,28 @@ export const decreaseItemDepth = editor => {
 };
 
 export const withList = editor => {
-  const { insertText, deleteBackward } = editor;
+  const { deleteBackward, deleteFragment } = editor;
 
   editor.deleteBackward = (...args) => {
     const { selection } = editor;
 
     if (selection && Range.isCollapsed(selection)) {
       const match = Editor.above(editor, {
-        match: n => Editor.isBlock(editor, n)
+        match: n => n.type === LIST_ITEM
       });
 
       if (match) {
         const [block, path] = match;
         const start = Editor.start(editor, path);
 
+        const parentAbove = Editor.above(editor, {
+          match: n => n.type === BULLETED_LIST || n.type === NUMBERED_LIST
+        });
+
         if (
           block.type !== PARAGRAPH &&
           Point.equals(selection.anchor, start) &&
-          isBlockActive(editor, LIST_ITEM)
+          parentAbove
         ) {
           const type = isBlockActive(editor, BULLETED_LIST)
             ? BULLETED_LIST
@@ -135,6 +139,8 @@ export const withList = editor => {
           }
 
           return;
+        } else if (block.type !== PARAGRAPH && Point.equals(selection.anchor, start)) {
+          Transforms.setNodes(editor, { type: PARAGRAPH });
         }
       }
 

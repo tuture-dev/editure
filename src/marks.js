@@ -1,9 +1,20 @@
 import React from "react";
 import { css } from "emotion";
-import { Editor } from "slate";
+import { Editor, Transforms, Range } from "slate";
 
 import { isBlockActive } from "./blocks";
-import { CODE_BLOCK } from "./constants";
+import {
+  CODE_BLOCK,
+  BOLD,
+  ITALIC,
+  UNDERLINE,
+  STRIKETHROUGH,
+  CODE,
+  LINK,
+  PARAGRAPH
+} from "./constants";
+
+const MARK_TYPES = [BOLD, ITALIC, UNDERLINE, STRIKETHROUGH, CODE, LINK];
 
 const Link = ({ attributes, children, url }) => {
   return (
@@ -25,6 +36,18 @@ export const isMarkActive = (editor, format) => {
   return marks ? marks[format] === true : false;
 };
 
+export const detectMarkFormat = (editor, marks = MARK_TYPES) => {
+  let realMarks = [];
+
+  for (const mark of marks) {
+    if (isMarkActive(editor, mark)) {
+      realMarks.push(mark);
+    }
+  }
+
+  return realMarks;
+};
+
 export const toggleMark = (editor, format) => {
   const isActive = isMarkActive(editor, format);
 
@@ -36,6 +59,21 @@ export const toggleMark = (editor, format) => {
     Editor.removeMark(editor, format);
   } else {
     Editor.addMark(editor, format, true);
+  }
+
+  const { selection, children } = editor;
+
+  // Slate 对首行删除 mark 有问题，这里做一下变通
+  if (
+    selection &&
+    Range.isCollapsed(selection) &&
+    children.length === 1 &&
+    !children[0].children[0].text
+  ) {
+    Transforms.insertNodes(editor, {
+      type: PARAGRAPH,
+      children: [{ text: "" }]
+    });
   }
 };
 
