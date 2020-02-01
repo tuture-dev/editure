@@ -63,6 +63,7 @@ export const toggleMark = (editor, format) => {
 
   const { selection, children } = editor;
 
+  // Slate 对首行删除 mark 有问题，这里做一下变通
   if (
     selection &&
     Range.isCollapsed(selection) &&
