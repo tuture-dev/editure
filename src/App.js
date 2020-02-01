@@ -21,11 +21,26 @@ import { linkReducer } from "./utils/link";
 import "./App.css";
 import "material-icons/iconfont/material-icons.css";
 
+// const defaultValue = [
+//   {
+//     type: "paragraph",
+//     children: [
+//       { text: "This is " },
+//       { text: "bold", bold: true },
+//       { text: " and " },
+//       { text: "italic", italic: true },
+//       { text: " and " },
+//       { text: "code", code: true },
+//       { text: "." }
+//     ]
+//   }
+// ];
+
 const defaultValue = [
   {
     type: "paragraph",
     children: [
-      { text: "there is a " },
+      { text: "There is a " },
       { text: "link", link: true, url: "https://tuture.co" },
       { text: " in the paragraph." }
     ]
@@ -59,7 +74,6 @@ const App = () => {
     url: ""
   });
 
-  console.log("linkStatus", linkStatus);
   console.log("editor", editor);
   updateLastSelection(editor.selection);
 
