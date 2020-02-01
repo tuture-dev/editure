@@ -7,7 +7,9 @@ import {
   HOT_KEY,
   SHORT_CUTS,
   CODE_BLOCK,
-  NOTE
+  NOTE,
+  BULLETED_LIST,
+  NUMBERED_LIST
 } from "../constants";
 import { isBlockActive, toggleBlock, detectBlockFormat } from "../blocks";
 import { getLineText } from "../utils";
@@ -69,7 +71,13 @@ export const withBlockquote = editor => {
   const { insertBreak } = editor;
 
   editor.insertBreak = () => {
-    const format = detectBlockFormat(editor, [CODE_BLOCK, NOTE, BLOCK_QUOTE]);
+    const format = detectBlockFormat(editor, [
+      CODE_BLOCK,
+      NOTE,
+      BLOCK_QUOTE,
+      BULLETED_LIST,
+      NUMBERED_LIST
+    ]);
 
     if (format === BLOCK_QUOTE) {
       const { wholeLineText } = getLineText(editor);
