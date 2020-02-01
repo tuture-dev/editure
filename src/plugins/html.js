@@ -1,5 +1,5 @@
 import { jsx } from "slate-hyperscript";
-import { Transforms, Editor } from "slate";
+import { Transforms, Editor, Node, Text } from "slate";
 import {
   LINK,
   BLOCK_QUOTE,
@@ -125,13 +125,20 @@ export const withHtml = editor => {
       const parsed = new DOMParser().parseFromString(html, "text/html");
       console.log("parsed", parsed.body);
       const fragment = deserialize(parsed.body);
-      console.log("fragment", fragment);
+      const { selection } = editor;
+      const { focus } = selection;
       // fragment.forEach(node => Transforms.insertNodes(editor, node));
       Transforms.insertNodes(editor, fragment);
-      Transforms.select(
-        editor,
-        Editor.end(editor, [editor.selection.focus.path[0] + fragment.length - 1])
-      );
+
+      let nodeLen = 0;
+      fragment.map(node => {
+        console.log("node", node);
+        if (Editor.isBlock(editor, node)) {
+          nodeLen++;
+        }
+      });
+
+      Transforms.select(editor, Editor.end(editor, [focus.path[0] + nodeLen]));
       // Transforms.insertFragment(editor, fragment);
       return;
     }
