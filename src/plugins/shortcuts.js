@@ -240,7 +240,7 @@ function handleBlockShortcut(editor, shortcut) {
 }
 
 export default function withShortcuts(editor) {
-  const { insertText, insertBreak, deleteBackward } = editor;
+  const { insertText, insertBreak, deleteBackward, deleteFragment } = editor;
 
   editor.insertText = text => {
     const { selection } = editor;

@@ -24,7 +24,8 @@ import {
   NUMBERED_LIST,
   HR,
   SHORT_CUTS,
-  NOTE
+  NOTE,
+  LIST_ITEM
 } from "./constants";
 
 const MARK_HOTKEYS = {
@@ -85,7 +86,7 @@ function handleSelectAll(editor, event) {
     event.preventDefault();
 
     const match = Editor.above(editor, {
-      match: n => Element.matches(n, { type: format })
+      match: n => n.type === format
     });
 
     const path = match[1];
