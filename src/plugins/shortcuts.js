@@ -271,7 +271,7 @@ export default function withShortcuts(editor) {
       if ([NOTE, CODE_BLOCK, HR].includes(format)) {
         insertText(text);
       } else if (BLOCK_SHORTCUTS.includes(format)) {
-        if (isBlockActive(editor, CODE_BLOCK)) {
+        if (detectBlockFormat(editor, [CODE_BLOCK, BULLETED_LIST, NUMBERED_LIST])) {
           insertText(text);
         } else {
           handleBlockShortcut(editor, shortcut);
@@ -296,7 +296,7 @@ export default function withShortcuts(editor) {
     // 检测是否为代码块触发条件
     const shortcut = detectShortcut(editor);
     if ([CODE_BLOCK, NOTE, HR].includes(shortcut.format)) {
-      if (!detectBlockFormat(editor, [CODE_BLOCK])) {
+      if (!detectBlockFormat(editor, [CODE_BLOCK, BULLETED_LIST, NUMBERED_LIST])) {
         handleBlockShortcut(editor, shortcut);
         return;
       } else {
