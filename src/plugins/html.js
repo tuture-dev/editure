@@ -128,7 +128,10 @@ export const withHtml = editor => {
       console.log("fragment", fragment);
       // fragment.forEach(node => Transforms.insertNodes(editor, node));
       Transforms.insertNodes(editor, fragment);
-      Transforms.select(editor, Editor.end(editor, []));
+      Transforms.select(
+        editor,
+        Editor.end(editor, [editor.selection.focus.path[0] + fragment.length - 1])
+      );
       // Transforms.insertFragment(editor, fragment);
       return;
     }
