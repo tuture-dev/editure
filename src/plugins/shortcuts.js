@@ -1,8 +1,9 @@
-import { Range, Editor, Transforms, Point } from "slate";
+import { Range, Editor, Transforms, Point, Node } from "slate";
 
 import { toggleMark } from "../marks";
 import { isBlockActive, toggleBlock, detectBlockFormat } from "../blocks";
-import { getBeforeText, getChildrenText } from "../utils";
+import { detectMarkFormat } from "../marks";
+import { getBeforeText, getChildrenText, compareNode } from "../utils";
 import {
   BOLD,
   ITALIC,
@@ -22,8 +23,26 @@ import {
   HR,
   LIST_ITEM,
   PARAGRAPH,
-  LINK
+  LINK,
+  CODE_LINE
 } from "../constants";
+
+const BLOCKS_CONSTANTS = [
+  H1,
+  H2,
+  H3,
+  H4,
+  H5,
+  H6,
+  CODE_BLOCK,
+  BLOCK_QUOTE,
+  NOTE,
+  BULLETED_LIST,
+  NUMBERED_LIST,
+  HR,
+  LIST_ITEM,
+  PARAGRAPH
+];
 
 const MARK_SHORTCUTS = [CODE, BOLD, ITALIC, STRIKETHROUGH, LINK];
 const BLOCK_SHORTCUTS = [
@@ -240,7 +259,7 @@ function handleBlockShortcut(editor, shortcut) {
 }
 
 export default function withShortcuts(editor) {
-  const { insertText, insertBreak, deleteBackward } = editor;
+  const { insertText, insertBreak, deleteBackward, deleteFragment } = editor;
 
   editor.insertText = text => {
     const { selection } = editor;
@@ -311,7 +330,7 @@ export default function withShortcuts(editor) {
   };
 
   editor.deleteBackward = (...args) => {
-    const { selection } = editor;
+    const { selection, children } = editor;
 
     if (selection && Range.isCollapsed(selection)) {
       const match = Editor.above(editor, {
@@ -330,10 +349,99 @@ export default function withShortcuts(editor) {
           Transforms.setNodes(editor, { type: PARAGRAPH });
 
           return;
+        } else if (
+          children.length === 1 &&
+          block.type === PARAGRAPH &&
+          Point.equals(selection.anchor, start)
+        ) {
+          const marks = detectMarkFormat(editor);
+
+          for (const mark of marks) {
+            toggleMark(editor, mark);
+          }
         }
       }
 
       deleteBackward(...args);
+    }
+  };
+
+  editor.deleteFragment = () => {
+    // 判断是否是全选删除
+    const { selection, children } = editor;
+    deleteFragment();
+
+    const match = Editor.above(editor, {
+      match: n => n.type === LIST_ITEM
+    });
+
+    // 修复删除 list 的问题
+    if (match) {
+      Transforms.setNodes(
+        editor,
+        {
+          type: PARAGRAPH
+        },
+        {
+          match: n => n.type === LIST_ITEM
+        }
+      );
+    }
+
+    // 如果是全选删除;
+    let res = selection.focus.path[0] === children.length - 1;
+
+    // 判断是否全选 BLOCK_QUOTE | CODE_BLOCK | NOTE
+    const format = detectBlockFormat(editor, [BLOCK_QUOTE, CODE_BLOCK, NOTE]);
+    if (format) {
+      const [_, path] = Editor.above(editor, {
+        match: n => n.type === format
+      });
+
+      const [start, end] = Editor.edges(editor, path);
+      const { anchor, focus } = editor.selection;
+
+      const isSameRange = compareNode(start, anchor) && compareNode(end, focus);
+      res = isSameRange;
+    }
+
+    if (res) {
+      const matchNode = Editor.next(editor, {
+        match: n =>
+          n.type === PARAGRAPH ||
+          n.type === BULLETED_LIST ||
+          n.type === NUMBERED_LIST ||
+          n.type === CODE_LINE
+      });
+
+      if (
+        matchNode &&
+        (matchNode[0].type === PARAGRAPH || matchNode[0].type === CODE_LINE)
+      ) {
+        const [_, path] = matchNode;
+        Transforms.select(editor, path);
+        Transforms.collapse(editor, {
+          edge: "end"
+        });
+
+        Transforms.mergeNodes(editor);
+
+        return;
+      }
+
+      if (
+        matchNode &&
+        (matchNode[0].type === BULLETED_LIST || matchNode[0].type === NUMBERED_LIST)
+      ) {
+        const [node, path] = matchNode;
+
+        Transforms.select(editor, path);
+        toggleBlock(editor, node.type);
+
+        Transforms.mergeNodes(editor);
+
+        return;
+      }
     }
   };
 

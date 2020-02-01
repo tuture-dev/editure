@@ -24,14 +24,15 @@ import {
   NUMBERED_LIST,
   HR,
   SHORT_CUTS,
-  NOTE
+  NOTE,
+  LIST_ITEM
 } from "./constants";
 
 const MARK_HOTKEYS = {
   "mod+b": BOLD,
   "mod+i": ITALIC,
   "mod+u": UNDERLINE,
-  "mod+`": CODE,
+  "ctrl+`": CODE,
   "mod+k": LINK,
   "mod+shift+`": STRIKETHROUGH
 };
@@ -85,7 +86,7 @@ function handleSelectAll(editor, event) {
     event.preventDefault();
 
     const match = Editor.above(editor, {
-      match: n => Element.matches(n, { type: format })
+      match: n => n.type === format
     });
 
     const path = match[1];
