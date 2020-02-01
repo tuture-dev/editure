@@ -1,5 +1,5 @@
 import { jsx } from "slate-hyperscript";
-import { Transforms } from "slate";
+import { Transforms, Editor } from "slate";
 import {
   LINK,
   BLOCK_QUOTE,
@@ -12,7 +12,9 @@ import {
   LIST_ITEM,
   NUMBERED_LIST,
   BULLETED_LIST,
-  PARAGRAPH
+  PARAGRAPH,
+  CODE_BLOCK,
+  CODE_LINE
 } from "../constants";
 
 const ELEMENT_TAGS = {
@@ -26,8 +28,9 @@ const ELEMENT_TAGS = {
   IMG: el => ({ type: IMAGE, url: el.getAttribute("src") }),
   LI: () => ({ type: LIST_ITEM }),
   OL: () => ({ type: NUMBERED_LIST }),
+  DIV: () => ({ type: PARAGRAPH }),
   P: () => ({ type: PARAGRAPH }),
-  PRE: () => ({ type: BLOCK_QUOTE }),
+  PRE: () => ({ type: CODE_BLOCK }),
   UL: () => ({ type: BULLETED_LIST })
 };
 
@@ -53,17 +56,37 @@ export const deserialize = el => {
   }
 
   const { nodeName } = el;
-  let parent = el;
 
-  if (nodeName === "PRE" && el.childNodes[0] && el.childNodes[0].nodeName === "CODE") {
-    parent = el.childNodes[0];
+  if (nodeName === "PRE") {
+    const attrs = ELEMENT_TAGS["PRE"]();
+
+    // 如果检测到 pre -> code 的 DOM 结构，直接取 code 的 innerText 构建代码块
+    if (el.childNodes[0] && el.childNodes[0].nodeName === "CODE") {
+      return jsx(
+        "element",
+        attrs,
+        el.childNodes[0].innerText
+          .slice(0, -1)
+          .split("\n")
+          .map(line => jsx("element", { type: CODE_LINE }, [{ text: line }]))
+      );
+    }
+
+    // 否则是 pre -> div 的 DOM 结构，取每个子 div 的 innerText（通常可以认为是一行）
+    return jsx(
+      "element",
+      attrs,
+      Array.from(el.childNodes).map(child =>
+        jsx("element", { type: CODE_LINE }, [{ text: child.innerText }])
+      )
+    );
   }
 
-  const children = Array.from(parent.childNodes)
+  const children = Array.from(el.childNodes)
     .map(deserialize)
     .flat();
 
-  if (el.nodeName === "BODY") {
+  if (nodeName === "BODY") {
     return jsx("fragment", {}, children);
   }
 
@@ -92,12 +115,8 @@ export const withHtml = editor => {
   };
 
   editor.insertData = data => {
-    console.log("insertData", data);
     if (data.types.length === 1 && data.types[0] === "text/plain") {
-      const text = data.getData("text/plain");
-      console.log("text", typeof text);
-      insertText(text);
-      return;
+      return insertText(data.getData("text/plain"));
     }
 
     const html = data.getData("text/html");
@@ -107,7 +126,10 @@ export const withHtml = editor => {
       console.log("parsed", parsed.body);
       const fragment = deserialize(parsed.body);
       console.log("fragment", fragment);
-      Transforms.insertFragment(editor, fragment);
+      // fragment.forEach(node => Transforms.insertNodes(editor, node));
+      Transforms.insertNodes(editor, fragment);
+      Transforms.select(editor, Editor.end(editor, []));
+      // Transforms.insertFragment(editor, fragment);
       return;
     }
 
