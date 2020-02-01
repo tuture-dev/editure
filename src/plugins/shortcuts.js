@@ -3,7 +3,7 @@ import { Range, Editor, Transforms, Point, Node } from "slate";
 import { toggleMark } from "../marks";
 import { isBlockActive, toggleBlock, detectBlockFormat } from "../blocks";
 import { detectMarkFormat } from "../marks";
-import { getBeforeText, getChildrenText } from "../utils";
+import { getBeforeText, getChildrenText, compareNode } from "../utils";
 import {
   BOLD,
   ITALIC,
@@ -23,7 +23,8 @@ import {
   HR,
   LIST_ITEM,
   PARAGRAPH,
-  LINK
+  LINK,
+  CODE_LINE
 } from "../constants";
 
 const BLOCKS_CONSTANTS = [
@@ -388,14 +389,35 @@ export default function withShortcuts(editor) {
     }
 
     // 如果是全选删除;
-    const res = selection.focus.path[0] === children.length - 1;
+    let res = selection.focus.path[0] === children.length - 1;
+
+    // 判断是否全选 BLOCK_QUOTE | CODE_BLOCK | NOTE
+    const format = detectBlockFormat(editor, [BLOCK_QUOTE, CODE_BLOCK, NOTE]);
+    if (format) {
+      const [_, path] = Editor.above(editor, {
+        match: n => n.type === format
+      });
+
+      const [start, end] = Editor.edges(editor, path);
+      const { anchor, focus } = editor.selection;
+
+      const isSameRange = compareNode(start, anchor) && compareNode(end, focus);
+      res = isSameRange;
+    }
+
     if (res) {
       const matchNode = Editor.next(editor, {
         match: n =>
-          n.type === PARAGRAPH || n.type === BULLETED_LIST || n.type === NUMBERED_LIST
+          n.type === PARAGRAPH ||
+          n.type === BULLETED_LIST ||
+          n.type === NUMBERED_LIST ||
+          n.type === CODE_LINE
       });
 
-      if (matchNode && matchNode[0].type === PARAGRAPH) {
+      if (
+        matchNode &&
+        (matchNode[0].type === PARAGRAPH || matchNode[0].type === CODE_LINE)
+      ) {
         const [_, path] = matchNode;
         Transforms.select(editor, path);
         Transforms.collapse(editor, {

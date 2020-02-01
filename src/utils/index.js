@@ -55,3 +55,17 @@ export const getChildrenText = (children, path) => {
 
   return childrenItem[path[i]].text;
 };
+
+export const compareNode = (nodeOnePath = [], nodeTwoPath = []) => {
+  if (nodeOnePath.length !== nodeTwoPath.length) {
+    return false;
+  }
+
+  for (let i = 0; i < nodeOnePath.length; i++) {
+    if (nodeOnePath[i] !== nodeTwoPath[i]) {
+      return false;
+    }
+  }
+
+  return true;
+};
