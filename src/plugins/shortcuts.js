@@ -1,7 +1,8 @@
-import { Range, Editor, Transforms, Point } from "slate";
+import { Range, Editor, Transforms, Point, Node } from "slate";
 
 import { toggleMark } from "../marks";
 import { isBlockActive, toggleBlock, detectBlockFormat } from "../blocks";
+import { detectMarkFormat } from "../marks";
 import { getBeforeText, getChildrenText } from "../utils";
 import {
   BOLD,
@@ -24,6 +25,23 @@ import {
   PARAGRAPH,
   LINK
 } from "../constants";
+
+const BLOCKS_CONSTANTS = [
+  H1,
+  H2,
+  H3,
+  H4,
+  H5,
+  H6,
+  CODE_BLOCK,
+  BLOCK_QUOTE,
+  NOTE,
+  BULLETED_LIST,
+  NUMBERED_LIST,
+  HR,
+  LIST_ITEM,
+  PARAGRAPH
+];
 
 const MARK_SHORTCUTS = [CODE, BOLD, ITALIC, STRIKETHROUGH, LINK];
 const BLOCK_SHORTCUTS = [
@@ -311,7 +329,7 @@ export default function withShortcuts(editor) {
   };
 
   editor.deleteBackward = (...args) => {
-    const { selection } = editor;
+    const { selection, children } = editor;
 
     if (selection && Range.isCollapsed(selection)) {
       const match = Editor.above(editor, {
@@ -330,10 +348,39 @@ export default function withShortcuts(editor) {
           Transforms.setNodes(editor, { type: PARAGRAPH });
 
           return;
+        } else if (
+          children.length === 1 &&
+          block.type === PARAGRAPH &&
+          Point.equals(selection.anchor, start)
+        ) {
+          const marks = detectMarkFormat(editor);
+
+          for (const mark of marks) {
+            toggleMark(editor, mark);
+          }
         }
       }
 
       deleteBackward(...args);
+    }
+  };
+
+  editor.deleteFragment = () => {
+    deleteFragment();
+    const match = Editor.above(editor, {
+      match: n => n.type === LIST_ITEM
+    });
+
+    if (match) {
+      Transforms.setNodes(
+        editor,
+        {
+          type: PARAGRAPH
+        },
+        {
+          match: n => n.type === LIST_ITEM
+        }
+      );
     }
   };
 

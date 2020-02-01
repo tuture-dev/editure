@@ -3,7 +3,17 @@ import { css } from "emotion";
 import { Editor } from "slate";
 
 import { isBlockActive } from "./blocks";
-import { CODE_BLOCK } from "./constants";
+import {
+  CODE_BLOCK,
+  BOLD,
+  ITALIC,
+  UNDERLINE,
+  STRIKETHROUGH,
+  CODE,
+  LINK
+} from "./constants";
+
+const MARK_TYPES = [BOLD, ITALIC, UNDERLINE, STRIKETHROUGH, CODE, LINK];
 
 const Link = ({ attributes, children, url }) => {
   return (
@@ -23,6 +33,18 @@ const Link = ({ attributes, children, url }) => {
 export const isMarkActive = (editor, format) => {
   const marks = Editor.marks(editor);
   return marks ? marks[format] === true : false;
+};
+
+export const detectMarkFormat = (editor, marks = MARK_TYPES) => {
+  let realMarks = [];
+
+  for (const mark of marks) {
+    if (isMarkActive(editor, mark)) {
+      realMarks.push(mark);
+    }
+  }
+
+  return realMarks;
 };
 
 export const toggleMark = (editor, format) => {

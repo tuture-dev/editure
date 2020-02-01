@@ -148,24 +148,5 @@ export const withList = editor => {
     }
   };
 
-  editor.deleteFragment = () => {
-    deleteFragment();
-    const match = Editor.above(editor, {
-      match: n => n.type === LIST_ITEM
-    });
-
-    if (match) {
-      Transforms.setNodes(
-        editor,
-        {
-          type: PARAGRAPH
-        },
-        {
-          match: n => n.type === LIST_ITEM
-        }
-      );
-    }
-  };
-
   return editor;
 };
