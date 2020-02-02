@@ -1,4 +1,4 @@
-import { Transforms, Editor, Point, Range } from "slate";
+import { Transforms, Editor, Point, Range, Element } from "slate";
 
 import {
   CODE_BLOCK,
@@ -82,7 +82,7 @@ export const handleActiveCodeBlock = (editor, type) => {
 };
 
 export const withCodeBlock = editor => {
-  const { deleteBackward } = editor;
+  const { deleteBackward, normalizeNode } = editor;
 
   editor.deleteBackward = (...args) => {
     const { selection } = editor;
@@ -122,6 +122,28 @@ export const withCodeBlock = editor => {
 
       deleteBackward(...args);
     }
+  };
+
+  editor.normalizeNode = entry => {
+    const [node, path] = entry;
+
+    // 当前为根节点，无需处理
+    if (path.length === 0) {
+      return normalizeNode(entry);
+    }
+
+    const [parent] = Editor.parent(editor, path);
+
+    if (!Element.isElement(node) || !Element.isElement(parent)) {
+      return normalizeNode(entry);
+    }
+
+    // 如果父节点为 code-block，则确保自身为 code-line
+    if (parent.type === CODE_BLOCK && node.type !== CODE_LINE) {
+      return Transforms.setNodes(editor, { type: CODE_LINE }, { at: path });
+    }
+
+    normalizeNode(entry);
   };
 
   return editor;

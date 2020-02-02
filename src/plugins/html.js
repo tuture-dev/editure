@@ -1,5 +1,7 @@
 import { jsx } from "slate-hyperscript";
-import { Transforms, Editor, Node, Text } from "slate";
+import { Transforms, Editor } from "slate";
+
+import { isBlockActive } from "../blocks";
 import {
   LINK,
   BLOCK_QUOTE,
@@ -104,7 +106,7 @@ export const deserialize = el => {
 };
 
 export const withHtml = editor => {
-  const { insertData, insertText, isInline, isVoid } = editor;
+  const { insertData, insertText, isInline, isVoid, normalizeNode } = editor;
 
   editor.isInline = element => {
     return element.type === LINK ? true : isInline(element);
@@ -115,7 +117,10 @@ export const withHtml = editor => {
   };
 
   editor.insertData = data => {
-    if (data.types.length === 1 && data.types[0] === "text/plain") {
+    if (
+      isBlockActive(editor, CODE_BLOCK) ||
+      (data.types.length === 1 && data.types[0] === "text/plain")
+    ) {
       return insertText(data.getData("text/plain"));
     }
 
@@ -125,21 +130,17 @@ export const withHtml = editor => {
       const parsed = new DOMParser().parseFromString(html, "text/html");
       console.log("parsed", parsed.body);
       const fragment = deserialize(parsed.body);
+      console.log("fragment", fragment);
       const { selection } = editor;
       const { focus } = selection;
-      // fragment.forEach(node => Transforms.insertNodes(editor, node));
+
       Transforms.insertNodes(editor, fragment);
 
-      let nodeLen = 0;
-      fragment.map(node => {
-        console.log("node", node);
-        if (Editor.isBlock(editor, node)) {
-          nodeLen++;
-        }
-      });
+      const nodeLen = fragment
+        .map(node => Editor.isBlock(editor, node))
+        .reduce((a, b) => a + b, 0);
 
       Transforms.select(editor, Editor.end(editor, [focus.path[0] + nodeLen]));
-      // Transforms.insertFragment(editor, fragment);
       return;
     }
 
