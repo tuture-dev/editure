@@ -7,8 +7,8 @@ import BlockButton from "./BlockButton";
 import ImageButton from "./ImageButton";
 import HrButton from "./HrButton";
 import NoteButton from "./NoteButton";
-import HoverLink from "./HoverLink";
 import LinkButton from "./LinkButton";
+import StatusButton from "./StatusButton";
 import {
   BOLD,
   ITALIC,
@@ -18,7 +18,6 @@ import {
   H1,
   H2,
   CODE_BLOCK,
-  LINK,
   BLOCK_QUOTE,
   BULLETED_LIST,
   NUMBERED_LIST
@@ -39,6 +38,8 @@ const Toolbar = React.forwardRef(({ className, linkDispatch, ...props }, ref) =>
           margin-bottom: 20px;
         `
       )}>
+      <StatusButton icon="undo" status="undo" title="撤销" />
+      <StatusButton icon="redo" status="redo" title="重做" />
       <MarkButton format={BOLD} icon="format_bold" title="加粗" />
       <MarkButton format={ITALIC} icon="format_italic" title="斜体" />
       <MarkButton format={UNDERLINE} icon="format_underlined" title="下划线" />
