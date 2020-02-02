@@ -19,11 +19,18 @@ export const withLinks = editor => {
   };
 
   editor.insertData = data => {
+    console.log("insertData", data);
+    data.types.forEach(type => {
+      console.log("type", type);
+      console.log("data", data.getData(type));
+    });
+
     const text = data.getData("text/plain");
 
     if (text && isUrl(text)) {
       insertNewLink(editor, text, text);
     } else {
+      // insertText(text);
       insertData(data);
     }
   };

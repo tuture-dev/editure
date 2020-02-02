@@ -1,4 +1,4 @@
-import { Transforms, Editor, Point, Range } from "slate";
+import { Transforms, Editor, Point, Range, Element, Node } from "slate";
 
 import {
   CODE_BLOCK,
@@ -82,7 +82,7 @@ export const handleActiveCodeBlock = (editor, type) => {
 };
 
 export const withCodeBlock = editor => {
-  const { deleteBackward } = editor;
+  const { deleteBackward, normalizeNode } = editor;
 
   editor.deleteBackward = (...args) => {
     const { selection } = editor;
@@ -108,20 +108,33 @@ export const withCodeBlock = editor => {
           const { wholeLineText } = getLineText(editor);
           const { children = [] } = node;
 
-          if (children.length === 1 && !wholeLineText) {
-            unwrapCodeBlock(editor);
-            return;
-          } else if (children.length === 1 && wholeLineText) {
-            return;
-          } else if (children.length > 1) {
-            Transforms.mergeNodes(editor);
-            return;
-          }
+          return Editor.withoutNormalizing(editor, () => {
+            if (children.length === 1 && !wholeLineText) {
+              unwrapCodeBlock(editor);
+            } else if (children.length > 1) {
+              Transforms.mergeNodes(editor);
+            }
+          });
         }
       }
 
       deleteBackward(...args);
     }
+  };
+
+  editor.normalizeNode = entry => {
+    const [node, path] = entry;
+
+    if (Element.isElement(node) && node.type === CODE_BLOCK) {
+      for (const [child, childPath] of Node.children(editor, path)) {
+        if (Element.isElement(child) && child.type !== CODE_LINE) {
+          Transforms.setNodes(editor, { type: CODE_LINE }, { at: childPath });
+        }
+      }
+      return;
+    }
+
+    normalizeNode(entry);
   };
 
   return editor;

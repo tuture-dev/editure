@@ -5,9 +5,11 @@ import withShortcuts from "./shortcuts";
 import { withList } from "./list";
 import { withCodeBlock } from "./codeBlock";
 import { withBlockquote } from "./blockquote";
+import { withHtml } from "./html";
 
 export default [
-  withLinks,
+  withHtml,
+  // withLinks,
   withImages,
   withHr,
   withShortcuts,
