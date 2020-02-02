@@ -180,7 +180,9 @@ function handleExitBlock(editor, event) {
 
     Editor.insertBreak(editor);
 
-    toggleBlock(editor, format, {}, SHORT_CUTS);
+    Editor.withoutNormalizing(editor, () => {
+      toggleBlock(editor, format, {}, SHORT_CUTS);
+    });
   }
 }
 

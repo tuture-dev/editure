@@ -1,4 +1,4 @@
-import { Transforms, Editor, Point, Range, Element } from "slate";
+import { Transforms, Editor, Point, Range, Element, Node } from "slate";
 
 import {
   CODE_BLOCK,
@@ -108,15 +108,13 @@ export const withCodeBlock = editor => {
           const { wholeLineText } = getLineText(editor);
           const { children = [] } = node;
 
-          if (children.length === 1 && !wholeLineText) {
-            unwrapCodeBlock(editor);
-            return;
-          } else if (children.length === 1 && wholeLineText) {
-            return;
-          } else if (children.length > 1) {
-            Transforms.mergeNodes(editor);
-            return;
-          }
+          return Editor.withoutNormalizing(editor, () => {
+            if (children.length === 1 && !wholeLineText) {
+              unwrapCodeBlock(editor);
+            } else if (children.length > 1) {
+              Transforms.mergeNodes(editor);
+            }
+          });
         }
       }
 
@@ -132,15 +130,13 @@ export const withCodeBlock = editor => {
       return normalizeNode(entry);
     }
 
-    const [parent] = Editor.parent(editor, path);
-
-    if (!Element.isElement(node) || !Element.isElement(parent)) {
-      return normalizeNode(entry);
-    }
-
-    // 如果父节点为 code-block，则确保自身为 code-line
-    if (parent.type === CODE_BLOCK && node.type !== CODE_LINE) {
-      return Transforms.setNodes(editor, { type: CODE_LINE }, { at: path });
+    if (Element.isElement(node) && node.type === CODE_BLOCK) {
+      for (const [child, childPath] of Node.children(editor, path)) {
+        if (Element.isElement(child) && child.type !== CODE_LINE) {
+          Transforms.setNodes(editor, { type: CODE_LINE }, { at: childPath });
+        }
+      }
+      return;
     }
 
     normalizeNode(entry);
