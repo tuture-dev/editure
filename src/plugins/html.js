@@ -1,5 +1,5 @@
 import { jsx } from "slate-hyperscript";
-import { Transforms, Editor } from "slate";
+import { Transforms, Editor, Element } from "slate";
 
 import { isBlockActive } from "../blocks";
 import {
@@ -18,6 +18,7 @@ import {
   CODE_BLOCK,
   CODE_LINE
 } from "../constants";
+import { getBeforeText } from "../utils";
 
 const ELEMENT_TAGS = {
   BLOCKQUOTE: () => ({ type: BLOCK_QUOTE }),
@@ -120,11 +121,32 @@ export const withHtml = editor => {
   };
 
   editor.insertData = data => {
-    if (
-      isBlockActive(editor, CODE_BLOCK) ||
-      (data.types.length === 1 && data.types[0] === "text/plain")
-    ) {
+    if (data.types.length === 1 && data.types[0] === "text/plain") {
       return insertText(data.getData("text/plain"));
+    }
+
+    const { selection } = editor;
+    const { beforeText } = getBeforeText(editor);
+    console.log("beforeText", beforeText);
+
+    if (isBlockActive(editor, CODE_BLOCK)) {
+      data
+        .getData("text/plain")
+        .trim()
+        .split("\n")
+        .forEach(line => {
+          Transforms.insertNodes(editor, {
+            type: CODE_LINE,
+            children: [{ text: line.trimRight() }]
+          });
+        });
+
+      // 如果粘贴时所在 code-line 为空，则删除此空行
+      if (!beforeText) {
+        Transforms.removeNodes(editor, { at: selection });
+      }
+
+      return;
     }
 
     const html = data.getData("text/html");
@@ -144,6 +166,16 @@ export const withHtml = editor => {
         .reduce((a, b) => a + b, 0);
 
       Transforms.select(editor, Editor.end(editor, [focus.path[0] + nodeLen]));
+
+      const numOfElements = fragment
+        .map(node => Element.isElement(node))
+        .reduce((a, b) => a + b, 0);
+
+      // 如果插入的 node 至少有一个 element，并且粘贴时所在行为空，则删除此空行
+      if (numOfElements >= 1 && !beforeText) {
+        Transforms.removeNodes(editor, { at: selection });
+      }
+
       return;
     }
 

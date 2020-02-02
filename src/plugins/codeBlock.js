@@ -134,23 +134,6 @@ export const withCodeBlock = editor => {
       return;
     }
 
-    if (Element.isElement(node) && node.type === CODE_LINE) {
-      for (const [child, childPath] of Node.children(editor, path)) {
-        // 找到换行符，然后拆分 code-line节点
-        const newlineIndex = child.text.indexOf("\n");
-        if (newlineIndex >= 0) {
-          Transforms.splitNodes(editor, {
-            at: { path: childPath, offset: newlineIndex + 1 }
-          });
-          Transforms.select(editor, Editor.end(editor, childPath));
-          Editor.deleteBackward(editor);
-        } else {
-          Transforms.select(editor, Editor.end(editor, childPath));
-        }
-      }
-      return;
-    }
-
     normalizeNode(entry);
   };
 
