@@ -26,11 +26,10 @@ const ELEMENT_TAGS = {
   H3: () => ({ type: H3 }),
   H4: () => ({ type: H4 }),
   H5: () => ({ type: H5 }),
-  // H6: () => ({ type: "heading-six" }),
+  H6: () => ({ type: PARAGRAPH }),
   IMG: el => ({ type: IMAGE, url: el.getAttribute("src") }),
   LI: () => ({ type: LIST_ITEM }),
   OL: () => ({ type: NUMBERED_LIST }),
-  DIV: () => ({ type: PARAGRAPH }),
   P: () => ({ type: PARAGRAPH }),
   PRE: () => ({ type: CODE_BLOCK }),
   UL: () => ({ type: BULLETED_LIST })
@@ -75,13 +74,17 @@ export const deserialize = el => {
     }
 
     // 否则是 pre -> div 的 DOM 结构，取每个子 div 的 innerText（通常可以认为是一行）
-    return jsx(
-      "element",
-      attrs,
-      Array.from(el.childNodes).map(child =>
-        jsx("element", { type: CODE_LINE }, [{ text: child.innerText }])
-      )
-    );
+    try {
+      return jsx(
+        "element",
+        attrs,
+        Array.from(el.childNodes).map(child =>
+          jsx("element", { type: CODE_LINE }, [{ text: child.innerText }])
+        )
+      );
+    } catch {
+      return jsx("element", attrs, [jsx("element", CODE_LINE, [{ text: el.innerText }])]);
+    }
   }
 
   const children = Array.from(el.childNodes)
