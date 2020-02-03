@@ -98,6 +98,5 @@ export const serializeToMarkdown = serialize;
 
 export const deserializeFromMarkdown = text => {
   const md = new MarkdownIt();
-  console.log("html", md.render(text));
   return deserializeFromHtml(md.render(text));
 };

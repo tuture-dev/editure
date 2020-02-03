@@ -37,8 +37,6 @@ export const updateLinkUrl = url => {
 };
 
 export const linkReducer = (state, action) => {
-  // console.log("state", state);
-  // console.log("action", action);
   switch (action.type) {
     case linkActionTypes.START_EDIT:
       return { ...state, isEditing: true };

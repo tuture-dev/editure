@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useCallback, useReducer } from "react";
 
 // Import the Slate editor factory.
-import { createEditor, Editor } from "slate";
+import { createEditor } from "slate";
 
 // Import the Slate components and React plugin.
 import { Slate, Editable, withReact } from "slate-react";
@@ -17,25 +17,9 @@ import highlight from "./utils/highlight";
 import { createDropListener } from "./utils/image";
 import { updateLastSelection } from "./utils/selection";
 import { linkReducer } from "./utils/link";
-import { serializeToMarkdown, deserializeFromMarkdown } from "./serializers";
 
 import "./App.css";
 import "material-icons/iconfont/material-icons.css";
-
-// const defaultValue = [
-//   {
-//     type: "paragraph",
-//     children: [
-//       { text: "This is " },
-//       { text: "bold", bold: true },
-//       { text: " and " },
-//       { text: "italic", italic: true },
-//       { text: " and " },
-//       { text: "code", code: true },
-//       { text: "." }
-//     ]
-//   }
-// ];
 
 const defaultValue = [
   {
@@ -74,13 +58,6 @@ const App = () => {
     text: "",
     url: ""
   });
-
-  console.log("editor", editor);
-  console.log("markdown");
-  const markdown = serializeToMarkdown(editor);
-  console.log(markdown);
-  console.log("parsed");
-  console.log(deserializeFromMarkdown(markdown));
 
   updateLastSelection(editor.selection);
 

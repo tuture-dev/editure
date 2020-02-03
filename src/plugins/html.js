@@ -23,7 +23,6 @@ export const withHtml = editor => {
 
     const { selection } = editor;
     const { beforeText } = getBeforeText(editor);
-    console.log("beforeText", beforeText);
 
     if (isBlockActive(editor, CODE_BLOCK)) {
       data

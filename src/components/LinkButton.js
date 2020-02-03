@@ -11,10 +11,7 @@ import { updateLinkText, startEditLink } from "../utils/link";
 const LinkButton = React.forwardRef(({ dispatch }, ref) => {
   const editor = useSlate();
 
-  const onClick = e => {
-    console.log("linkButton clicked");
-    // e.preventDefault();
-
+  const onClick = () => {
     const { selection } = editor;
     if (!selection) {
       return;
