@@ -235,6 +235,10 @@ function handleBlockShortcut(editor, shortcut) {
     } else if (format === NOTE) {
       nodeProp = { ...nodeProp, level: matchArr[1] };
     }
+
+    const currentSelection = editor.selection;
+    Transforms.insertNodes(editor, { type: PARAGRAPH, children: [{ text: "" }] });
+    Transforms.setSelection(editor, currentSelection);
   }
 
   if (format === BULLETED_LIST || format === NUMBERED_LIST) {
