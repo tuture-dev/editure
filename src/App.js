@@ -17,6 +17,7 @@ import highlight from "./utils/highlight";
 import { createDropListener } from "./utils/image";
 import { updateLastSelection } from "./utils/selection";
 import { linkReducer } from "./utils/link";
+import { serializeToMarkdown, deserializeFromMarkdown } from "./serializers";
 
 import "./App.css";
 import "material-icons/iconfont/material-icons.css";
@@ -75,6 +76,12 @@ const App = () => {
   });
 
   console.log("editor", editor);
+  console.log("markdown");
+  const markdown = serializeToMarkdown(editor);
+  console.log(markdown);
+  console.log("parsed");
+  console.log(deserializeFromMarkdown(markdown));
+
   updateLastSelection(editor.selection);
 
   return (
@@ -85,7 +92,12 @@ const App = () => {
         padding: 20px;
         background-color: #fff;
       `}>
-      <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+      <Slate
+        editor={editor}
+        value={value}
+        onChange={value => {
+          setValue(value);
+        }}>
         <Toolbar linkDispatch={linkDispatch} ref={buttonRefs} />
         <HoverLink dispatch={linkDispatch} />
         <EditLink link={linkStatus} dispatch={linkDispatch} />
