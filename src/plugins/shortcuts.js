@@ -235,11 +235,6 @@ function handleBlockShortcut(editor, shortcut) {
     } else if (format === NOTE) {
       nodeProp = { ...nodeProp, level: matchArr[1] };
     }
-
-    // 在底部插入空行
-    const currentSelection = editor.selection;
-    Editor.insertBreak(editor);
-    Transforms.setSelection(editor, currentSelection);
   }
 
   if (format === BULLETED_LIST || format === NUMBERED_LIST) {
@@ -295,8 +290,15 @@ export default function withShortcuts(editor) {
   editor.insertBreak = () => {
     // 检测是否为代码块触发条件
     const shortcut = detectShortcut(editor);
+
     if ([CODE_BLOCK, NOTE, HR].includes(shortcut.format)) {
-      if (!detectBlockFormat(editor, [CODE_BLOCK, BULLETED_LIST, NUMBERED_LIST])) {
+      const isInBlock = detectBlockFormat(editor, [
+        CODE_BLOCK,
+        BULLETED_LIST,
+        NUMBERED_LIST
+      ]);
+
+      if (!isInBlock) {
         handleBlockShortcut(editor, shortcut);
         return;
       } else {
