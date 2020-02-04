@@ -1,8 +1,14 @@
 import escapeHtml from "escape-html";
-import { Text } from "slate";
+import { Editor, Text } from "slate";
 import { jsx } from "slate-hyperscript";
 
 import {
+  BOLD,
+  ITALIC,
+  CODE,
+  STRIKETHROUGH,
+  UNDERLINE,
+  LINK,
   BLOCK_QUOTE,
   H1,
   H2,
@@ -12,13 +18,56 @@ import {
   HR,
   NOTE,
   IMAGE,
-  LIST_ITEM,
   NUMBERED_LIST,
   BULLETED_LIST,
   PARAGRAPH,
-  CODE_BLOCK,
-  CODE_LINE
+  CODE_BLOCK
 } from "../constants";
+
+const MARK_DECORATORS = {
+  [CODE]: node => ({ ...node, text: `<code>${node.text}</code>` }),
+  [BOLD]: node => ({ ...node, text: `<strong>${node.text}</strong>` }),
+  [ITALIC]: node => ({ ...node, text: `<em>${node.text}</em>` }),
+  [STRIKETHROUGH]: node => ({
+    ...node,
+    text: `<span style="text-decoration: line-through">${node.text}</span>`
+  }),
+  [UNDERLINE]: node => ({ ...node, text: `<u>${node.text}</u>` }),
+  [LINK]: node => ({
+    ...node,
+    text: `<a href="${escapeHtml(node.url)}">${node.text}</a>`
+  })
+};
+
+const joinChildren = node => node.children.map(n => serialize(n)).join("");
+
+const BLOCK_CONVERTERS = {
+  [H1]: node => `<h1>${joinChildren(node)}</h1>`,
+  [H2]: node => `<h2>${joinChildren(node)}</h2>`,
+  [H3]: node => `<h3>${joinChildren(node)}</h3>`,
+  [H4]: node => `<h4>${joinChildren(node)}</h4>`,
+  [H5]: node => `<h5>${joinChildren(node)}</h5>`,
+  [PARAGRAPH]: node => `<p>${joinChildren(node)}</p>`,
+  [IMAGE]: node => `<img src="${escapeHtml(node.url)}" alt="" />`,
+  [HR]: () => "<hr />",
+  [BLOCK_QUOTE]: node => `<blockquote>${joinChildren(node)}</blockquote>`,
+  [NOTE]: node => `<blockquote>${joinChildren(node)}</blockquote>`,
+  [BULLETED_LIST]: node => {
+    const { children } = node;
+    const items = children.map(item => `<li>${item.children[0].text}</li>`);
+    return `<ul>${items.join("")}</ul>`;
+  },
+  [NUMBERED_LIST]: node => {
+    const { children } = node;
+    const items = children.map(item => `<li>${item.children[0].text}</li>`);
+    return `<ol>${items.join("")}</ol>`;
+  },
+  [CODE_BLOCK]: node => {
+    const { children } = node;
+    const codeLines = children.map(line => `<code>${line.children[0].text}</code>`);
+    return `<pre>${codeLines.join("")}</pre>`;
+  }
+};
 
 const ELEMENT_TAGS = {
   BLOCKQUOTE: () => ({ type: BLOCK_QUOTE }),
@@ -51,67 +100,24 @@ const TEXT_TAGS = {
 
 const serialize = node => {
   if (Text.isText(node)) {
-    return escapeHtml(node.text);
+    const markedNode = Object.keys(MARK_DECORATORS).reduce(
+      (decoratedNode, currentMark) => {
+        return node[currentMark]
+          ? MARK_DECORATORS[currentMark](decoratedNode)
+          : decoratedNode;
+      },
+      { ...node, text: escapeHtml(node.text) }
+    );
+
+    return markedNode.text;
   }
 
-  const children = node.children.map(n => serialize(n)).join("");
-
-  if (node.bold) {
-    return `<strong>${children}</strong>`;
+  const converter = BLOCK_CONVERTERS[node.type];
+  if (typeof converter === "function") {
+    return converter(node);
   }
 
-  if (node.code) {
-    return `<code>${children}</code>`;
-  }
-
-  if (node.italic) {
-    return `<em>${children}</em>`;
-  }
-
-  if (node.strikethrough) {
-    return `<span style="text-decoration: line-through">${children}</span>`;
-  }
-
-  if (node.underline) {
-    return `<u>${children}</u>`;
-  }
-
-  if (node.link) {
-    return `<a href="${escapeHtml(node.url)}">${children}</a>`;
-  }
-
-  switch (node.type) {
-    case H1:
-      return `<h1>${children}</h1>`;
-    case H2:
-      return `<h2>${children}</h2>`;
-    case H3:
-      return `<h3>${children}</h3>`;
-    case H4:
-      return `<h4>${children}</h4>`;
-    case LIST_ITEM:
-      return `<li>${children}</li>`;
-    case BULLETED_LIST:
-      return `<ul>${children}</ul>`;
-    case NUMBERED_LIST:
-      return `<ol>${children}</ol>`;
-    case CODE_LINE:
-      return `<div>${children}</div>`;
-    case CODE_BLOCK:
-      return `<pre>${children}</pre>`;
-    case BLOCK_QUOTE:
-      return `<blockquote>${children}</blockquote>`;
-    case IMAGE:
-      return `<img src=${node.url} alt=${node.url} />`;
-    case NOTE:
-      return `<blockquote>${children}</blockquote>`;
-    case PARAGRAPH:
-      return `<p>${children}</p>`;
-    case HR:
-      return `<hr />`;
-    default:
-      return children;
-  }
+  return joinChildren(node, "");
 };
 
 const deserialize = el => {
