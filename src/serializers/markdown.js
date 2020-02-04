@@ -46,14 +46,14 @@ const BLOCK_CONVERTERS = {
   [IMAGE]: node => `![](${node.url})`,
   [HR]: () => "---",
   [BLOCK_QUOTE]: node =>
-    joinChildren(node, "\n")
+    joinChildren(node, "\n\n")
       .split("\n")
-      .map(line => `> ${line}`)
+      .map(line => (line ? `> ${line}` : ">"))
       .join("\n"),
   [NOTE]: node =>
-    joinChildren(node, "\n")
+    joinChildren(node, "\n\n")
       .split("\n")
-      .map(line => `> ${line}`)
+      .map(line => (line ? `> ${line}` : ">"))
       .join("\n"),
   [BULLETED_LIST]: node => {
     const { children, level = 0 } = node;
@@ -99,7 +99,7 @@ const serialize = node => {
     return converter(node);
   }
 
-  return joinChildren(node, "\n");
+  return joinChildren(node, "\n\n");
 };
 
 export const serializeToMarkdown = serialize;
