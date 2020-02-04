@@ -1,3 +1,4 @@
+import { Text } from "slate";
 import MarkdownIt from "markdown-it";
 
 import { deserializeFromHtml } from "./html";
@@ -23,13 +24,13 @@ import {
   CODE_BLOCK
 } from "../constants";
 
-const MARK_CONVERTERS = {
-  [BOLD]: node => `**${node.text}**`,
-  [ITALIC]: node => `*${node.text}*`,
-  [CODE]: node => `\`${node.text}\``,
-  [STRIKETHROUGH]: node => `~~${node.text}~~`,
-  [UNDERLINE]: node => node.text,
-  [LINK]: node => `[${node.text}](${node.url})`
+const MARK_DECORATORS = {
+  [CODE]: node => ({ ...node, text: `\`${node.text}\`` }),
+  [BOLD]: node => ({ ...node, text: `**${node.text}**` }),
+  [ITALIC]: node => ({ ...node, text: `*${node.text}*` }),
+  [STRIKETHROUGH]: node => ({ ...node, text: `~~${node.text}~~` }),
+  [UNDERLINE]: node => node,
+  [LINK]: node => ({ ...node, text: `[${node.text}](${node.url})` })
 };
 
 const joinChildren = (node, joinChar) =>
@@ -76,10 +77,17 @@ const BLOCK_CONVERTERS = {
 };
 
 const serialize = node => {
-  for (const mark of Object.keys(MARK_CONVERTERS)) {
-    if (node[mark]) {
-      return MARK_CONVERTERS[mark](node);
-    }
+  if (Text.isText(node)) {
+    const markedNode = Object.keys(MARK_DECORATORS).reduce(
+      (decoratedNode, currentMark) => {
+        return node[currentMark]
+          ? MARK_DECORATORS[currentMark](decoratedNode)
+          : decoratedNode;
+      },
+      node
+    );
+
+    return markedNode.text;
   }
 
   if (!node.children) {
