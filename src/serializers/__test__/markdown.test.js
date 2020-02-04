@@ -361,7 +361,7 @@ describe("markdown serialization", () => {
       expect(serialize(node)).toBe(output);
     });
 
-    test("bulleted-list (with level)", () => {
+    test("numbered-list (with level)", () => {
       const node = {
         type: NUMBERED_LIST,
         level: 1,
@@ -374,8 +374,43 @@ describe("markdown serialization", () => {
       expect(serialize(node)).toBe(output);
     });
 
-    test("bulleted-list (with mixed level)", () => {
+    test("numbered-list (with mixed level)", () => {
       // TODO: correct the sequence number
+    });
+
+    test("mixed bulleted and numbered list", () => {
+      const node = {
+        children: [
+          {
+            type: BULLETED_LIST,
+            children: [
+              { type: LIST_ITEM, children: [{ text: "foo" }] },
+              { type: LIST_ITEM, children: [{ text: "bar" }] }
+            ]
+          },
+          {
+            type: NUMBERED_LIST,
+            level: 1,
+            children: [
+              { type: LIST_ITEM, children: [{ text: "hello" }] },
+              { type: LIST_ITEM, children: [{ text: "world" }] }
+            ]
+          },
+          {
+            type: BULLETED_LIST,
+            level: 0,
+            children: [{ type: LIST_ITEM, children: [{ text: "test" }] }]
+          }
+        ]
+      };
+      const output = `- foo
+- bar
+
+  1. hello
+  2. world
+
+- test`;
+      expect(serialize(node)).toBe(output);
     });
 
     test("sequential blocks", () => {
