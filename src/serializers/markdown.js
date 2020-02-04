@@ -90,10 +90,6 @@ const serialize = node => {
     return markedNode.text;
   }
 
-  if (!node.children) {
-    return node.text;
-  }
-
   const converter = BLOCK_CONVERTERS[node.type];
   if (typeof converter === "function") {
     return converter(node);
