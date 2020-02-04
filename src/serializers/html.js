@@ -20,8 +20,10 @@ import {
   IMAGE,
   NUMBERED_LIST,
   BULLETED_LIST,
+  LIST_ITEM,
   PARAGRAPH,
-  CODE_BLOCK
+  CODE_BLOCK,
+  CODE_LINE
 } from "../constants";
 
 const MARK_DECORATORS = {
