@@ -499,6 +499,18 @@ describe("html deserialization", () => {
       expect(deserialize(html)).toStrictEqual(fragment);
     });
 
+    test("div", () => {
+      const html = "<div>test</div>";
+      const fragment = [{ type: PARAGRAPH, children: [{ text: "test" }] }];
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+
+    test("br", () => {
+      const html = "<br />";
+      const fragment = [{ type: PARAGRAPH, children: [{ text: "" }] }];
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+
     test("h1", () => {
       const html = "<h1>test</h1>";
       const fragment = [{ type: H1, children: [{ text: "test" }] }];
@@ -531,8 +543,8 @@ describe("html deserialization", () => {
 
     test("hr", () => {
       const html = "<hr />";
-      const fragment = [{ type: HR }];
-      expect(deserialize(html)).toMatchObject(fragment);
+      const fragment = [{ type: HR, children: [{ text: "" }] }];
+      expect(deserialize(html)).toStrictEqual(fragment);
     });
 
     test("image", () => {
@@ -540,10 +552,11 @@ describe("html deserialization", () => {
       const fragment = [
         {
           type: IMAGE,
-          url: "https://test.com/image.png"
+          url: "https://test.com/image.png",
+          children: [{ text: "" }]
         }
       ];
-      expect(deserialize(html)).toMatchObject(fragment);
+      expect(deserialize(html)).toStrictEqual(fragment);
     });
 
     test("blockquote (single line)", () => {
@@ -626,10 +639,11 @@ describe("html deserialization", () => {
 
     test("sequential blocks", () => {
       const html =
-        "<h1>title</h1><p>paragraph1</p><blockquote><p>blockquote</p></blockquote><pre><code>const a = 1;</code><code>console.log('hello');</code></pre>";
+        "<h1>title</h1><p>paragraph1</p><br /><blockquote><p>blockquote</p></blockquote><pre><code>const a = 1;</code><code>console.log('hello');</code></pre>";
       const fragment = [
         { type: H1, children: [{ text: "title" }] },
         { type: PARAGRAPH, children: [{ text: "paragraph1" }] },
+        { type: PARAGRAPH, children: [{ text: "" }] },
         {
           type: BLOCK_QUOTE,
           children: [{ type: PARAGRAPH, children: [{ text: "blockquote" }] }]
@@ -643,6 +657,31 @@ describe("html deserialization", () => {
         }
       ];
 
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+  });
+
+  describe("flattening", () => {
+    test("flatten p tags", () => {
+      const html = '<p><img src="https://test.com/image.png" alt="" /></p>';
+      const fragment = [
+        {
+          type: IMAGE,
+          url: "https://test.com/image.png",
+          children: [{ text: "" }]
+        }
+      ];
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+
+    test("flatten div tags", () => {
+      const html = "<div><div>test</div></div>";
+      const fragment = [
+        {
+          type: PARAGRAPH,
+          children: [{ text: "test" }]
+        }
+      ];
       expect(deserialize(html)).toStrictEqual(fragment);
     });
   });
