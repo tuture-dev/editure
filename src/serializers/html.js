@@ -84,6 +84,7 @@ const ELEMENT_TAGS = {
   LI: () => ({ type: LIST_ITEM }),
   OL: () => ({ type: NUMBERED_LIST }),
   P: () => ({ type: PARAGRAPH }),
+  DIV: () => ({ type: PARAGRAPH }),
   PRE: () => ({ type: CODE_BLOCK }),
   UL: () => ({ type: BULLETED_LIST })
 };
@@ -128,7 +129,7 @@ const deserialize = el => {
   } else if (el.nodeType !== 1) {
     return null;
   } else if (el.nodeName === "BR") {
-    return "\n";
+    return jsx("element", { type: PARAGRAPH }, [{ text: "" }]);
   }
 
   const { nodeName } = el;
@@ -155,8 +156,22 @@ const deserialize = el => {
     .map(deserialize)
     .flat();
 
+  // Ensure that children is not empty.
+  if (children.length === 0) {
+    children.push({ text: "" });
+  }
+
   if (nodeName === "BODY") {
     return jsx("fragment", {}, children);
+  }
+
+  if (["P", "DIV"].includes(nodeName)) {
+    // If any child is a block, return all children directly without adding any type.
+    for (const child of children) {
+      if (child.type) {
+        return children;
+      }
+    }
   }
 
   if (ELEMENT_TAGS[nodeName]) {

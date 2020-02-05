@@ -15,6 +15,7 @@ const containsMarkdownCode = text => {
     /\[([^\\*]+)\]\(([^\\*]+)\)/,
 
     // Blocks.
+    /!\[.*\]\(.+\)/,
     /^\* /,
     /^- /,
     /^\+ /,
@@ -47,20 +48,27 @@ export const withPaste = editor => {
       return insertData(data);
     }
 
-    const text = data.getData("text/plain");
+    const { selection } = editor;
+    const { beforeText } = getBeforeText(editor);
 
-    if (containsMarkdownCode(text)) {
-      return Transforms.insertNodes(editor, deserializeFromMarkdown(text));
+    const text = data.getData("text/plain");
+    const isInCodeBlock = isBlockActive(editor, CODE_BLOCK);
+
+    if (!isInCodeBlock && containsMarkdownCode(text)) {
+      const parsed = deserializeFromMarkdown(text);
+      Transforms.insertNodes(editor, parsed);
+
+      if (!beforeText) {
+        Transforms.removeNodes(editor, { at: selection });
+      }
+      return;
     }
 
     if (data.types.length === 1 && data.types[0] === "text/plain") {
       return insertText(data.getData("text/plain"));
     }
 
-    const { selection } = editor;
-    const { beforeText } = getBeforeText(editor);
-
-    if (isBlockActive(editor, CODE_BLOCK)) {
+    if (isInCodeBlock) {
       data
         .getData("text/plain")
         .trim()
