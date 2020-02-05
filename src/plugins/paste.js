@@ -3,9 +3,35 @@ import { Transforms, Editor, Element } from "slate";
 import { isBlockActive } from "../blocks";
 import { LINK, IMAGE, CODE_BLOCK, CODE_LINE } from "../constants";
 import { getBeforeText } from "../utils";
-import { deserializeFromHtml } from "../serializers";
+import { deserializeFromHtml, deserializeFromMarkdown } from "../serializers";
 
-export const withHtml = editor => {
+const containsMarkdownCode = text => {
+  const testRegexes = [
+    // Marks.
+    /`[^`]+`/,
+    /\*[^\*]+\*/,
+    /_[^_]+_/,
+    /~~[^~]~~/,
+    /\[([^\\*]+)\]\(([^\\*]+)\)/,
+
+    // Blocks.
+    /^\* /,
+    /^- /,
+    /^\+ /,
+    /^[0-9]\\. /,
+    /^\s*>/,
+    /^\s*#/,
+    /^\s*```\s*([a-zA-Z]*)/,
+    /^\s*---/
+  ];
+
+  for (const regex of testRegexes) {
+    if (text.match(regex)) return true;
+  }
+  return false;
+};
+
+export const withPaste = editor => {
   const { insertData, insertText, isInline, isVoid } = editor;
 
   editor.isInline = element => {
@@ -17,6 +43,16 @@ export const withHtml = editor => {
   };
 
   editor.insertData = data => {
+    if (!Array.from(data.types).includes("text/plain")) {
+      return insertData(data);
+    }
+
+    const text = data.getData("text/plain");
+
+    if (containsMarkdownCode(text)) {
+      return Transforms.insertNodes(editor, deserializeFromMarkdown(text));
+    }
+
     if (data.types.length === 1 && data.types[0] === "text/plain") {
       return insertText(data.getData("text/plain"));
     }

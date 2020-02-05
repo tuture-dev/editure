@@ -102,5 +102,5 @@ export const serializeToMarkdown = serialize;
 
 export const deserializeFromMarkdown = text => {
   const md = new MarkdownIt();
-  return deserializeFromHtml(md.render(text));
+  return deserializeFromHtml(md.render(text).replace(/\n/g, ""));
 };
