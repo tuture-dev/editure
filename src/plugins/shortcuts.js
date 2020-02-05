@@ -1,8 +1,7 @@
-import { Range, Editor, Transforms, Point, Node } from "slate";
+import { Range, Editor, Transforms, Point } from "slate";
 
-import { toggleMark } from "../marks";
+import { toggleMark, detectMarkFormat } from "../marks";
 import { isBlockActive, toggleBlock, detectBlockFormat } from "../blocks";
-import { detectMarkFormat } from "../marks";
 import { getBeforeText, getChildrenText, compareNode } from "../utils";
 import {
   BOLD,
@@ -27,64 +26,33 @@ import {
   CODE_LINE
 } from "../constants";
 
-const BLOCKS_CONSTANTS = [
-  H1,
-  H2,
-  H3,
-  H4,
-  H5,
-  H6,
-  CODE_BLOCK,
-  BLOCK_QUOTE,
-  NOTE,
-  BULLETED_LIST,
-  NUMBERED_LIST,
-  HR,
-  LIST_ITEM,
-  PARAGRAPH
+const MARK_SHORTCUT_REGEXES = [
+  [CODE, /`([^`]+)`/],
+  [BOLD, /\*\*([^\*]+)\*\*/],
+  [BOLD, /__([^_]+)__/],
+  [ITALIC, /\*([^\*]+)\*/],
+  [ITALIC, /_([^_]+)_/],
+  [STRIKETHROUGH, /~~([^~]+)~~/],
+  [LINK, /\[([^\\*]+)\]\(([^\\*]+)\)/]
 ];
 
-const MARK_SHORTCUTS = [CODE, BOLD, ITALIC, STRIKETHROUGH, LINK];
-const BLOCK_SHORTCUTS = [
-  BULLETED_LIST,
-  BULLETED_LIST,
-  BULLETED_LIST,
-  NUMBERED_LIST,
-  BLOCK_QUOTE,
-  NOTE,
-  H1,
-  H2,
-  H3,
-  H4,
-  H5,
-  H6,
-  CODE_BLOCK,
-  HR
-];
-
-const MARK_SHORTCUTS_REGEX = [
-  "`([^`]+)`",
-  "\\*\\*([^\\*]+)\\*\\*",
-  "\\*([^\\*]+)\\*",
-  "~~([^~]+)~~",
-  /\[([^\\*]+)\]\(([^\\*]+)\)/
-];
-
-const BLOCK_SHORTCUTS_REGEX = [
-  "^\\*$",
-  "^-$",
-  "^\\+$",
-  "^[0-9]\\.$",
-  "^\\s*>$",
-  "^\\s*:::\\s*([a-zA-Z]*)$",
-  "^\\s*#$",
-  "^\\s*##$",
-  "^\\s*###$",
-  "^\\s*####$",
-  "^\\s*#####$",
-  "^\\s*######$",
-  "^\\s*```\\s*([a-zA-Z]*)$",
-  "^\\s*---$"
+const BLOCK_SHORTCUT_REGEXES = [
+  [BULLETED_LIST, /^\*$/],
+  [BULLETED_LIST, /^-$/],
+  [BULLETED_LIST, /^\+$/],
+  [NUMBERED_LIST, /^[0-9]\.$/],
+  [BLOCK_QUOTE, /^\s*>$/],
+  [NOTE, /^\s*:::\\s*([a-zA-Z]*)$/],
+  [H1, /^\s*#$/],
+  [H2, /^\s*##$/],
+  [H3, /^\s*###$/],
+  [H4, /^\s*####$/],
+  [H5, /^\s*#####$/],
+  [H6, /^\s*######$/],
+  [CODE_BLOCK, /^\s*```\s*([a-zA-Z]*)$/],
+  [HR, /^\s*---$/],
+  [HR, /^\s*\*\*\*$/],
+  [HR, /^\s*___$/]
 ];
 
 function reverseStr(str = "") {
@@ -98,11 +66,8 @@ function detectMarkShortcut(editor) {
   let { beforeText, range } = getBeforeText(editor);
   const shortcut = { lineRange: range };
 
-  for (const index in MARK_SHORTCUTS_REGEX) {
-    const regex = new RegExp(MARK_SHORTCUTS_REGEX[index]);
+  for (const [format, regex] of MARK_SHORTCUT_REGEXES) {
     if (beforeText && regex.test(beforeText)) {
-      const format = MARK_SHORTCUTS[index];
-
       if (format !== LINK) {
         // 对内容进行 reverse 操作，如果匹配，且 index = 0，那么说明满足触发条件
         beforeText = reverseStr(beforeText);
@@ -131,13 +96,12 @@ function deleteBlockShortcut(editor) {
   const { beforeText, range } = getBeforeText(editor);
   const shortcut = { lineRange: range };
 
-  for (const index in BLOCK_SHORTCUTS_REGEX) {
-    const regex = new RegExp(BLOCK_SHORTCUTS_REGEX[index]);
+  for (const [format, regex] of BLOCK_SHORTCUT_REGEXES) {
     if (beforeText && regex.test(beforeText)) {
       const matchArr = regex.exec(beforeText);
 
       if (matchArr.index + matchArr[0].length === beforeText.length) {
-        shortcut.format = BLOCK_SHORTCUTS[index];
+        shortcut.format = format;
         shortcut.matchArr = matchArr;
         break;
       }
@@ -267,15 +231,11 @@ export default function withShortcuts(editor) {
       const shortcut = detectShortcut(editor);
       const { format } = shortcut;
 
-      if ([NOTE, CODE_BLOCK, HR].includes(format)) {
+      if ([NOTE, CODE_BLOCK, HR, BULLETED_LIST, NUMBERED_LIST].includes(format)) {
         insertText(text);
-      } else if (BLOCK_SHORTCUTS.includes(format)) {
-        if (detectBlockFormat(editor, [CODE_BLOCK, BULLETED_LIST, NUMBERED_LIST])) {
-          insertText(text);
-        } else {
-          handleBlockShortcut(editor, shortcut);
-        }
-      } else if (MARK_SHORTCUTS.includes(format)) {
+      } else if ([BLOCK_QUOTE, H1, H2, H3, H4, H5, H6, HR].includes(format)) {
+        handleBlockShortcut(editor, shortcut);
+      } else if ([CODE, BOLD, ITALIC, STRIKETHROUGH, LINK].includes(format)) {
         // 在代码块里面不允许进行 mark 操作
         if (isBlockActive(editor, CODE_BLOCK)) {
           insertText(text);
