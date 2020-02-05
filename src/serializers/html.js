@@ -136,29 +136,18 @@ const deserialize = el => {
   if (nodeName === "PRE") {
     const attrs = ELEMENT_TAGS["PRE"]();
 
-    // 如果检测到 pre -> code 的 DOM 结构，直接取 code 的 innerText 构建代码块
-    if (el.childNodes[0] && el.childNodes[0].nodeName === "CODE") {
-      return jsx(
-        "element",
-        attrs,
-        el.childNodes[0].innerText
-          .slice(0, -1)
-          .split("\n")
-          .map(line => jsx("element", { type: CODE_LINE }, [{ text: line }]))
-      );
-    }
-
-    // 否则是 pre -> div 的 DOM 结构，取每个子 div 的 innerText（通常可以认为是一行）
     try {
       return jsx(
         "element",
         attrs,
         Array.from(el.childNodes).map(child =>
-          jsx("element", { type: CODE_LINE }, [{ text: child.innerText }])
+          jsx("element", { type: CODE_LINE }, [{ text: child.textContent }])
         )
       );
     } catch {
-      return jsx("element", attrs, [jsx("element", CODE_LINE, [{ text: el.innerText }])]);
+      return jsx("element", attrs, [
+        jsx("element", CODE_LINE, [{ text: el.textContent }])
+      ]);
     }
   }
 
