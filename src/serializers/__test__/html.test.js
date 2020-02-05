@@ -15,7 +15,10 @@ import {
   CODE_LINE,
   LIST_ITEM
 } from "../../constants";
-import { serializeToHtml as serialize } from "../html";
+import {
+  serializeToHtml as serialize,
+  deserializeFromHtml as deserialize
+} from "../html";
 
 describe("html serialization", () => {
   describe("pure mark", () => {
@@ -360,6 +363,312 @@ describe("html serialization", () => {
         "<blockquote><p><strong>Danger!</strong></p><blockquote><p>A really wise quote.</p></blockquote><p>Bye.</p></blockquote>";
 
       expect(serialize(node)).toBe(output);
+    });
+  });
+});
+
+describe("html deserialization", () => {
+  describe("pure mark", () => {
+    test("bare text", () => {
+      const html = "test";
+      const fragment = [{ text: "test" }];
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+
+    test("bold", () => {
+      const html = "<strong>test</strong>";
+      const fragment = [{ bold: true, text: "test" }];
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+
+    test("italic", () => {
+      const html = "<em>test</em>";
+      const fragment = [{ italic: true, text: "test" }];
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+
+    test("code", () => {
+      const html = "<code>test</code>";
+      const fragment = [{ code: true, text: "test" }];
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+
+    test("underline", () => {
+      const html = "<u>test</u>";
+      const fragment = [{ underline: true, text: "test" }];
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+
+    test("link", () => {
+      const html = `<a href="https://test.com">test</a>`;
+      const fragment = [{ link: true, text: "test", url: "https://test.com" }];
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+
+    test("sequential marks in a paragraph", () => {
+      const html =
+        "<p>This is <strong>bold</strong> and <em>italic</em> and <code>code</code>.</p>";
+      const fragment = [
+        {
+          type: PARAGRAPH,
+          children: [
+            { text: "This is " },
+            { bold: true, text: "bold" },
+            { text: " and " },
+            { italic: true, text: "italic" },
+            { text: " and " },
+            { code: true, text: "code" },
+            { text: "." }
+          ]
+        }
+      ];
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+  });
+
+  describe("mixed marks", () => {
+    test("bold + italic", () => {
+      const html = "<em><strong>test</strong></em>";
+      const fragment = [{ bold: true, italic: true, text: "test" }];
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+
+    test("bold + code", () => {
+      const html = "<strong><code>test</code></strong>";
+      const fragment = [{ bold: true, code: true, text: "test" }];
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+
+    test("bold + underline", () => {
+      const html = "<u><strong>test</strong></u>";
+      const fragment = [{ bold: true, underline: true, text: "test" }];
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+
+    test("bold + link", () => {
+      const html = '<a href="https://test.com"><strong>test</strong></a>';
+      const fragment = [
+        { bold: true, link: true, url: "https://test.com", text: "test" }
+      ];
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+
+    test("bold + italic + code + underline + strikethrough + link", () => {
+      const html =
+        '<a href="https://test.com"><u><em><strong><code>test</code></strong></em></u></a>';
+      const fragment = [
+        {
+          bold: true,
+          italic: true,
+          code: true,
+          underline: true,
+          link: true,
+          url: "https://test.com",
+          text: "test"
+        }
+      ];
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+
+    test("sequential mixed marks", () => {
+      const html =
+        '<p>This is <em><strong>mixed</strong></em> and <u>underlined</u> and <a href="https://test.com"><code>code</code></a>.</p>';
+      const fragment = [
+        {
+          type: PARAGRAPH,
+          children: [
+            { text: "This is " },
+            { bold: true, italic: true, text: "mixed" },
+            { text: " and " },
+            { underline: true, text: "underlined" },
+            { text: " and " },
+            { code: true, link: true, url: "https://test.com", text: "code" },
+            { text: "." }
+          ]
+        }
+      ];
+
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+  });
+
+  describe("pure block", () => {
+    test("paragraph", () => {
+      const html = "<p>test</p>";
+      const fragment = [{ type: PARAGRAPH, children: [{ text: "test" }] }];
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+
+    test("h1", () => {
+      const html = "<h1>test</h1>";
+      const fragment = [{ type: H1, children: [{ text: "test" }] }];
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+
+    test("h2", () => {
+      const html = "<h2>test</h2>";
+      const fragment = [{ type: H2, children: [{ text: "test" }] }];
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+
+    test("h3", () => {
+      const html = "<h3>test</h3>";
+      const fragment = [{ type: H3, children: [{ text: "test" }] }];
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+
+    test("h4", () => {
+      const html = "<h4>test</h4>";
+      const fragment = [{ type: H4, children: [{ text: "test" }] }];
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+
+    test("h5", () => {
+      const html = "<h5>test</h5>";
+      const fragment = [{ type: H5, children: [{ text: "test" }] }];
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+
+    test("hr", () => {
+      const html = "<hr />";
+      const fragment = [{ type: HR }];
+      expect(deserialize(html)).toMatchObject(fragment);
+    });
+
+    test("image", () => {
+      const html = '<img src="https://test.com/image.png" alt="" />';
+      const fragment = [
+        {
+          type: IMAGE,
+          url: "https://test.com/image.png"
+        }
+      ];
+      expect(deserialize(html)).toMatchObject(fragment);
+    });
+
+    test("blockquote (single line)", () => {
+      const html = "<blockquote><p>test</p></blockquote>";
+      const fragment = [
+        {
+          type: BLOCK_QUOTE,
+          children: [{ type: PARAGRAPH, children: [{ text: "test" }] }]
+        }
+      ];
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+
+    test("blockquote (multiple lines)", () => {
+      const html = "<blockquote><p>foo</p><p>bar</p></blockquote>";
+      const fragment = [
+        {
+          type: BLOCK_QUOTE,
+          children: [
+            { type: PARAGRAPH, children: [{ text: "foo" }] },
+            { type: PARAGRAPH, children: [{ text: "bar" }] }
+          ]
+        }
+      ];
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+
+    test("code-block (single line)", () => {
+      const html = "<pre><code>test</code></pre>";
+      const fragment = [
+        {
+          type: CODE_BLOCK,
+          children: [{ type: CODE_LINE, children: [{ text: "test" }] }]
+        }
+      ];
+      expect(deserialize(html)).toMatchObject(fragment);
+    });
+
+    test("code-block (multiple lines)", () => {
+      const html = "<pre><code>foo</code><code>bar</code></pre>";
+      const fragment = [
+        {
+          type: CODE_BLOCK,
+          children: [
+            { type: CODE_LINE, children: [{ text: "foo" }] },
+            { type: CODE_LINE, children: [{ text: "bar" }] }
+          ]
+        }
+      ];
+      expect(deserialize(html)).toMatchObject(fragment);
+    });
+
+    test("bulleted-list", () => {
+      const html = "<ul><li>foo</li><li>bar</li></ul>";
+      const fragment = [
+        {
+          type: BULLETED_LIST,
+          children: [
+            { type: LIST_ITEM, children: [{ text: "foo" }] },
+            { type: LIST_ITEM, children: [{ text: "bar" }] }
+          ]
+        }
+      ];
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+
+    test("numbered-list", () => {
+      const html = "<ol><li>foo</li><li>bar</li></ol>";
+      const fragment = [
+        {
+          type: NUMBERED_LIST,
+          children: [
+            { type: LIST_ITEM, children: [{ text: "foo" }] },
+            { type: LIST_ITEM, children: [{ text: "bar" }] }
+          ]
+        }
+      ];
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+
+    test("sequential blocks", () => {
+      const html =
+        "<h1>title</h1><p>paragraph1</p><blockquote><p>blockquote</p></blockquote><pre><code>const a = 1;</code><code>console.log('hello');</code></pre>";
+      const fragment = [
+        { type: H1, children: [{ text: "title" }] },
+        { type: PARAGRAPH, children: [{ text: "paragraph1" }] },
+        {
+          type: BLOCK_QUOTE,
+          children: [{ type: PARAGRAPH, children: [{ text: "blockquote" }] }]
+        },
+        {
+          type: CODE_BLOCK,
+          children: [
+            { type: CODE_LINE, children: [{ text: "const a = 1;" }] },
+            { type: CODE_LINE, children: [{ text: "console.log('hello');" }] }
+          ]
+        }
+      ];
+
+      expect(deserialize(html)).toStrictEqual(fragment);
+    });
+  });
+
+  describe("nested blocks", () => {
+    test("blockquote as a container", () => {
+      const html =
+        "<blockquote><p>This is some code:</p><pre><code>const a = 1;</code><code>console.log('hello');</code></pre><p>Bye.</p></blockquote>";
+      const fragment = [
+        {
+          type: BLOCK_QUOTE,
+          children: [
+            { type: PARAGRAPH, children: [{ text: "This is some code:" }] },
+            {
+              type: CODE_BLOCK,
+              children: [
+                { type: CODE_LINE, children: [{ text: "const a = 1;" }] },
+                { type: CODE_LINE, children: [{ text: "console.log('hello');" }] }
+              ]
+            },
+            { type: PARAGRAPH, children: [{ text: "Bye." }] }
+          ]
+        }
+      ];
+
+      expect(deserialize(html)).toStrictEqual(fragment);
     });
   });
 });
