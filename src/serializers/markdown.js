@@ -98,9 +98,10 @@ const serialize = node => {
   return joinChildren(node, "\n\n");
 };
 
+const md = new MarkdownIt({ linkify: true });
+
 export const serializeToMarkdown = serialize;
 
 export const deserializeFromMarkdown = text => {
-  const md = new MarkdownIt();
-  return deserializeFromHtml(md.render(text));
+  return deserializeFromHtml(md.render(text).replace(/\n/g, ""));
 };

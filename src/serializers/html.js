@@ -84,6 +84,7 @@ const ELEMENT_TAGS = {
   LI: () => ({ type: LIST_ITEM }),
   OL: () => ({ type: NUMBERED_LIST }),
   P: () => ({ type: PARAGRAPH }),
+  DIV: () => ({ type: PARAGRAPH }),
   PRE: () => ({ type: CODE_BLOCK }),
   UL: () => ({ type: BULLETED_LIST })
 };
@@ -128,7 +129,7 @@ const deserialize = el => {
   } else if (el.nodeType !== 1) {
     return null;
   } else if (el.nodeName === "BR") {
-    return "\n";
+    return jsx("element", { type: PARAGRAPH }, [{ text: "" }]);
   }
 
   const { nodeName } = el;
@@ -136,29 +137,18 @@ const deserialize = el => {
   if (nodeName === "PRE") {
     const attrs = ELEMENT_TAGS["PRE"]();
 
-    // 如果检测到 pre -> code 的 DOM 结构，直接取 code 的 innerText 构建代码块
-    if (el.childNodes[0] && el.childNodes[0].nodeName === "CODE") {
-      return jsx(
-        "element",
-        attrs,
-        el.childNodes[0].innerText
-          .slice(0, -1)
-          .split("\n")
-          .map(line => jsx("element", { type: CODE_LINE }, [{ text: line }]))
-      );
-    }
-
-    // 否则是 pre -> div 的 DOM 结构，取每个子 div 的 innerText（通常可以认为是一行）
     try {
       return jsx(
         "element",
         attrs,
         Array.from(el.childNodes).map(child =>
-          jsx("element", { type: CODE_LINE }, [{ text: child.innerText }])
+          jsx("element", { type: CODE_LINE }, [{ text: child.textContent }])
         )
       );
     } catch {
-      return jsx("element", attrs, [jsx("element", CODE_LINE, [{ text: el.innerText }])]);
+      return jsx("element", attrs, [
+        jsx("element", CODE_LINE, [{ text: el.textContent }])
+      ]);
     }
   }
 
@@ -166,8 +156,22 @@ const deserialize = el => {
     .map(deserialize)
     .flat();
 
+  // Ensure that children is not empty.
+  if (children.length === 0) {
+    children.push({ text: "" });
+  }
+
   if (nodeName === "BODY") {
     return jsx("fragment", {}, children);
+  }
+
+  if (["P", "DIV"].includes(nodeName)) {
+    // If any child is a block, return all children directly without adding any type.
+    for (const child of children) {
+      if (child.type) {
+        return children;
+      }
+    }
   }
 
   if (ELEMENT_TAGS[nodeName]) {

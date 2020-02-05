@@ -5,10 +5,10 @@ import withShortcuts from "./shortcuts";
 import { withList } from "./list";
 import { withCodeBlock } from "./codeBlock";
 import { withBlockquote } from "./blockquote";
-import { withHtml } from "./html";
+import { withPaste } from "./paste";
 
 export default [
-  withHtml,
+  withPaste,
   // withLinks,
   withImages,
   withHr,
