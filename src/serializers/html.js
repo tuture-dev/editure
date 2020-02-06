@@ -81,7 +81,10 @@ const ELEMENT_TAGS = {
   H6: () => ({ type: PARAGRAPH }),
   HR: () => ({ type: HR }),
   IMG: el => ({ type: IMAGE, url: el.getAttribute("src") }),
-  LI: () => ({ type: LIST_ITEM }),
+  LI: el => ({
+    type: LIST_ITEM,
+    parent: el.parentNode.nodeName === "UL" ? BULLETED_LIST : NUMBERED_LIST
+  }),
   OL: () => ({ type: NUMBERED_LIST }),
   P: () => ({ type: PARAGRAPH }),
   DIV: () => ({ type: PARAGRAPH }),

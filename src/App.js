@@ -84,7 +84,9 @@ const App = () => {
           renderElement={renderElement}
           renderLeaf={renderLeaf}
           onKeyDown={hotKeyHandler}
-          // onClick={() => updateLastSelection(editor.selection)}
+          onCopy={e => {
+            e.clipboardData.setData("application/x-editure-fragment", true);
+          }}
           onDrop={createDropListener(editor)}
           autoFocus
         />
