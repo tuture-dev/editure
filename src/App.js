@@ -13,7 +13,6 @@ import Leaf from "./marks";
 import Element from "./blocks";
 import createHotKeysHandler from "./hotkeys";
 import { Toolbar, EditLink, HoverLink } from "./components";
-import highlight from "./utils/highlight";
 import { createDropListener } from "./utils/image";
 import { updateLastSelection } from "./utils/selection";
 import { linkReducer } from "./utils/link";
@@ -43,7 +42,6 @@ const App = () => {
 
   const renderElement = useCallback(Element, []);
   const renderLeaf = useCallback(Leaf, []);
-  const decorate = useCallback(args => highlight(args), []);
 
   // 用来控制工具栏按钮的 refs
   const buttonRefs = {
@@ -59,7 +57,6 @@ const App = () => {
     url: ""
   });
 
-  console.log("nodes", editor.children);
   updateLastSelection(editor.selection);
 
   return (
@@ -80,7 +77,6 @@ const App = () => {
         <HoverLink dispatch={linkDispatch} />
         <EditLink link={linkStatus} dispatch={linkDispatch} />
         <Editable
-          decorate={decorate}
           renderElement={renderElement}
           renderLeaf={renderLeaf}
           onKeyDown={hotKeyHandler}
