@@ -103,18 +103,23 @@ export const withList = editor => {
       let lastLevel = 0;
 
       for (const [child, childPath] of Node.children(editor, path)) {
-        const { level = 0 } = child;
-        if (level === lastLevel + 1) {
+        const { level = 0, number } = child;
+        if (level > lastLevel) {
           counterStack.push(counter);
           counter = 1;
-        } else if (level === lastLevel - 1) {
-          counter = counterStack.pop() + 1;
+        } else if (level < lastLevel) {
+          while (level < lastLevel) {
+            counter = counterStack.pop() + 1;
+            lastLevel--;
+          }
         } else {
           counter++;
         }
 
-        // Update item level and number.
-        Transforms.setNodes(editor, { level, number: counter }, { at: childPath });
+        // Update item level and number if necessary.
+        if (number !== counter) {
+          Transforms.setNodes(editor, { level, number: counter }, { at: childPath });
+        }
 
         lastLevel = level;
       }
