@@ -59,6 +59,7 @@ const App = () => {
     url: ""
   });
 
+  console.log("nodes", editor.children);
   updateLastSelection(editor.selection);
 
   return (

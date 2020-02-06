@@ -102,6 +102,10 @@ input:focus {
   border-color: blue;
 }
 
+[data-slate-editor] > * + * {
+  margin-top: 1em;
+}
+
 code[class*="language-"],
 pre[class*="language-"] {
   color: black;

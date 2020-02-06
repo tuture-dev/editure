@@ -1,101 +1,46 @@
-import { Transforms, Editor, Point, Range, Node, Element } from "slate";
+import { Transforms, Editor, Point, Range, Element, Node } from "slate";
 
 import { isBlockActive } from "../blocks";
 import { LIST_ITEM, BULLETED_LIST, NUMBERED_LIST, PARAGRAPH } from "../constants";
 
 export const increaseItemDepth = editor => {
-  const type = isBlockActive(editor, BULLETED_LIST) ? BULLETED_LIST : NUMBERED_LIST;
-
-  const [node, _] = Editor.above(editor, {
-    match: n => n.type === type
+  const [node] = Editor.above(editor, {
+    match: n => n.type === LIST_ITEM
   });
-  const { level = 0 } = node;
+  const { level = 0, parent } = node;
 
-  // 如果此时 ul 中 li 大于 1 个，那么分出此时的 li，将其变成  ul > li
-  if (node && node.children.length > 1) {
-    Transforms.liftNodes(editor, {
+  Transforms.setNodes(
+    editor,
+    {
+      parent,
+      level: Math.min(level + 1, 8)
+    },
+    {
       match: n => n.type === LIST_ITEM
-    });
-
-    Transforms.wrapNodes(
-      editor,
-      {
-        type,
-        level: Math.min(level + 1, 8)
-      },
-      {
-        macth: n => n.type === LIST_ITEM
-      }
-    );
-  } else {
-    const type = isBlockActive(editor, BULLETED_LIST) ? BULLETED_LIST : NUMBERED_LIST;
-
-    Transforms.setNodes(
-      editor,
-      {
-        level: Math.min(level + 1, 8)
-      },
-      {
-        match: n => n.type === type
-      }
-    );
-  }
+    }
+  );
 };
 
 export const decreaseItemDepth = editor => {
-  const type = isBlockActive(editor, BULLETED_LIST) ? BULLETED_LIST : NUMBERED_LIST;
-  const [node, _] = Editor.above(editor, {
-    match: n => n.type === type
+  const [node] = Editor.above(editor, {
+    match: n => n.type === LIST_ITEM
   });
-  const { level = 0 } = node;
+  const { level = 0, parent } = node;
 
-  // 如果此 list-item 所属列表中元素个数大于1，
-  // 就要考虑将此元素单独提取出来，成为一个列表
-  if (node && node.children.length > 1) {
-    Transforms.liftNodes(editor, {
+  Transforms.setNodes(
+    editor,
+    {
+      parent,
+      level: Math.max(level - 1, 0)
+    },
+    {
       match: n => n.type === LIST_ITEM
-    });
-
-    Transforms.wrapNodes(
-      editor,
-      {
-        type,
-        level: Math.max(level - 1, 0)
-      },
-      {
-        macth: n => n.type === LIST_ITEM
-      }
-    );
-  } else {
-    // 设置层级
-    Transforms.setNodes(
-      editor,
-      {
-        level: Math.max(level - 1, 0)
-      },
-      {
-        match: n => n.type === type
-      }
-    );
-
-    // 判断如果此时回退层级和之前的同类型列表的 level 一致，就合并进此同类型列表
-    const [node, _] = Editor.previous(editor, {
-      match: n => n.type === type
-    });
-
-    if (node) {
-      const { level: previousLevel = 0 } = node;
-      if (previousLevel === Math.max(level - 1, 0)) {
-        Transforms.mergeNodes(editor, {
-          match: n => n.type === type
-        });
-      }
     }
-  }
+  );
 };
 
 export const withList = editor => {
-  const { deleteBackward, deleteFragment } = editor;
+  const { deleteBackward, normalizeNode } = editor;
 
   editor.deleteBackward = (...args) => {
     const { selection } = editor;
@@ -146,6 +91,37 @@ export const withList = editor => {
 
       deleteBackward(...args);
     }
+  };
+
+  editor.normalizeNode = entry => {
+    const [node, path] = entry;
+
+    // If the element is a numbered-list, ensure each item has correct number.
+    if (Element.isElement(node) && node.type === NUMBERED_LIST) {
+      const counterStack = [];
+      let counter = 0;
+      let lastLevel = 0;
+
+      for (const [child, childPath] of Node.children(editor, path)) {
+        const { level = 0 } = child;
+        if (level === lastLevel + 1) {
+          counterStack.push(counter);
+          counter = 1;
+        } else if (level === lastLevel - 1) {
+          counter = counterStack.pop() + 1;
+        } else {
+          counter++;
+        }
+
+        // Update item level and number.
+        Transforms.setNodes(editor, { level, number: counter }, { at: childPath });
+
+        lastLevel = level;
+      }
+    }
+
+    // Fall back to the original `normalizeNode` to enforce other constraints.
+    normalizeNode(entry);
   };
 
   return editor;

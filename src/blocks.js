@@ -32,7 +32,7 @@ const numberedListStyleType = ["decimal", "lower-alpha", "lower-roman"];
 
 const LIST_TYPES = [NUMBERED_LIST, BULLETED_LIST];
 
-const BLOCK_TYPES = [
+export const BLOCK_TYPES = [
   H1,
   H2,
   H3,
@@ -48,6 +48,32 @@ const BLOCK_TYPES = [
   IMAGE,
   HR
 ];
+
+const ListItemElement = props => {
+  const { attributes, children, element } = props;
+  const { parent, level, number } = element;
+
+  const bulletedStyle = css`
+    margin-left: ${(level || 0) * 2 + 2}em;
+    list-style-type: ${bulletedListStyleType[element.level % 3]};
+  `;
+
+  const numberedStyle = css`
+    ::before {
+      content: "${number || 1}.  ";
+    }
+    margin-left: ${(level || 0) * 2 + 1}em;
+    list-style-type: none;
+  `;
+
+  return (
+    <li
+      {...attributes}
+      className={parent === BULLETED_LIST ? bulletedStyle : numberedStyle}>
+      {children}
+    </li>
+  );
+};
 
 const CodeBlockElement = props => {
   const { element } = props;
@@ -280,6 +306,7 @@ export const toggleBlock = (editor, format, props, type) => {
 
     default: {
       Transforms.setNodes(editor, {
+        ...props,
         type: isActive ? PARAGRAPH : isList ? LIST_ITEM : format
       });
     }
@@ -301,13 +328,14 @@ export default props => {
           <div>{children}</div>
         </blockquote>
       );
+    case LIST_ITEM:
+      return <ListItemElement {...props} />;
     case BULLETED_LIST:
       return (
         <ul
           {...attributes}
           className={css`
-            padding-left: ${(element.level || 0) * 2 + 2}em;
-            list-style-type: ${bulletedListStyleType[element.level % 3]};
+            padding-inline-start: 0;
           `}>
           {children}
         </ul>
@@ -317,8 +345,7 @@ export default props => {
         <ol
           {...attributes}
           className={css`
-            padding-left: ${(element.level || 0) * 2 + 2}em;
-            list-style-type: ${numberedListStyleType[element.level % 3]};
+            padding-inline-start: 0;
           `}>
           {children}
         </ol>
@@ -331,8 +358,6 @@ export default props => {
       return <h3 {...attributes}>{children}</h3>;
     case H4:
       return <h4 {...attributes}>{children}</h4>;
-    case LIST_ITEM:
-      return <li {...attributes}>{children}</li>;
     case CODE_BLOCK:
       return <CodeBlockElement {...props} />;
     case CODE_LINE:

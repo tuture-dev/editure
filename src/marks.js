@@ -14,7 +14,7 @@ import {
   PARAGRAPH
 } from "./constants";
 
-const MARK_TYPES = [BOLD, ITALIC, UNDERLINE, STRIKETHROUGH, CODE, LINK];
+export const MARK_TYPES = [BOLD, ITALIC, UNDERLINE, STRIKETHROUGH, CODE, LINK];
 
 const Link = ({ attributes, children, url }) => {
   return (

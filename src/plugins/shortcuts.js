@@ -1,7 +1,7 @@
 import { Range, Editor, Transforms, Point } from "slate";
 
-import { toggleMark, detectMarkFormat } from "../marks";
-import { isBlockActive, toggleBlock, detectBlockFormat } from "../blocks";
+import { toggleMark, detectMarkFormat, MARK_TYPES } from "../marks";
+import { isBlockActive, toggleBlock, detectBlockFormat, BLOCK_TYPES } from "../blocks";
 import { getBeforeText, getChildrenText, compareNode } from "../utils";
 import {
   BOLD,
@@ -206,7 +206,7 @@ function handleBlockShortcut(editor, shortcut) {
   }
 
   if (format === BULLETED_LIST || format === NUMBERED_LIST) {
-    nodeProp = { ...nodeProp, type: LIST_ITEM };
+    nodeProp = { ...nodeProp, level: 0, parent: format, type: LIST_ITEM };
   }
 
   if (format === HR) {
@@ -217,6 +217,7 @@ function handleBlockShortcut(editor, shortcut) {
     Transforms.insertNodes(editor, { type: HR, children: [text] });
     Transforms.insertNodes(editor, { children: [text] });
   } else {
+    console.log("nodeProp", nodeProp);
     toggleBlock(editor, format, nodeProp);
   }
 }
@@ -229,13 +230,18 @@ export default function withShortcuts(editor) {
 
     if (text === " " && selection && Range.isCollapsed(selection)) {
       const shortcut = detectShortcut(editor);
+      console.log("shortcut", shortcut);
       const { format } = shortcut;
 
-      if ([NOTE, CODE_BLOCK, HR, BULLETED_LIST, NUMBERED_LIST].includes(format)) {
+      if ([NOTE, CODE_BLOCK, HR].includes(format)) {
         insertText(text);
-      } else if ([BLOCK_QUOTE, H1, H2, H3, H4, H5, H6, HR].includes(format)) {
-        handleBlockShortcut(editor, shortcut);
-      } else if ([CODE, BOLD, ITALIC, STRIKETHROUGH, LINK].includes(format)) {
+      } else if (BLOCK_TYPES.includes(format)) {
+        if (detectBlockFormat(editor, [CODE_BLOCK, BULLETED_LIST, NUMBERED_LIST])) {
+          insertText(text);
+        } else {
+          handleBlockShortcut(editor, shortcut);
+        }
+      } else if (MARK_TYPES.includes(format)) {
         // 在代码块里面不允许进行 mark 操作
         if (isBlockActive(editor, CODE_BLOCK)) {
           insertText(text);
