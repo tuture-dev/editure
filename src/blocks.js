@@ -268,6 +268,11 @@ export const toggleBlock = (editor, format, props, type) => {
   const isActive = isBlockActive(editor, format);
   const isList = LIST_TYPES.includes(format);
 
+  let nodeProps = props;
+  if (isList) {
+    nodeProps = { ...nodeProps, level: 0, parent: format, type: LIST_ITEM };
+  }
+
   Transforms.unwrapNodes(editor, {
     match: n => LIST_TYPES.includes(n.type),
     split: true
@@ -278,7 +283,7 @@ export const toggleBlock = (editor, format, props, type) => {
       if (isActive) {
         handleActiveCodeBlock(editor, type);
       } else {
-        wrapCodeBlock(editor, props);
+        wrapCodeBlock(editor, nodeProps);
       }
 
       break;
@@ -298,7 +303,7 @@ export const toggleBlock = (editor, format, props, type) => {
       if (isActive) {
         handleActiveNote(editor, type);
       } else {
-        wrapNote(editor, props);
+        wrapNote(editor, nodeProps);
       }
 
       break;
@@ -306,7 +311,7 @@ export const toggleBlock = (editor, format, props, type) => {
 
     default: {
       Transforms.setNodes(editor, {
-        ...props,
+        ...nodeProps,
         type: isActive ? PARAGRAPH : isList ? LIST_ITEM : format
       });
     }

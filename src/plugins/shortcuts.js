@@ -217,7 +217,6 @@ function handleBlockShortcut(editor, shortcut) {
     Transforms.insertNodes(editor, { type: HR, children: [text] });
     Transforms.insertNodes(editor, { children: [text] });
   } else {
-    console.log("nodeProp", nodeProp);
     toggleBlock(editor, format, nodeProp);
   }
 }
