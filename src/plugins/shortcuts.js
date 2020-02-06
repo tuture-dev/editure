@@ -33,7 +33,7 @@ const MARK_SHORTCUT_REGEXES = [
   [ITALIC, /\*([^\*]+)\*/],
   [ITALIC, /_([^_]+)_/],
   [STRIKETHROUGH, /~~([^~]+)~~/],
-  [LINK, /\[([^\\*]+)\]\(([^\\*]+)\)/]
+  [LINK, /\[([^*]+)\]\(([^*]+)\)/]
 ];
 
 const BLOCK_SHORTCUT_REGEXES = [
@@ -42,7 +42,7 @@ const BLOCK_SHORTCUT_REGEXES = [
   [BULLETED_LIST, /^\+$/],
   [NUMBERED_LIST, /^[0-9]\.$/],
   [BLOCK_QUOTE, /^\s*>$/],
-  [NOTE, /^\s*:::\\s*([a-zA-Z]*)$/],
+  [NOTE, /^\s*:::\s*([a-zA-Z]*)$/],
   [H1, /^\s*#$/],
   [H2, /^\s*##$/],
   [H3, /^\s*###$/],
@@ -229,7 +229,6 @@ export default function withShortcuts(editor) {
 
     if (text === " " && selection && Range.isCollapsed(selection)) {
       const shortcut = detectShortcut(editor);
-      console.log("shortcut", shortcut);
       const { format } = shortcut;
 
       if ([NOTE, CODE_BLOCK, HR].includes(format)) {
@@ -365,7 +364,7 @@ export default function withShortcuts(editor) {
     // 判断是否全选 BLOCK_QUOTE | CODE_BLOCK | NOTE
     const format = detectBlockFormat(editor, [BLOCK_QUOTE, CODE_BLOCK, NOTE]);
     if (format) {
-      const [_, path] = Editor.above(editor, {
+      const [, path] = Editor.above(editor, {
         match: n => n.type === format
       });
 
@@ -389,7 +388,7 @@ export default function withShortcuts(editor) {
         matchNode &&
         (matchNode[0].type === PARAGRAPH || matchNode[0].type === CODE_LINE)
       ) {
-        const [_, path] = matchNode;
+        const [, path] = matchNode;
         Transforms.select(editor, path);
         Transforms.collapse(editor, {
           edge: "end"

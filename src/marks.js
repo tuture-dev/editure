@@ -1,5 +1,4 @@
 import React from "react";
-import { css } from "emotion";
 import { Editor, Transforms, Range } from "slate";
 
 import { isBlockActive } from "./blocks";
@@ -15,21 +14,6 @@ import {
 } from "./constants";
 
 export const MARK_TYPES = [BOLD, ITALIC, UNDERLINE, STRIKETHROUGH, CODE, LINK];
-
-const Link = ({ attributes, children, url }) => {
-  return (
-    <a
-      className={css`
-        &:hover {
-          cursor: pointer;
-        }
-      `}
-      {...attributes}
-      href={url || "#"}>
-      {children}
-    </a>
-  );
-};
 
 export const isMarkActive = (editor, format) => {
   const marks = Editor.marks(editor);
@@ -100,9 +84,9 @@ export default ({ attributes, children, leaf }) => {
 
   if (leaf.link) {
     children = (
-      <Link {...attributes} url={leaf.url}>
+      <a {...attributes} href={leaf.url || "#"}>
         {children}
-      </Link>
+      </a>
     );
   }
 

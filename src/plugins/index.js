@@ -9,7 +9,7 @@ import { withPaste } from "./paste";
 
 export default [
   withPaste,
-  // withLinks,
+  withLinks,
   withImages,
   withHr,
   withShortcuts,

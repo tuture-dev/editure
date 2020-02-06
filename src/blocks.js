@@ -19,7 +19,6 @@ import {
   LIST_ITEM,
   BLOCK_QUOTE,
   NOTE,
-  LINK,
   IMAGE,
   HR
 } from "./constants";
@@ -28,7 +27,6 @@ import { wrapBlockquote, handleActiveBlockquote } from "./plugins/blockquote";
 import { wrapNote, handleActiveNote } from "./plugins/note";
 
 const bulletedListStyleType = ["disc", "circle", "square"];
-const numberedListStyleType = ["decimal", "lower-alpha", "lower-roman"];
 
 const LIST_TYPES = [NUMBERED_LIST, BULLETED_LIST];
 
@@ -44,7 +42,6 @@ export const BLOCK_TYPES = [
   LIST_ITEM,
   BLOCK_QUOTE,
   NOTE,
-  LINK,
   IMAGE,
   HR
 ];
@@ -252,7 +249,7 @@ export const detectBlockFormat = (editor, formats = BLOCK_TYPES) => {
 
   for (const format of formats) {
     if (isBlockActive(editor, format)) {
-      const [_, path] = getBlock(editor, format);
+      const [, path] = getBlock(editor, format);
 
       if (path.length > pathLength) {
         pathLength = path.length;
@@ -265,6 +262,7 @@ export const detectBlockFormat = (editor, formats = BLOCK_TYPES) => {
 };
 
 export const toggleBlock = (editor, format, props, type) => {
+  console.log("toggleBlock", format);
   const isActive = isBlockActive(editor, format);
   const isList = LIST_TYPES.includes(format);
 

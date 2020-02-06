@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React from "react";
 import { useSlate } from "slate-react";
 import { css } from "emotion";
 

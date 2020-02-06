@@ -1,5 +1,5 @@
 import escapeHtml from "escape-html";
-import { Editor, Text } from "slate";
+import { Text } from "slate";
 import { jsx } from "slate-hyperscript";
 
 import {

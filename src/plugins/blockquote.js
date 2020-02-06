@@ -1,4 +1,4 @@
-import { Transforms, Editor, Range, Node, Point } from "slate";
+import { Transforms, Editor } from "slate";
 
 import {
   BLOCK_QUOTE,
@@ -11,7 +11,7 @@ import {
   BULLETED_LIST,
   NUMBERED_LIST
 } from "../constants";
-import { isBlockActive, toggleBlock, detectBlockFormat } from "../blocks";
+import { toggleBlock, detectBlockFormat } from "../blocks";
 import { getLineText } from "../utils";
 
 export const wrapBlockquote = editor => {
@@ -32,7 +32,7 @@ export const unwrapBlockquote = editor => {
 };
 
 export const exitBlockquote = editor => {
-  const [_, path] = Editor.above(editor, {
+  const [, path] = Editor.above(editor, {
     match: n => n.type === PARAGRAPH
   });
 
@@ -63,6 +63,10 @@ export const handleActiveBlockquote = (editor, type) => {
     case HOT_KEY: {
       unwrapBlockquote(editor);
       break;
+    }
+
+    default: {
+      return;
     }
   }
 };

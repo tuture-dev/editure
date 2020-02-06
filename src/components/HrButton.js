@@ -1,5 +1,5 @@
 import React from "react";
-import { Editor, Transforms, Element } from "slate";
+import { Editor, Transforms } from "slate";
 import { useSlate } from "slate-react";
 
 import Icon from "./Icon";

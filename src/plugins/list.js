@@ -67,7 +67,7 @@ export const withList = editor => {
             ? BULLETED_LIST
             : NUMBERED_LIST;
 
-          const [node, _] = Editor.above(editor, {
+          const [node] = Editor.above(editor, {
             match: n => n.type === type
           });
 

@@ -24,7 +24,6 @@ export const withLinks = editor => {
     if (text && isUrl(text)) {
       insertNewLink(editor, text, text);
     } else {
-      // insertText(text);
       insertData(data);
     }
   };

@@ -1,8 +1,3 @@
-import { Editor, Transforms } from "slate";
-
-import { getBeforeText } from "./index";
-import { NOTE } from "../constants";
-
 export const levels = ["default", "primary", "success", "info", "warning", "danger"];
 
 export const palette = {
