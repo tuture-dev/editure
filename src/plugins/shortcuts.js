@@ -1,7 +1,7 @@
 import { Range, Editor, Transforms, Point } from "slate";
 
-import { toggleMark, detectMarkFormat } from "../marks";
-import { isBlockActive, toggleBlock, detectBlockFormat } from "../blocks";
+import { toggleMark, detectMarkFormat, MARK_TYPES } from "../marks";
+import { isBlockActive, toggleBlock, detectBlockFormat, BLOCK_TYPES } from "../blocks";
 import { getBeforeText, getChildrenText, compareNode } from "../utils";
 import {
   BOLD,
@@ -33,7 +33,7 @@ const MARK_SHORTCUT_REGEXES = [
   [ITALIC, /\*([^\*]+)\*/],
   [ITALIC, /_([^_]+)_/],
   [STRIKETHROUGH, /~~([^~]+)~~/],
-  [LINK, /\[([^\\*]+)\]\(([^\\*]+)\)/]
+  [LINK, /\[([^*]+)\]\(([^*]+)\)/]
 ];
 
 const BLOCK_SHORTCUT_REGEXES = [
@@ -42,7 +42,7 @@ const BLOCK_SHORTCUT_REGEXES = [
   [BULLETED_LIST, /^\+$/],
   [NUMBERED_LIST, /^[0-9]\.$/],
   [BLOCK_QUOTE, /^\s*>$/],
-  [NOTE, /^\s*:::\\s*([a-zA-Z]*)$/],
+  [NOTE, /^\s*:::\s*([a-zA-Z]*)$/],
   [H1, /^\s*#$/],
   [H2, /^\s*##$/],
   [H3, /^\s*###$/],
@@ -206,7 +206,7 @@ function handleBlockShortcut(editor, shortcut) {
   }
 
   if (format === BULLETED_LIST || format === NUMBERED_LIST) {
-    nodeProp = { ...nodeProp, type: LIST_ITEM };
+    nodeProp = { ...nodeProp, level: 0, parent: format, type: LIST_ITEM };
   }
 
   if (format === HR) {
@@ -231,11 +231,15 @@ export default function withShortcuts(editor) {
       const shortcut = detectShortcut(editor);
       const { format } = shortcut;
 
-      if ([NOTE, CODE_BLOCK, HR, BULLETED_LIST, NUMBERED_LIST].includes(format)) {
+      if ([NOTE, CODE_BLOCK, HR].includes(format)) {
         insertText(text);
-      } else if ([BLOCK_QUOTE, H1, H2, H3, H4, H5, H6, HR].includes(format)) {
-        handleBlockShortcut(editor, shortcut);
-      } else if ([CODE, BOLD, ITALIC, STRIKETHROUGH, LINK].includes(format)) {
+      } else if (BLOCK_TYPES.includes(format)) {
+        if (detectBlockFormat(editor, [CODE_BLOCK, BULLETED_LIST, NUMBERED_LIST])) {
+          insertText(text);
+        } else {
+          handleBlockShortcut(editor, shortcut);
+        }
+      } else if (MARK_TYPES.includes(format)) {
         // 在代码块里面不允许进行 mark 操作
         if (isBlockActive(editor, CODE_BLOCK)) {
           insertText(text);
@@ -360,7 +364,7 @@ export default function withShortcuts(editor) {
     // 判断是否全选 BLOCK_QUOTE | CODE_BLOCK | NOTE
     const format = detectBlockFormat(editor, [BLOCK_QUOTE, CODE_BLOCK, NOTE]);
     if (format) {
-      const [_, path] = Editor.above(editor, {
+      const [, path] = Editor.above(editor, {
         match: n => n.type === format
       });
 
@@ -384,7 +388,7 @@ export default function withShortcuts(editor) {
         matchNode &&
         (matchNode[0].type === PARAGRAPH || matchNode[0].type === CODE_LINE)
       ) {
-        const [_, path] = matchNode;
+        const [, path] = matchNode;
         Transforms.select(editor, path);
         Transforms.collapse(editor, {
           edge: "end"

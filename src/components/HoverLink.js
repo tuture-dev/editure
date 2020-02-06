@@ -104,7 +104,7 @@ const HoverLink = ({ dispatch }) => {
           border-radius: 4px;
           transition: opacity 0.75s;
         `}>
-        <a href={url} target="_blank">
+        <a href={url} target="_blank" rel="noopener noreferrer">
           {url}
         </a>
         <span> </span>

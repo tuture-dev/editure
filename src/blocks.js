@@ -19,7 +19,6 @@ import {
   LIST_ITEM,
   BLOCK_QUOTE,
   NOTE,
-  LINK,
   IMAGE,
   HR
 } from "./constants";
@@ -28,11 +27,10 @@ import { wrapBlockquote, handleActiveBlockquote } from "./plugins/blockquote";
 import { wrapNote, handleActiveNote } from "./plugins/note";
 
 const bulletedListStyleType = ["disc", "circle", "square"];
-const numberedListStyleType = ["decimal", "lower-alpha", "lower-roman"];
 
 const LIST_TYPES = [NUMBERED_LIST, BULLETED_LIST];
 
-const BLOCK_TYPES = [
+export const BLOCK_TYPES = [
   H1,
   H2,
   H3,
@@ -44,10 +42,35 @@ const BLOCK_TYPES = [
   LIST_ITEM,
   BLOCK_QUOTE,
   NOTE,
-  LINK,
   IMAGE,
   HR
 ];
+
+const ListItemElement = props => {
+  const { attributes, children, element } = props;
+  const { parent, level, number } = element;
+
+  const bulletedStyle = css`
+    margin-left: ${(level || 0) * 2 + 2}em;
+    list-style-type: ${bulletedListStyleType[element.level % 3]};
+  `;
+
+  const numberedStyle = css`
+    ::before {
+      content: "${number || 1}.  ";
+    }
+    margin-left: ${(level || 0) * 2 + 1}em;
+    list-style-type: none;
+  `;
+
+  return (
+    <li
+      {...attributes}
+      className={parent === BULLETED_LIST ? bulletedStyle : numberedStyle}>
+      {children}
+    </li>
+  );
+};
 
 const CodeBlockElement = props => {
   const { element } = props;
@@ -226,7 +249,7 @@ export const detectBlockFormat = (editor, formats = BLOCK_TYPES) => {
 
   for (const format of formats) {
     if (isBlockActive(editor, format)) {
-      const [_, path] = getBlock(editor, format);
+      const [, path] = getBlock(editor, format);
 
       if (path.length > pathLength) {
         pathLength = path.length;
@@ -239,8 +262,14 @@ export const detectBlockFormat = (editor, formats = BLOCK_TYPES) => {
 };
 
 export const toggleBlock = (editor, format, props, type) => {
+  console.log("toggleBlock", format);
   const isActive = isBlockActive(editor, format);
   const isList = LIST_TYPES.includes(format);
+
+  let nodeProps = props;
+  if (isList) {
+    nodeProps = { ...nodeProps, level: 0, parent: format, type: LIST_ITEM };
+  }
 
   Transforms.unwrapNodes(editor, {
     match: n => LIST_TYPES.includes(n.type),
@@ -252,7 +281,7 @@ export const toggleBlock = (editor, format, props, type) => {
       if (isActive) {
         handleActiveCodeBlock(editor, type);
       } else {
-        wrapCodeBlock(editor, props);
+        wrapCodeBlock(editor, nodeProps);
       }
 
       break;
@@ -272,7 +301,7 @@ export const toggleBlock = (editor, format, props, type) => {
       if (isActive) {
         handleActiveNote(editor, type);
       } else {
-        wrapNote(editor, props);
+        wrapNote(editor, nodeProps);
       }
 
       break;
@@ -280,6 +309,7 @@ export const toggleBlock = (editor, format, props, type) => {
 
     default: {
       Transforms.setNodes(editor, {
+        ...nodeProps,
         type: isActive ? PARAGRAPH : isList ? LIST_ITEM : format
       });
     }
@@ -301,13 +331,14 @@ export default props => {
           <div>{children}</div>
         </blockquote>
       );
+    case LIST_ITEM:
+      return <ListItemElement {...props} />;
     case BULLETED_LIST:
       return (
         <ul
           {...attributes}
           className={css`
-            padding-left: ${(element.level || 0) * 2 + 2}em;
-            list-style-type: ${bulletedListStyleType[element.level % 3]};
+            padding-inline-start: 0;
           `}>
           {children}
         </ul>
@@ -317,8 +348,7 @@ export default props => {
         <ol
           {...attributes}
           className={css`
-            padding-left: ${(element.level || 0) * 2 + 2}em;
-            list-style-type: ${numberedListStyleType[element.level % 3]};
+            padding-inline-start: 0;
           `}>
           {children}
         </ol>
@@ -331,8 +361,6 @@ export default props => {
       return <h3 {...attributes}>{children}</h3>;
     case H4:
       return <h4 {...attributes}>{children}</h4>;
-    case LIST_ITEM:
-      return <li {...attributes}>{children}</li>;
     case CODE_BLOCK:
       return <CodeBlockElement {...props} />;
     case CODE_LINE:

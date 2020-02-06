@@ -1,8 +1,6 @@
-import { Transforms, Editor, Point, Range } from "slate";
+import { Transforms, Editor } from "slate";
 
 import { NOTE, PARAGRAPH, TOOL_BUTTON, HOT_KEY, SHORT_CUTS } from "../constants";
-import { isBlockActive } from "../blocks";
-import { getLineText } from "../utils";
 
 export const wrapNote = (editor, props) => {
   const text = { text: "" };
@@ -22,7 +20,7 @@ export const unwrapNote = editor => {
 };
 
 export const exitNote = editor => {
-  const [_, path] = Editor.above(editor, {
+  const [, path] = Editor.above(editor, {
     match: n => n.type === PARAGRAPH
   });
 
@@ -53,6 +51,10 @@ export const handleActiveNote = (editor, type) => {
     case HOT_KEY: {
       unwrapNote(editor);
       break;
+    }
+
+    default: {
+      return;
     }
   }
 };

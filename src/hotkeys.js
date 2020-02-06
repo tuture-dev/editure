@@ -1,4 +1,4 @@
-import { Transforms, Editor, Element, Node, Text } from "slate";
+import { Transforms, Editor, Element } from "slate";
 import isHotkey from "is-hotkey";
 
 import { getBeforeText } from "./utils";
@@ -24,8 +24,7 @@ import {
   NUMBERED_LIST,
   HR,
   SHORT_CUTS,
-  NOTE,
-  LIST_ITEM
+  NOTE
 } from "./constants";
 
 const MARK_HOTKEYS = {
@@ -52,23 +51,18 @@ const BLOCK_HOTKEYS = {
 };
 
 function handleTabKey(editor, event) {
+  event.preventDefault();
+
   const { beforeText } = getBeforeText(editor);
+  const isInList = !!detectBlockFormat(editor, [BULLETED_LIST, NUMBERED_LIST]);
 
-  if (!beforeText.length && detectBlockFormat(editor, [BULLETED_LIST, NUMBERED_LIST])) {
-    event.preventDefault();
-
+  if (!beforeText.length && isInList) {
     increaseItemDepth(editor);
-  } else if (
-    beforeText.length &&
-    detectBlockFormat(editor, [BULLETED_LIST, NUMBERED_LIST])
-  ) {
-    event.preventDefault();
+  } else if (beforeText.length && isInList) {
     Transforms.insertText(editor, "\t");
   } else if (isBlockActive(editor, CODE_BLOCK)) {
-    event.preventDefault();
     Transforms.insertText(editor, "  ");
   } else {
-    event.preventDefault();
     Transforms.insertText(editor, "\t");
   }
 }

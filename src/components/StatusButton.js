@@ -17,14 +17,16 @@ const StatusButton = ({ status = UNDO, title, icon }) => {
         switch (status) {
           case REDO: {
             editor.redo();
-
             break;
           }
 
           case UNDO: {
             editor.undo();
-
             break;
+          }
+
+          default: {
+            return;
           }
         }
       }}>

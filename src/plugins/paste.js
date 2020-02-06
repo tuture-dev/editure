@@ -12,7 +12,7 @@ const containsMarkdownCode = text => {
     /\*[^\*]+\*/,
     /_[^_]+_/,
     /~~[^~]~~/,
-    /\[([^\\*]+)\]\(([^\\*]+)\)/,
+    /\[([^*]+)\]\(([^*]+)\)/,
 
     // Blocks.
     /!\[.*\]\(.+\)/,
@@ -44,31 +44,15 @@ export const withPaste = editor => {
   };
 
   editor.insertData = data => {
-    if (!Array.from(data.types).includes("text/plain")) {
+    const dataTypes = Array.from(data.types);
+    if (!dataTypes.includes("text/plain")) {
       return insertData(data);
     }
 
     const { selection } = editor;
     const { beforeText } = getBeforeText(editor);
 
-    const text = data.getData("text/plain");
-    const isInCodeBlock = isBlockActive(editor, CODE_BLOCK);
-
-    if (!isInCodeBlock && containsMarkdownCode(text)) {
-      const parsed = deserializeFromMarkdown(text);
-      Transforms.insertNodes(editor, parsed);
-
-      if (!beforeText) {
-        Transforms.removeNodes(editor, { at: selection });
-      }
-      return;
-    }
-
-    if (data.types.length === 1 && data.types[0] === "text/plain") {
-      return insertText(data.getData("text/plain"));
-    }
-
-    if (isInCodeBlock) {
+    if (isBlockActive(editor, CODE_BLOCK)) {
       data
         .getData("text/plain")
         .trim()
@@ -88,10 +72,31 @@ export const withPaste = editor => {
       return;
     }
 
+    // Paste slate fragment data directly.
+    if (dataTypes.includes("application/x-editure-fragment")) {
+      return insertData(data);
+    }
+
+    const text = data.getData("text/plain");
+    if (containsMarkdownCode(text)) {
+      const parsed = deserializeFromMarkdown(text);
+      Transforms.insertNodes(editor, parsed);
+
+      if (!beforeText) {
+        Transforms.removeNodes(editor, { at: selection });
+      }
+      return;
+    }
+
+    if (dataTypes.length === 1 && dataTypes[0] === "text/plain") {
+      return insertText(data.getData("text/plain"));
+    }
+
     const html = data.getData("text/html");
 
     if (html) {
       const fragment = deserializeFromHtml(html);
+      console.log("fragment", fragment);
       const { selection } = editor;
       const { focus } = selection;
 

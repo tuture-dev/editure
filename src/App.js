@@ -59,6 +59,7 @@ const App = () => {
     url: ""
   });
 
+  console.log("nodes", editor.children);
   updateLastSelection(editor.selection);
 
   return (
@@ -83,7 +84,9 @@ const App = () => {
           renderElement={renderElement}
           renderLeaf={renderLeaf}
           onKeyDown={hotKeyHandler}
-          // onClick={() => updateLastSelection(editor.selection)}
+          onCopy={e => {
+            e.clipboardData.setData("application/x-editure-fragment", true);
+          }}
           onDrop={createDropListener(editor)}
           autoFocus
         />

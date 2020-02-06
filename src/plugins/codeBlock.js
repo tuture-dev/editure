@@ -23,7 +23,7 @@ export const wrapCodeBlock = (editor, props) => {
 };
 
 export const unwrapCodeBlock = editor => {
-  const [_, path] = Editor.above(editor, {
+  const [, path] = Editor.above(editor, {
     match: n => n.type === CODE_BLOCK
   });
 
@@ -78,6 +78,10 @@ export const handleActiveCodeBlock = (editor, type) => {
       unwrapCodeBlock(editor);
       break;
     }
+
+    default: {
+      return;
+    }
   }
 };
 
@@ -101,7 +105,7 @@ export const withCodeBlock = editor => {
           Point.equals(selection.anchor, start) &&
           isBlockActive(editor, CODE_LINE)
         ) {
-          const [node, _] = Editor.above(editor, {
+          const [node] = Editor.above(editor, {
             match: n => n.type === CODE_BLOCK
           });
 
