@@ -9,8 +9,8 @@ import { withHistory } from "slate-history";
 import { css } from "emotion";
 
 import customPlugins from "./plugins";
-import Leaf from "./marks";
-import Element from "./blocks";
+import Leaf from "./leaf";
+import Element from "./element";
 import createHotKeysHandler from "./hotkeys";
 import { Toolbar, EditLink, HoverLink } from "./components";
 import { createDropListener } from "./utils/image";

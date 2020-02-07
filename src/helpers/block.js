@@ -111,21 +111,15 @@ export const isBlockActive = (editor, format) => {
   return !!match;
 };
 
-export const getBlock = (editor, format) => {
-  const node = Editor.above(editor, {
-    match: n => n.type === format
-  });
-
-  return node;
-};
-
 export const detectBlockFormat = (editor, formats = BLOCK_TYPES) => {
   let pathLength = -1;
   let realFormat = null;
 
   for (const format of formats) {
     if (isBlockActive(editor, format)) {
-      const [, path] = getBlock(editor, format);
+      const [, path] = Editor.above(editor, {
+        match: n => n.type === format
+      });
 
       if (path.length > pathLength) {
         pathLength = path.length;
@@ -173,4 +167,10 @@ export const toggleBlock = (editor, format, props, options) => {
     const block = { type: format, children: [] };
     Transforms.wrapNodes(editor, block);
   }
+};
+
+export const updateBlock = (editor, format, props) => {
+  Transforms.setNodes(editor, props, {
+    match: n => n.type === format
+  });
 };

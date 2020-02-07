@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { css, cx } from "emotion";
-import { useSlate } from "slate-react";
-import { Transforms, Element } from "slate";
-import { useSelected, useFocused } from "slate-react";
+import { useSlate, useSelected, useFocused } from "slate-react";
 
 import * as F from "./constants";
+import { updateBlock } from "./helpers";
 import { languages, enumPrismLangToLanguage } from "./utils/code";
 import { palette, icons, levels } from "./utils/note";
 
@@ -44,15 +43,9 @@ const CodeBlockElement = props => {
   const editor = useSlate();
 
   function handleChange(event) {
-    setLang(event.target.value);
-
-    Transforms.setNodes(
-      editor,
-      { lang: event.target.value },
-      {
-        match: n => Element.matches(n, { type: F.CODE_BLOCK })
-      }
-    );
+    const newLang = event.target.value;
+    setLang(newLang);
+    updateBlock(editor, F.CODE_BLOCK, { lang: newLang });
   }
 
   const selectValue =
@@ -135,15 +128,9 @@ const NoteElement = props => {
   const editor = useSlate();
 
   function handleChange(event) {
-    setLevel(event.target.value);
-
-    Transforms.setNodes(
-      editor,
-      { level: event.target.value },
-      {
-        match: n => n.type === F.NOTE
-      }
-    );
+    const newLevel = event.target.value;
+    setLevel(newLevel);
+    updateBlock(editor, F.NOTE, { level: newLevel });
   }
 
   const baseStyle = css`
