@@ -103,75 +103,6 @@ const exitBlock = (editor, format) => {
   });
 };
 
-export const handleActiveBlockquote = (editor, type) => {
-  switch (type) {
-    case F.TOOL_BUTTON: {
-      unwrapBlock(editor, F.BLOCK_QUOTE);
-      break;
-    }
-
-    case F.SHORT_CUTS: {
-      exitBlock(editor, F.BLOCK_QUOTE);
-      break;
-    }
-
-    case F.HOT_KEY: {
-      unwrapBlock(editor, F.BLOCK_QUOTE);
-      break;
-    }
-
-    default: {
-      return;
-    }
-  }
-};
-
-export const handleActiveCodeBlock = (editor, type) => {
-  switch (type) {
-    case F.TOOL_BUTTON: {
-      unwrapBlock(editor, F.CODE_BLOCK);
-      break;
-    }
-
-    case F.SHORT_CUTS: {
-      exitBlock(editor, F.CODE_BLOCK);
-      break;
-    }
-
-    case F.HOT_KEY: {
-      unwrapBlock(editor, F.CODE_BLOCK);
-      break;
-    }
-
-    default: {
-      return;
-    }
-  }
-};
-
-export const handleActiveNote = (editor, type) => {
-  switch (type) {
-    case F.TOOL_BUTTON: {
-      unwrapBlock(editor, F.NOTE);
-      break;
-    }
-
-    case F.SHORT_CUTS: {
-      exitBlock(editor, F.NOTE);
-      break;
-    }
-
-    case F.HOT_KEY: {
-      unwrapBlock(editor, F.NOTE);
-      break;
-    }
-
-    default: {
-      return;
-    }
-  }
-};
-
 export const isBlockActive = (editor, format) => {
   const [match] = Editor.nodes(editor, {
     match: n => n.type === format
@@ -206,8 +137,7 @@ export const detectBlockFormat = (editor, formats = BLOCK_TYPES) => {
   return realFormat;
 };
 
-export const toggleBlock = (editor, format, props, type) => {
-  console.log("toggleBlock", format);
+export const toggleBlock = (editor, format, props, options) => {
   const isActive = isBlockActive(editor, format);
   const isList = LIST_TYPES.includes(format);
 
@@ -221,43 +151,22 @@ export const toggleBlock = (editor, format, props, type) => {
     split: true
   });
 
-  switch (format) {
-    case F.CODE_BLOCK: {
-      if (isActive) {
-        handleActiveCodeBlock(editor, type);
-      } else {
-        wrapBlock(editor, format, nodeProps);
+  if ([F.BLOCK_QUOTE, F.CODE_BLOCK, F.NOTE].includes(format)) {
+    if (isActive && options) {
+      const { exit, unwrap } = options;
+      if (exit) {
+        exitBlock(editor, format);
+      } else if (unwrap) {
+        unwrapBlock(editor, format);
       }
-
-      break;
+    } else {
+      wrapBlock(editor, format);
     }
-
-    case F.BLOCK_QUOTE: {
-      if (isActive) {
-        handleActiveBlockquote(editor, type);
-      } else {
-        wrapBlock(editor, format);
-      }
-
-      break;
-    }
-
-    case F.NOTE: {
-      if (isActive) {
-        handleActiveNote(editor, type);
-      } else {
-        wrapBlock(editor, format, nodeProps);
-      }
-
-      break;
-    }
-
-    default: {
-      Transforms.setNodes(editor, {
-        ...nodeProps,
-        type: isActive ? F.PARAGRAPH : isList ? F.LIST_ITEM : format
-      });
-    }
+  } else {
+    Transforms.setNodes(editor, {
+      ...nodeProps,
+      type: isActive ? F.PARAGRAPH : isList ? F.LIST_ITEM : format
+    });
   }
 
   if (!isActive && isList) {

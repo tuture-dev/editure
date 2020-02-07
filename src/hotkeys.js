@@ -22,7 +22,6 @@ import {
   BULLETED_LIST,
   NUMBERED_LIST,
   HR,
-  SHORT_CUTS,
   NOTE
 } from "./constants";
 
@@ -174,7 +173,7 @@ function handleExitBlock(editor, event) {
     Editor.insertBreak(editor);
 
     Editor.withoutNormalizing(editor, () => {
-      toggleBlock(editor, format, {}, SHORT_CUTS);
+      toggleBlock(editor, format, {}, { exit: true });
     });
   }
 }

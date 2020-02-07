@@ -6,7 +6,7 @@ import Icon from "./Icon";
 import Button from "./Button";
 import { toggleBlock } from "../helpers";
 import { levels } from "../utils/note";
-import { NOTE, TOOL_BUTTON } from "../constants";
+import { NOTE } from "../constants";
 
 const NoteButton = () => {
   const editor = useSlate();
@@ -15,7 +15,7 @@ const NoteButton = () => {
   const handleClickItem = (e, level) => {
     e.preventDefault();
 
-    toggleBlock(editor, NOTE, { level }, TOOL_BUTTON);
+    toggleBlock(editor, NOTE, { level }, { unwrap: true });
   };
 
   return (

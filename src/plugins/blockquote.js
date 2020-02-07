@@ -1,6 +1,5 @@
 import {
   BLOCK_QUOTE,
-  SHORT_CUTS,
   CODE_BLOCK,
   NOTE,
   BULLETED_LIST,
@@ -26,7 +25,7 @@ export const withBlockquote = editor => {
 
       if (!wholeLineText) {
         // 如果最后一行为空，退出块状引用
-        toggleBlock(editor, BLOCK_QUOTE, {}, SHORT_CUTS);
+        toggleBlock(editor, BLOCK_QUOTE, {}, { exit: true });
       } else {
         insertBreak();
       }
