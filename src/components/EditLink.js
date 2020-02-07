@@ -4,7 +4,7 @@ import { Transforms } from "slate";
 import { useSlate } from "slate-react";
 import { css } from "emotion";
 
-import { isMarkActive } from "../marks";
+import { isMarkActive } from "../helpers";
 import { LINK } from "../constants";
 import { getLastSelection } from "../utils/selection";
 import {

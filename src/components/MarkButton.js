@@ -1,7 +1,7 @@
 import React from "react";
 import { useSlate } from "slate-react";
 
-import { isMarkActive, toggleMark } from "../marks";
+import { isMarkActive, toggleMark } from "../helpers";
 import Icon from "./Icon";
 import Button from "./Button";
 

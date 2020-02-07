@@ -5,7 +5,7 @@ import { Editor, Transforms } from "slate";
 import { useSlate } from "slate-react";
 
 import Icon from "./Icon";
-import { isMarkActive, toggleMark } from "../marks";
+import { isMarkActive, toggleMark } from "../helpers";
 import { LINK } from "../constants";
 import { startEditLink, updateLinkText, updateLinkUrl } from "../utils/link";
 

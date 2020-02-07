@@ -4,7 +4,7 @@ import { useSlate } from "slate-react";
 
 import Icon from "./Icon";
 import Button from "./Button";
-import { isMarkActive, toggleMark } from "../marks";
+import { isMarkActive, toggleMark } from "../helpers";
 import { LINK } from "../constants";
 import { updateLinkText, startEditLink } from "../utils/link";
 

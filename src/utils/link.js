@@ -1,5 +1,5 @@
 import { Transforms, Editor } from "slate";
-import { toggleMark } from "../marks";
+import { toggleMark } from "../helpers";
 import { LINK } from "../constants";
 
 const initialState = {

@@ -2,8 +2,7 @@ import { Transforms, Editor, Element } from "slate";
 import isHotkey from "is-hotkey";
 
 import { getBeforeText } from "./utils";
-import { toggleMark } from "./marks";
-import { toggleBlock, isBlockActive, detectBlockFormat } from "./helpers";
+import { toggleMark, toggleBlock, isBlockActive, detectBlockFormat } from "./helpers";
 import { decreaseItemDepth, increaseItemDepth } from "./plugins/list";
 import {
   BOLD,
