@@ -34,9 +34,38 @@ const wrapBlock = (editor, format, props) => {
   });
 };
 
-export const unwrapBlockquote = editor => {
+export const unwrapBlock = (editor, format) => {
+  if (![F.BLOCK_QUOTE, F.CODE_BLOCK, F.NOTE].includes(format)) {
+    return;
+  }
+
+  if (format === F.CODE_BLOCK) {
+    const [, path] = Editor.above(editor, {
+      match: n => n.type === F.CODE_BLOCK
+    });
+
+    const anchor = Editor.start(editor, path);
+    const focus = Editor.end(editor, path);
+    const range = { anchor, focus };
+
+    Transforms.setNodes(
+      editor,
+      { type: F.PARAGRAPH },
+      {
+        at: range,
+        match: n => n.type === F.CODE_LINE
+      }
+    );
+    Transforms.unwrapNodes(editor, {
+      at: range,
+      match: n => n.type === F.CODE_BLOCK
+    });
+
+    return;
+  }
+
   Transforms.unwrapNodes(editor, {
-    match: n => n.type === F.BLOCK_QUOTE
+    match: n => n.type === format
   });
 };
 
@@ -60,7 +89,7 @@ export const exitBlockquote = editor => {
 export const handleActiveBlockquote = (editor, type) => {
   switch (type) {
     case F.TOOL_BUTTON: {
-      unwrapBlockquote(editor);
+      unwrapBlock(editor, F.BLOCK_QUOTE);
       break;
     }
 
@@ -70,7 +99,7 @@ export const handleActiveBlockquote = (editor, type) => {
     }
 
     case F.HOT_KEY: {
-      unwrapBlockquote(editor);
+      unwrapBlock(editor, F.BLOCK_QUOTE);
       break;
     }
 
@@ -78,29 +107,6 @@ export const handleActiveBlockquote = (editor, type) => {
       return;
     }
   }
-};
-
-export const unwrapCodeBlock = editor => {
-  const [, path] = Editor.above(editor, {
-    match: n => n.type === F.CODE_BLOCK
-  });
-
-  const anchor = Editor.start(editor, path);
-  const focus = Editor.end(editor, path);
-  const range = { anchor, focus };
-
-  Transforms.setNodes(
-    editor,
-    { type: F.PARAGRAPH },
-    {
-      at: range,
-      match: n => n.type === F.CODE_LINE
-    }
-  );
-  Transforms.unwrapNodes(editor, {
-    at: range,
-    match: n => n.type === F.CODE_BLOCK
-  });
 };
 
 export const exitCodeBlock = editor => {
@@ -123,7 +129,7 @@ export const exitCodeBlock = editor => {
 export const handleActiveCodeBlock = (editor, type) => {
   switch (type) {
     case F.TOOL_BUTTON: {
-      unwrapCodeBlock(editor);
+      unwrapBlock(editor, F.CODE_BLOCK);
       break;
     }
 
@@ -133,7 +139,7 @@ export const handleActiveCodeBlock = (editor, type) => {
     }
 
     case F.HOT_KEY: {
-      unwrapCodeBlock(editor);
+      unwrapBlock(editor, F.CODE_BLOCK);
       break;
     }
 
@@ -141,12 +147,6 @@ export const handleActiveCodeBlock = (editor, type) => {
       return;
     }
   }
-};
-
-export const unwrapNote = editor => {
-  Transforms.unwrapNodes(editor, {
-    match: n => n.type === F.NOTE
-  });
 };
 
 export const exitNote = editor => {
@@ -169,7 +169,7 @@ export const exitNote = editor => {
 export const handleActiveNote = (editor, type) => {
   switch (type) {
     case F.TOOL_BUTTON: {
-      unwrapNote(editor);
+      unwrapBlock(editor, F.NOTE);
       break;
     }
 
@@ -179,7 +179,7 @@ export const handleActiveNote = (editor, type) => {
     }
 
     case F.HOT_KEY: {
-      unwrapNote(editor);
+      unwrapBlock(editor, F.NOTE);
       break;
     }
 
