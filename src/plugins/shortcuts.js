@@ -1,58 +1,44 @@
 import { Range, Editor, Transforms, Point } from "slate";
 
-import { toggleMark, detectMarkFormat, MARK_TYPES } from "../helpers";
-import { isBlockActive, toggleBlock, detectBlockFormat, BLOCK_TYPES } from "../helpers";
-import { getBeforeText, getChildrenText, compareNode } from "../utils";
 import {
-  BOLD,
-  ITALIC,
-  CODE,
-  STRIKETHROUGH,
-  H1,
-  H2,
-  H3,
-  H4,
-  H5,
-  H6,
-  CODE_BLOCK,
-  BLOCK_QUOTE,
-  NOTE,
-  BULLETED_LIST,
-  NUMBERED_LIST,
-  HR,
-  LIST_ITEM,
-  PARAGRAPH,
-  LINK,
-  CODE_LINE
-} from "../constants";
+  toggleMark,
+  detectMarkFormat,
+  isBlockActive,
+  toggleBlock,
+  detectBlockFormat,
+  MARK_TYPES,
+  BLOCK_TYPES
+} from "../helpers";
+import { getBeforeText, getChildrenText, compareNode } from "../helpers/utils";
+import * as F from "../constants";
 
 const MARK_SHORTCUT_REGEXES = [
-  [CODE, /`([^`]+)`/],
-  [BOLD, /\*\*([^\*]+)\*\*/],
-  [BOLD, /__([^_]+)__/],
-  [ITALIC, /\*([^\*]+)\*/],
-  [ITALIC, /_([^_]+)_/],
-  [STRIKETHROUGH, /~~([^~]+)~~/],
-  [LINK, /\[([^*]+)\]\(([^*]+)\)/]
+  [F.CODE, /`([^`]+)`/],
+  [F.BOLD, /\*\*([^\*]+)\*\*/],
+  [F.BOLD, /__([^_]+)__/],
+  [F.ITALIC, /\*([^\*]+)\*/],
+  [F.ITALIC, /_([^_]+)_/],
+  [F.STRIKETHROUGH, /~~([^~]+)~~/],
+  [F.LINK, /\[([^*]+)\]\(([^*]+)\)/]
 ];
 
 const BLOCK_SHORTCUT_REGEXES = [
-  [BULLETED_LIST, /^\*$/],
-  [BULLETED_LIST, /^-$/],
-  [BULLETED_LIST, /^\+$/],
-  [NUMBERED_LIST, /^[0-9]\.$/],
-  [BLOCK_QUOTE, /^\s*>$/],
-  [NOTE, /^\s*:::\s*([a-zA-Z]*)$/],
-  [H1, /^\s*#$/],
-  [H2, /^\s*##$/],
-  [H3, /^\s*###$/],
-  [H4, /^\s*####$/],
-  [H5, /^\s*#####$/],
-  [H6, /^\s*######$/],
-  [CODE_BLOCK, /^\s*```\s*([a-zA-Z]*)$/],
-  [HR, /^\s*---$/],
-  [HR, /^\s*\*\*\*$/],
-  [HR, /^\s*___$/]
+  [F.BULLETED_LIST, /^\*$/],
+  [F.BULLETED_LIST, /^-$/],
+  [F.BULLETED_LIST, /^\+$/],
+  [F.NUMBERED_LIST, /^[0-9]\.$/],
+  [F.BLOCK_QUOTE, /^\s*>$/],
+  [F.NOTE, /^\s*:::\s*([a-zA-Z]*)$/],
+  [F.H1, /^\s*#$/],
+  [F.H2, /^\s*##$/],
+  [F.H3, /^\s*###$/],
+  [F.H4, /^\s*####$/],
+  [F.H5, /^\s*#####$/],
+  [F.H6, /^\s*######$/],
+  [F.CODE_BLOCK, /^\s*```\s*([a-zA-Z]*)$/],
+  [F.HR, /^\s*---$/],
+  [F.HR, /^\s*\*\*\*$/],
+  [F.HR, /^\s*___$/]
 ];
 
 function reverseStr(str = "") {
@@ -68,17 +54,17 @@ function detectMarkShortcut(editor) {
 
   for (const [format, regex] of MARK_SHORTCUT_REGEXES) {
     if (beforeText && regex.test(beforeText)) {
-      if (format !== LINK) {
+      if (format !== F.LINK) {
         // 对内容进行 reverse 操作，如果匹配，且 index = 0，那么说明满足触发条件
         beforeText = reverseStr(beforeText);
       }
 
       let matchArr = regex.exec(beforeText);
 
-      if ((matchArr && matchArr.index === 0) || (format === LINK && matchArr)) {
+      if ((matchArr && matchArr.index === 0) || (format === F.LINK && matchArr)) {
         shortcut.format = format;
 
-        if (format !== LINK) {
+        if (format !== F.LINK) {
           matchArr = matchArr.map(elem =>
             typeof elem === "string" ? reverseStr(elem) : elem
           );
@@ -164,7 +150,7 @@ function handleMarkShortcut(editor, shortcut) {
   Transforms.select(editor, needMarkRange);
   toggleMark(editor, format);
 
-  if (format === LINK) {
+  if (format === F.LINK) {
     Transforms.setNodes(editor, { url: matchArr[2] }, { match: n => n.link });
   }
 
@@ -193,28 +179,28 @@ function handleBlockShortcut(editor, shortcut) {
   Transforms.select(editor, lineRange);
   Transforms.delete(editor);
 
-  if ([BLOCK_QUOTE, CODE_BLOCK, NOTE].includes(format)) {
-    if (format === CODE_BLOCK) {
+  if ([F.BLOCK_QUOTE, F.CODE_BLOCK, F.NOTE].includes(format)) {
+    if (format === F.CODE_BLOCK) {
       nodeProp = { ...nodeProp, lang: matchArr[1] };
-    } else if (format === NOTE) {
+    } else if (format === F.NOTE) {
       nodeProp = { ...nodeProp, level: matchArr[1] };
     }
 
     const currentSelection = editor.selection;
-    Transforms.insertNodes(editor, { type: PARAGRAPH, children: [{ text: "" }] });
+    Transforms.insertNodes(editor, { type: F.PARAGRAPH, children: [{ text: "" }] });
     Transforms.setSelection(editor, currentSelection);
   }
 
-  if (format === BULLETED_LIST || format === NUMBERED_LIST) {
-    nodeProp = { ...nodeProp, level: 0, parent: format, type: LIST_ITEM };
+  if (format === F.BULLETED_LIST || format === F.NUMBERED_LIST) {
+    nodeProp = { ...nodeProp, level: 0, parent: format, type: F.LIST_ITEM };
   }
 
-  if (format === HR) {
+  if (format === F.HR) {
     const text = { text: "" };
     Transforms.removeNodes(editor, {
       match: n => n.children && !n.children[0].text
     });
-    Transforms.insertNodes(editor, { type: HR, children: [text] });
+    Transforms.insertNodes(editor, { type: F.HR, children: [text] });
     Transforms.insertNodes(editor, { children: [text] });
   } else {
     toggleBlock(editor, format, nodeProp);
@@ -231,17 +217,17 @@ export default function withShortcuts(editor) {
       const shortcut = detectShortcut(editor);
       const { format } = shortcut;
 
-      if ([NOTE, CODE_BLOCK, HR].includes(format)) {
+      if ([F.NOTE, F.CODE_BLOCK, F.HR].includes(format)) {
         insertText(text);
       } else if (BLOCK_TYPES.includes(format)) {
-        if (detectBlockFormat(editor, [CODE_BLOCK, BULLETED_LIST, NUMBERED_LIST])) {
+        if (detectBlockFormat(editor, [F.CODE_BLOCK, F.BULLETED_LIST, F.NUMBERED_LIST])) {
           insertText(text);
         } else {
           handleBlockShortcut(editor, shortcut);
         }
       } else if (MARK_TYPES.includes(format)) {
         // 在代码块里面不允许进行 mark 操作
-        if (isBlockActive(editor, CODE_BLOCK)) {
+        if (isBlockActive(editor, F.CODE_BLOCK)) {
           insertText(text);
         } else {
           handleMarkShortcut(editor, shortcut);
@@ -259,11 +245,11 @@ export default function withShortcuts(editor) {
     // 检测是否为代码块触发条件
     const shortcut = detectShortcut(editor);
 
-    if ([CODE_BLOCK, NOTE, HR].includes(shortcut.format)) {
+    if ([F.CODE_BLOCK, F.NOTE, F.HR].includes(shortcut.format)) {
       const isInBlock = detectBlockFormat(editor, [
-        CODE_BLOCK,
-        BULLETED_LIST,
-        NUMBERED_LIST
+        F.CODE_BLOCK,
+        F.BULLETED_LIST,
+        F.NUMBERED_LIST
       ]);
 
       if (!isInBlock) {
@@ -276,7 +262,7 @@ export default function withShortcuts(editor) {
       return;
     }
 
-    for (const format of [BULLETED_LIST, NUMBERED_LIST]) {
+    for (const format of [F.BULLETED_LIST, F.NUMBERED_LIST]) {
       if (isBlockActive(editor, format)) {
         const { beforeText } = getBeforeText(editor);
 
@@ -293,7 +279,7 @@ export default function withShortcuts(editor) {
 
     insertBreak();
 
-    const headingFormat = detectBlockFormat(editor, [H1, H2, H3, H4, H5]);
+    const headingFormat = detectBlockFormat(editor, [F.H1, F.H2, F.H3, F.H4, F.H5]);
     if (headingFormat) {
       toggleBlock(editor, headingFormat);
     }
@@ -312,16 +298,16 @@ export default function withShortcuts(editor) {
         const start = Editor.start(editor, path);
 
         if (
-          block.type !== PARAGRAPH &&
+          block.type !== F.PARAGRAPH &&
           Point.equals(selection.anchor, start) &&
-          detectBlockFormat(editor, [H1, H2, H3, H4, H5, H6])
+          detectBlockFormat(editor, [F.H1, F.H2, F.H3, F.H4, F.H5, F.H6])
         ) {
-          Transforms.setNodes(editor, { type: PARAGRAPH });
+          Transforms.setNodes(editor, { type: F.PARAGRAPH });
 
           return;
         } else if (
           children.length === 1 &&
-          block.type === PARAGRAPH &&
+          block.type === F.PARAGRAPH &&
           Point.equals(selection.anchor, start)
         ) {
           const marks = detectMarkFormat(editor);
@@ -342,7 +328,7 @@ export default function withShortcuts(editor) {
     deleteFragment();
 
     const match = Editor.above(editor, {
-      match: n => n.type === LIST_ITEM
+      match: n => n.type === F.LIST_ITEM
     });
 
     // 修复删除 list 的问题
@@ -350,10 +336,10 @@ export default function withShortcuts(editor) {
       Transforms.setNodes(
         editor,
         {
-          type: PARAGRAPH
+          type: F.PARAGRAPH
         },
         {
-          match: n => n.type === LIST_ITEM
+          match: n => n.type === F.LIST_ITEM
         }
       );
     }
@@ -362,7 +348,7 @@ export default function withShortcuts(editor) {
     let res = selection.focus.path[0] === children.length - 1;
 
     // 判断是否全选 BLOCK_QUOTE | CODE_BLOCK | NOTE
-    const format = detectBlockFormat(editor, [BLOCK_QUOTE, CODE_BLOCK, NOTE]);
+    const format = detectBlockFormat(editor, [F.BLOCK_QUOTE, F.CODE_BLOCK, F.NOTE]);
     if (format) {
       const [, path] = Editor.above(editor, {
         match: n => n.type === format
@@ -378,15 +364,15 @@ export default function withShortcuts(editor) {
     if (res) {
       const matchNode = Editor.next(editor, {
         match: n =>
-          n.type === PARAGRAPH ||
-          n.type === BULLETED_LIST ||
-          n.type === NUMBERED_LIST ||
-          n.type === CODE_LINE
+          n.type === F.PARAGRAPH ||
+          n.type === F.BULLETED_LIST ||
+          n.type === F.NUMBERED_LIST ||
+          n.type === F.CODE_LINE
       });
 
       if (
         matchNode &&
-        (matchNode[0].type === PARAGRAPH || matchNode[0].type === CODE_LINE)
+        (matchNode[0].type === F.PARAGRAPH || matchNode[0].type === F.CODE_LINE)
       ) {
         const [, path] = matchNode;
         Transforms.select(editor, path);
@@ -401,7 +387,7 @@ export default function withShortcuts(editor) {
 
       if (
         matchNode &&
-        (matchNode[0].type === BULLETED_LIST || matchNode[0].type === NUMBERED_LIST)
+        (matchNode[0].type === F.BULLETED_LIST || matchNode[0].type === F.NUMBERED_LIST)
       ) {
         const [node, path] = matchNode;
 

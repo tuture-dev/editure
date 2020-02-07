@@ -14,7 +14,7 @@ import Element from "./blocks";
 import createHotKeysHandler from "./hotkeys";
 import { Toolbar, EditLink, HoverLink } from "./components";
 import { createDropListener } from "./utils/image";
-import { updateLastSelection } from "./utils/selection";
+import { updateLastSelection } from "./selection";
 import { linkReducer } from "./utils/link";
 
 import "./App.css";

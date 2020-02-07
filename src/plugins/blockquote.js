@@ -6,7 +6,7 @@ import {
   NUMBERED_LIST
 } from "../constants";
 import { toggleBlock, detectBlockFormat } from "../helpers";
-import { getLineText } from "../utils";
+import { getLineText } from "../helpers/utils";
 
 export const withBlockquote = editor => {
   const { insertBreak } = editor;

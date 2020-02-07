@@ -2,7 +2,7 @@ import { Transforms, Editor, Element } from "slate";
 
 import { isBlockActive } from "../helpers";
 import { LINK, IMAGE, CODE_BLOCK, CODE_LINE } from "../constants";
-import { getBeforeText } from "../utils";
+import { getBeforeText } from "../helpers/utils";
 import { deserializeFromHtml, deserializeFromMarkdown } from "../serializers";
 
 const containsMarkdownCode = text => {

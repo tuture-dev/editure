@@ -1,6 +1,6 @@
 import { Editor, Transforms, Range } from "slate";
 
-import { isBlockActive } from "./blocks";
+import { isBlockActive } from "./block";
 import * as F from "../constants";
 
 export const MARK_TYPES = [

@@ -1,7 +1,5 @@
-import { Editor, Transforms } from "slate";
-
+import { insertVoid } from "../helpers";
 import { IMAGE } from "../constants";
-import { getBeforeText } from "./index";
 
 const IMAGE_HOSTING_URL = "https://imgkr.com/api/files/upload";
 
@@ -24,20 +22,7 @@ export const uploadImage = (file, callback) => {
 export const createInsertImageCallback = editor => {
   return (err, url) => {
     if (err) return alert("图片上传失败，请检查网络连接并重新尝试");
-
-    const { beforeText } = getBeforeText(editor);
-
-    if (beforeText) {
-      Editor.insertBreak(editor);
-    }
-
-    const text = { text: "" };
-    const image = { type: IMAGE, url, children: [text] };
-    Transforms.removeNodes(editor, {
-      match: n => n.children && !n.children[0].text
-    });
-    Transforms.insertNodes(editor, image);
-    Transforms.insertNodes(editor, { children: [text] });
+    insertVoid(editor, IMAGE, { url });
   };
 };
 

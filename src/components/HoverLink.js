@@ -1,11 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { css } from "emotion";
-import { Editor, Transforms } from "slate";
 import { useSlate } from "slate-react";
 
 import Icon from "./Icon";
-import { isMarkActive, toggleMark } from "../helpers";
+import { isMarkActive, removeLink, getLinkData } from "../helpers";
 import { LINK } from "../constants";
 import { startEditLink, updateLinkText, updateLinkUrl } from "../utils/link";
 
@@ -31,23 +30,18 @@ const HoverLink = ({ dispatch }) => {
       return;
     }
 
+    setUrl(getLinkData(editor).url);
+
     const domSelection = window.getSelection();
     const domRange = domSelection.getRangeAt(0);
     const rect = domRange.getBoundingClientRect();
 
-    if (rect.top && rect.left) {
-      const [match] = Editor.nodes(editor, { match: n => n.link });
-      if (match) {
-        setUrl(match[0].url);
-      }
-
-      el.style.opacity = 1;
-      el.style.top = `${rect.top + window.pageYOffset - el.offsetHeight}px`;
-      el.style.left = `${rect.left +
-        window.pageXOffset -
-        el.offsetWidth / 2 +
-        rect.width / 2}px`;
-    }
+    el.style.opacity = 1;
+    el.style.top = `${rect.top + window.pageYOffset - el.offsetHeight}px`;
+    el.style.left = `${rect.left +
+      window.pageXOffset -
+      el.offsetWidth / 2 +
+      rect.width / 2}px`;
   });
 
   const onClickEdit = e => {
@@ -59,33 +53,14 @@ const HoverLink = ({ dispatch }) => {
 
     dispatch(startEditLink());
 
-    const [match] = Editor.nodes(editor, { match: n => n.link });
-    if (match) {
-      dispatch(updateLinkText(match[0].text));
-      dispatch(updateLinkUrl(match[0].url));
-    }
+    const { text, url } = getLinkData(editor);
+    text && dispatch(updateLinkText(text));
+    url && dispatch(updateLinkUrl(url));
   };
 
   const onDeleteLink = e => {
     e.preventDefault();
-
-    const { selection } = editor;
-    const [match] = Editor.nodes(editor, { match: n => n.link });
-
-    // 选中当前整个链接，取消链接
-    if (match) {
-      const { path } = selection.anchor;
-      const linkRange = {
-        anchor: { path, offset: 0 },
-        focus: { path, offset: match[0].text.length }
-      };
-
-      Transforms.select(editor, linkRange);
-      toggleMark(editor, LINK);
-      Transforms.collapse(editor, {
-        edge: "focus"
-      });
-    }
+    removeLink(editor);
   };
 
   return (

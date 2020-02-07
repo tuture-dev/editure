@@ -2,7 +2,7 @@ import { Transforms, Editor, Point, Range, Element, Node } from "slate";
 
 import { CODE_BLOCK, CODE_LINE, PARAGRAPH } from "../constants";
 import { isBlockActive, unwrapBlock } from "../helpers";
-import { getLineText } from "../utils";
+import { getLineText } from "../helpers/utils";
 
 export const withCodeBlock = editor => {
   const { deleteBackward, normalizeNode } = editor;

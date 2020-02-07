@@ -1,30 +1,17 @@
 import React from "react";
-import { Editor, Transforms } from "slate";
 import { useSlate } from "slate-react";
 
 import Icon from "./Icon";
 import Button from "./Button";
 import { HR } from "../constants";
-import { getBeforeText } from "../utils";
+import { insertVoid } from "../helpers";
 
 const HrButton = () => {
   const editor = useSlate();
 
   const onMouseDown = event => {
     event.preventDefault();
-    const { beforeText } = getBeforeText(editor);
-
-    if (beforeText) {
-      Editor.insertBreak(editor);
-    }
-
-    Transforms.removeNodes(editor, {
-      match: n => n.children && !n.children[0].text
-    });
-
-    const text = { text: "" };
-    Transforms.insertNodes(editor, { type: HR, children: [text] });
-    Transforms.insertNodes(editor, { children: [text] });
+    insertVoid(editor, HR);
   };
 
   return (

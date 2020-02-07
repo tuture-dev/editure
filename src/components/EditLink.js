@@ -1,18 +1,15 @@
 import React, { useRef } from "react";
 import Modal from "react-modal";
-import { Transforms } from "slate";
 import { useSlate } from "slate-react";
 import { css } from "emotion";
 
-import { isMarkActive } from "../helpers";
+import { isMarkActive, insertLink, updateLink } from "../helpers";
 import { LINK } from "../constants";
-import { getLastSelection } from "../utils/selection";
+import { selectLastPoint } from "../selection";
 import {
   updateLinkText,
   updateLinkUrl,
   finishEditLink,
-  insertNewLink,
-  updateCurrentLink,
   cancelEditLink
 } from "../utils/link";
 
@@ -37,14 +34,13 @@ const EditLink = ({ link, dispatch }) => {
     e.preventDefault();
 
     // 回到上次编辑的光标位置
-    const selection = getLastSelection();
-    Transforms.select(editor, selection);
+    selectLastPoint(editor);
 
     if (text) {
       if (!isMarkActive(editor, LINK)) {
-        insertNewLink(editor, text, url);
+        insertLink(editor, text, url);
       } else {
-        updateCurrentLink(editor, text, url);
+        updateLink(editor, text, url);
       }
     }
 
@@ -54,10 +50,7 @@ const EditLink = ({ link, dispatch }) => {
   const onCancel = e => {
     e.preventDefault();
 
-    // 回到上次编辑的光标位置
-    const selection = getLastSelection();
-    Transforms.select(editor, selection);
-
+    selectLastPoint(editor);
     dispatch(cancelEditLink());
   };
 
