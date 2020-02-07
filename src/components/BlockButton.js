@@ -3,7 +3,7 @@ import { useSlate } from "slate-react";
 
 import Icon from "./Icon";
 import Button from "./Button";
-import { isBlockActive, toggleBlock } from "../blocks";
+import { isBlockActive, toggleBlock } from "../helpers";
 import { TOOL_BUTTON } from "../constants";
 
 const BlockButton = ({ format = "", title, icon }) => {

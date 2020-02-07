@@ -1,50 +1,14 @@
 import React, { useState } from "react";
 import { css, cx } from "emotion";
 import { useSlate } from "slate-react";
-import { Editor, Transforms, Element } from "slate";
+import { Transforms, Element } from "slate";
 import { useSelected, useFocused } from "slate-react";
 
+import * as F from "./constants";
 import { languages, enumPrismLangToLanguage } from "./utils/code";
 import { palette, icons, levels } from "./utils/note";
-import {
-  H1,
-  H2,
-  H3,
-  H4,
-  CODE_BLOCK,
-  CODE_LINE,
-  NUMBERED_LIST,
-  BULLETED_LIST,
-  PARAGRAPH,
-  LIST_ITEM,
-  BLOCK_QUOTE,
-  NOTE,
-  IMAGE,
-  HR
-} from "./constants";
-import { wrapCodeBlock, handleActiveCodeBlock } from "./plugins/codeBlock";
-import { wrapBlockquote, handleActiveBlockquote } from "./plugins/blockquote";
-import { wrapNote, handleActiveNote } from "./plugins/note";
 
 const bulletedListStyleType = ["disc", "circle", "square"];
-
-const LIST_TYPES = [NUMBERED_LIST, BULLETED_LIST];
-
-export const BLOCK_TYPES = [
-  H1,
-  H2,
-  H3,
-  H4,
-  CODE_BLOCK,
-  NUMBERED_LIST,
-  BULLETED_LIST,
-  PARAGRAPH,
-  LIST_ITEM,
-  BLOCK_QUOTE,
-  NOTE,
-  IMAGE,
-  HR
-];
 
 const ListItemElement = props => {
   const { attributes, children, element } = props;
@@ -66,7 +30,7 @@ const ListItemElement = props => {
   return (
     <li
       {...attributes}
-      className={parent === BULLETED_LIST ? bulletedStyle : numberedStyle}>
+      className={parent === F.BULLETED_LIST ? bulletedStyle : numberedStyle}>
       {children}
     </li>
   );
@@ -86,7 +50,7 @@ const CodeBlockElement = props => {
       editor,
       { lang: event.target.value },
       {
-        match: n => Element.matches(n, { type: CODE_BLOCK })
+        match: n => Element.matches(n, { type: F.CODE_BLOCK })
       }
     );
   }
@@ -177,7 +141,7 @@ const NoteElement = props => {
       editor,
       { level: event.target.value },
       {
-        match: n => n.type === NOTE
+        match: n => n.type === F.NOTE
       }
     );
   }
@@ -227,113 +191,19 @@ const NoteElement = props => {
   );
 };
 
-export const isBlockActive = (editor, format) => {
-  const [match] = Editor.nodes(editor, {
-    match: n => n.type === format
-  });
-
-  return !!match;
-};
-
-export const getBlock = (editor, format) => {
-  const node = Editor.above(editor, {
-    match: n => n.type === format
-  });
-
-  return node;
-};
-
-export const detectBlockFormat = (editor, formats = BLOCK_TYPES) => {
-  let pathLength = -1;
-  let realFormat = null;
-
-  for (const format of formats) {
-    if (isBlockActive(editor, format)) {
-      const [, path] = getBlock(editor, format);
-
-      if (path.length > pathLength) {
-        pathLength = path.length;
-        realFormat = format;
-      }
-    }
-  }
-
-  return realFormat;
-};
-
-export const toggleBlock = (editor, format, props, type) => {
-  console.log("toggleBlock", format);
-  const isActive = isBlockActive(editor, format);
-  const isList = LIST_TYPES.includes(format);
-
-  let nodeProps = props;
-  if (isList) {
-    nodeProps = { ...nodeProps, level: 0, parent: format, type: LIST_ITEM };
-  }
-
-  Transforms.unwrapNodes(editor, {
-    match: n => LIST_TYPES.includes(n.type),
-    split: true
-  });
-
-  switch (format) {
-    case CODE_BLOCK: {
-      if (isActive) {
-        handleActiveCodeBlock(editor, type);
-      } else {
-        wrapCodeBlock(editor, nodeProps);
-      }
-
-      break;
-    }
-
-    case BLOCK_QUOTE: {
-      if (isActive) {
-        handleActiveBlockquote(editor, type);
-      } else {
-        wrapBlockquote(editor);
-      }
-
-      break;
-    }
-
-    case NOTE: {
-      if (isActive) {
-        handleActiveNote(editor, type);
-      } else {
-        wrapNote(editor, nodeProps);
-      }
-
-      break;
-    }
-
-    default: {
-      Transforms.setNodes(editor, {
-        ...nodeProps,
-        type: isActive ? PARAGRAPH : isList ? LIST_ITEM : format
-      });
-    }
-  }
-
-  if (!isActive && isList) {
-    const block = { type: format, children: [] };
-    Transforms.wrapNodes(editor, block);
-  }
-};
-
 export default props => {
   const { attributes, children, element } = props;
 
   switch (element.type) {
-    case BLOCK_QUOTE:
+    case F.BLOCK_QUOTE:
       return (
         <blockquote {...attributes}>
           <div>{children}</div>
         </blockquote>
       );
-    case LIST_ITEM:
+    case F.LIST_ITEM:
       return <ListItemElement {...props} />;
-    case BULLETED_LIST:
+    case F.BULLETED_LIST:
       return (
         <ul
           {...attributes}
@@ -343,7 +213,7 @@ export default props => {
           {children}
         </ul>
       );
-    case NUMBERED_LIST:
+    case F.NUMBERED_LIST:
       return (
         <ol
           {...attributes}
@@ -353,23 +223,23 @@ export default props => {
           {children}
         </ol>
       );
-    case H1:
+    case F.H1:
       return <h1 {...attributes}>{children}</h1>;
-    case H2:
+    case F.H2:
       return <h2 {...attributes}>{children}</h2>;
-    case H3:
+    case F.H3:
       return <h3 {...attributes}>{children}</h3>;
-    case H4:
+    case F.H4:
       return <h4 {...attributes}>{children}</h4>;
-    case CODE_BLOCK:
+    case F.CODE_BLOCK:
       return <CodeBlockElement {...props} />;
-    case CODE_LINE:
+    case F.CODE_LINE:
       return <pre {...attributes}>{children}</pre>;
-    case NOTE:
+    case F.NOTE:
       return <NoteElement {...props} />;
-    case IMAGE:
+    case F.IMAGE:
       return <ImageElement {...props} />;
-    case HR:
+    case F.HR:
       return <HrElement {...props} />;
     default:
       return <p {...attributes}>{children}</p>;

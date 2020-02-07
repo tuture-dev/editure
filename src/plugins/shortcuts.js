@@ -1,7 +1,7 @@
 import { Range, Editor, Transforms, Point } from "slate";
 
 import { toggleMark, detectMarkFormat, MARK_TYPES } from "../marks";
-import { isBlockActive, toggleBlock, detectBlockFormat, BLOCK_TYPES } from "../blocks";
+import { isBlockActive, toggleBlock, detectBlockFormat, BLOCK_TYPES } from "../helpers";
 import { getBeforeText, getChildrenText, compareNode } from "../utils";
 import {
   BOLD,

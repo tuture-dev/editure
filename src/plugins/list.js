@@ -1,6 +1,6 @@
 import { Transforms, Editor, Point, Range, Element, Node } from "slate";
 
-import { isBlockActive } from "../blocks";
+import { isBlockActive } from "../helpers";
 import { LIST_ITEM, BULLETED_LIST, NUMBERED_LIST, PARAGRAPH } from "../constants";
 
 export const increaseItemDepth = editor => {

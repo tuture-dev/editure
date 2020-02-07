@@ -3,7 +3,7 @@ import isHotkey from "is-hotkey";
 
 import { getBeforeText } from "./utils";
 import { toggleMark } from "./marks";
-import { toggleBlock, isBlockActive, detectBlockFormat } from "./blocks";
+import { toggleBlock, isBlockActive, detectBlockFormat } from "./helpers";
 import { decreaseItemDepth, increaseItemDepth } from "./plugins/list";
 import {
   BOLD,

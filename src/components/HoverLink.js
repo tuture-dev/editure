@@ -18,6 +18,7 @@ const HoverLink = ({ dispatch }) => {
   const ref = useRef(null);
   const editor = useSlate();
 
+  // eslint-disable-next-line
   useEffect(() => {
     const el = ref.current;
 

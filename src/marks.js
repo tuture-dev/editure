@@ -1,7 +1,7 @@
 import React from "react";
 import { Editor, Transforms, Range } from "slate";
 
-import { isBlockActive } from "./blocks";
+import { isBlockActive } from "./helpers";
 import {
   CODE_BLOCK,
   BOLD,
