@@ -19,14 +19,18 @@ export const BLOCK_TYPES = [
   F.HR
 ];
 
-export const wrapBlockquote = editor => {
-  const text = { text: "" };
-  const blockquoteLineNode = { type: F.PARAGRAPH, children: [text] };
-  const node = { type: F.BLOCK_QUOTE, children: [text] };
+const wrapBlock = (editor, format, props) => {
+  if (![F.BLOCK_QUOTE, F.CODE_BLOCK, F.NOTE].includes(format)) {
+    return;
+  }
 
-  Transforms.setNodes(editor, blockquoteLineNode);
+  const text = { text: "" };
+  const childType = format === F.CODE_BLOCK ? F.CODE_LINE : F.PARAGRAPH;
+  const node = { type: format, ...props, children: [text] };
+
+  Transforms.setNodes(editor, { type: childType, children: [text] });
   Transforms.wrapNodes(editor, node, {
-    match: n => n.type === F.PARAGRAPH
+    match: n => n.type === childType
   });
 };
 
@@ -74,17 +78,6 @@ export const handleActiveBlockquote = (editor, type) => {
       return;
     }
   }
-};
-
-export const wrapCodeBlock = (editor, props) => {
-  const text = { text: "" };
-  const codeLineNode = { type: F.CODE_LINE, children: [text] };
-  const node = { type: F.CODE_BLOCK, ...props, children: [text] };
-
-  Transforms.setNodes(editor, codeLineNode);
-  Transforms.wrapNodes(editor, node, {
-    match: n => n.type === F.CODE_LINE
-  });
 };
 
 export const unwrapCodeBlock = editor => {
@@ -148,17 +141,6 @@ export const handleActiveCodeBlock = (editor, type) => {
       return;
     }
   }
-};
-
-export const wrapNote = (editor, props) => {
-  const text = { text: "" };
-  const noteLineNode = { type: F.PARAGRAPH, children: [text] };
-  const node = { type: F.NOTE, ...props, children: [text] };
-
-  Transforms.setNodes(editor, noteLineNode);
-  Transforms.wrapNodes(editor, node, {
-    match: n => n.type === F.PARAGRAPH
-  });
 };
 
 export const unwrapNote = editor => {
@@ -261,7 +243,7 @@ export const toggleBlock = (editor, format, props, type) => {
       if (isActive) {
         handleActiveCodeBlock(editor, type);
       } else {
-        wrapCodeBlock(editor, nodeProps);
+        wrapBlock(editor, format, nodeProps);
       }
 
       break;
@@ -271,7 +253,7 @@ export const toggleBlock = (editor, format, props, type) => {
       if (isActive) {
         handleActiveBlockquote(editor, type);
       } else {
-        wrapBlockquote(editor);
+        wrapBlock(editor, format);
       }
 
       break;
@@ -281,7 +263,7 @@ export const toggleBlock = (editor, format, props, type) => {
       if (isActive) {
         handleActiveNote(editor, type);
       } else {
-        wrapNote(editor, nodeProps);
+        wrapBlock(editor, format, nodeProps);
       }
 
       break;
