@@ -69,19 +69,36 @@ export const unwrapBlock = (editor, format) => {
   });
 };
 
-export const exitBlockquote = editor => {
+const exitBlock = (editor, format) => {
+  if (![F.BLOCK_QUOTE, F.CODE_BLOCK, F.NOTE].includes(format)) {
+    return;
+  }
+
+  if (format === F.CODE_BLOCK) {
+    Transforms.setNodes(
+      editor,
+      { type: F.PARAGRAPH },
+      { match: n => n.type === F.CODE_LINE }
+    );
+
+    Transforms.unwrapNodes(editor, {
+      match: n => n.type === F.CODE_BLOCK,
+      split: true
+    });
+
+    return;
+  }
+
   const [, path] = Editor.above(editor, {
     match: n => n.type === F.PARAGRAPH
   });
 
-  const start = Editor.start(editor, path);
-  const end = Editor.end(editor, path);
-
-  const range = { anchor: start, focus: end };
-
   Transforms.unwrapNodes(editor, {
-    at: range,
-    match: n => n.type === F.BLOCK_QUOTE,
+    at: {
+      anchor: Editor.start(editor, path),
+      focus: Editor.end(editor, path)
+    },
+    match: n => n.type === format,
     split: true
   });
 };
@@ -94,7 +111,7 @@ export const handleActiveBlockquote = (editor, type) => {
     }
 
     case F.SHORT_CUTS: {
-      exitBlockquote(editor);
+      exitBlock(editor, F.BLOCK_QUOTE);
       break;
     }
 
@@ -109,23 +126,6 @@ export const handleActiveBlockquote = (editor, type) => {
   }
 };
 
-export const exitCodeBlock = editor => {
-  Transforms.setNodes(
-    editor,
-    {
-      type: F.PARAGRAPH
-    },
-    {
-      match: n => n.type === F.CODE_LINE
-    }
-  );
-
-  Transforms.unwrapNodes(editor, {
-    match: n => n.type === F.CODE_BLOCK,
-    split: true
-  });
-};
-
 export const handleActiveCodeBlock = (editor, type) => {
   switch (type) {
     case F.TOOL_BUTTON: {
@@ -134,7 +134,7 @@ export const handleActiveCodeBlock = (editor, type) => {
     }
 
     case F.SHORT_CUTS: {
-      exitCodeBlock(editor);
+      exitBlock(editor, F.CODE_BLOCK);
       break;
     }
 
@@ -149,23 +149,6 @@ export const handleActiveCodeBlock = (editor, type) => {
   }
 };
 
-export const exitNote = editor => {
-  const [, path] = Editor.above(editor, {
-    match: n => n.type === F.PARAGRAPH
-  });
-
-  const start = Editor.start(editor, path);
-  const end = Editor.end(editor, path);
-
-  const range = { anchor: start, focus: end };
-
-  Transforms.unwrapNodes(editor, {
-    at: range,
-    match: n => n.type === F.NOTE,
-    split: true
-  });
-};
-
 export const handleActiveNote = (editor, type) => {
   switch (type) {
     case F.TOOL_BUTTON: {
@@ -174,7 +157,7 @@ export const handleActiveNote = (editor, type) => {
     }
 
     case F.SHORT_CUTS: {
-      exitNote(editor);
+      exitBlock(editor, F.NOTE);
       break;
     }
 
