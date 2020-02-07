@@ -154,7 +154,7 @@ export const toggleBlock = (editor, format, props, options) => {
         unwrapBlock(editor, format);
       }
     } else {
-      wrapBlock(editor, format);
+      wrapBlock(editor, format, nodeProps);
     }
   } else {
     Transforms.setNodes(editor, {
@@ -165,7 +165,7 @@ export const toggleBlock = (editor, format, props, options) => {
 
   if (!isActive && isList) {
     const block = { type: format, children: [] };
-    Transforms.wrapNodes(editor, block);
+    Transforms.wrapNodes(editor, block, nodeProps);
   }
 };
 
