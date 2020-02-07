@@ -34,7 +34,7 @@ const wrapBlock = (editor, format, props) => {
   });
 };
 
-export const unwrapBlock = (editor, format) => {
+const unwrapBlock = (editor, format) => {
   if (![F.BLOCK_QUOTE, F.CODE_BLOCK, F.NOTE].includes(format)) {
     return;
   }

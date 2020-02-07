@@ -1,7 +1,7 @@
 import { Transforms, Editor, Point, Range, Element, Node } from "slate";
 
 import { CODE_BLOCK, CODE_LINE, PARAGRAPH } from "../constants";
-import { isBlockActive, unwrapBlock } from "../helpers";
+import { isBlockActive, toggleBlock } from "../helpers";
 import { getLineText } from "../helpers/utils";
 
 export const withCodeBlock = editor => {
@@ -33,7 +33,7 @@ export const withCodeBlock = editor => {
 
           return Editor.withoutNormalizing(editor, () => {
             if (children.length === 1 && !wholeLineText) {
-              unwrapBlock(editor, CODE_BLOCK);
+              toggleBlock(editor, CODE_BLOCK, {}, { unwrap: true });
             } else if (children.length > 1) {
               Transforms.mergeNodes(editor);
             }
