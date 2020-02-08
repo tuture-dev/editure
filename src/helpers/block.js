@@ -132,41 +132,43 @@ export const detectBlockFormat = (editor, formats = BLOCK_TYPES) => {
 };
 
 export const toggleBlock = (editor, format, props, options) => {
-  const isActive = isBlockActive(editor, format);
-  const isList = LIST_TYPES.includes(format);
+  Editor.withoutNormalizing(editor, () => {
+    const isActive = isBlockActive(editor, format);
+    const isList = LIST_TYPES.includes(format);
 
-  let nodeProps = props;
-  if (isList) {
-    nodeProps = { ...nodeProps, level: 0, parent: format, type: F.LIST_ITEM };
-  }
+    let nodeProps = props;
+    if (isList) {
+      nodeProps = { ...nodeProps, level: 0, parent: format, type: F.LIST_ITEM };
+    }
 
-  Transforms.unwrapNodes(editor, {
-    match: n => LIST_TYPES.includes(n.type),
-    split: true
-  });
+    Transforms.unwrapNodes(editor, {
+      match: n => LIST_TYPES.includes(n.type),
+      split: true
+    });
 
-  if ([F.BLOCK_QUOTE, F.CODE_BLOCK, F.NOTE].includes(format)) {
-    if (isActive && options) {
-      const { exit, unwrap } = options;
-      if (exit) {
-        exitBlock(editor, format);
-      } else if (unwrap) {
-        unwrapBlock(editor, format);
+    if ([F.BLOCK_QUOTE, F.CODE_BLOCK, F.NOTE].includes(format)) {
+      if (isActive && options) {
+        const { exit, unwrap } = options;
+        if (exit) {
+          exitBlock(editor, format);
+        } else if (unwrap) {
+          unwrapBlock(editor, format);
+        }
+      } else {
+        wrapBlock(editor, format, nodeProps);
       }
     } else {
-      wrapBlock(editor, format, nodeProps);
+      Transforms.setNodes(editor, {
+        ...nodeProps,
+        type: isActive ? F.PARAGRAPH : isList ? F.LIST_ITEM : format
+      });
     }
-  } else {
-    Transforms.setNodes(editor, {
-      ...nodeProps,
-      type: isActive ? F.PARAGRAPH : isList ? F.LIST_ITEM : format
-    });
-  }
 
-  if (!isActive && isList) {
-    const block = { type: format, children: [] };
-    Transforms.wrapNodes(editor, block, nodeProps);
-  }
+    if (!isActive && isList) {
+      const block = { type: format, children: [] };
+      Transforms.wrapNodes(editor, block, nodeProps);
+    }
+  });
 };
 
 export const updateBlock = (editor, format, props) => {

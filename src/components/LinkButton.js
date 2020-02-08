@@ -1,11 +1,11 @@
 import React from "react";
-import { Editor, Transforms } from "slate";
 import { useSlate } from "slate-react";
 
 import Icon from "./Icon";
 import Button from "./Button";
-import { isMarkActive, toggleMark } from "../helpers";
 import { LINK } from "../constants";
+import { isMarkActive, removeLink } from "../helpers";
+import { getSelectedString } from "../selection";
 import { updateLinkText, startEditLink } from "../utils/link";
 
 const LinkButton = React.forwardRef(({ dispatch }, ref) => {
@@ -18,24 +18,10 @@ const LinkButton = React.forwardRef(({ dispatch }, ref) => {
     }
 
     if (isMarkActive(editor, LINK)) {
-      const [match] = Editor.nodes(editor, { match: n => n.link });
-
-      // 选中当前整个链接，取消链接
-      if (match) {
-        const { path } = selection.anchor;
-        const linkRange = {
-          anchor: { path, offset: 0 },
-          focus: { path, offset: match[0].text.length }
-        };
-
-        Transforms.select(editor, linkRange);
-        toggleMark(editor, LINK);
-        Transforms.select(editor, selection);
-      }
-      return;
+      return removeLink(editor);
     }
 
-    dispatch(updateLinkText(Editor.string(editor, selection)));
+    dispatch(updateLinkText(getSelectedString(editor)));
     dispatch(startEditLink());
   };
 
