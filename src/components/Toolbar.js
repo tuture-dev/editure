@@ -8,7 +8,7 @@ import ImageButton from "./ImageButton";
 import HrButton from "./HrButton";
 import NoteButton from "./NoteButton";
 import LinkButton from "./LinkButton";
-import StatusButton from "./StatusButton";
+import HistoryButton from "./HistoryButton";
 import {
   BOLD,
   ITALIC,
@@ -38,8 +38,8 @@ const Toolbar = React.forwardRef(({ className, linkDispatch, ...props }, ref) =>
           margin-bottom: 20px;
         `
       )}>
-      <StatusButton icon="undo" status="undo" title="撤销" />
-      <StatusButton icon="redo" status="redo" title="重做" />
+      <HistoryButton icon="undo" status="undo" title="撤销" />
+      <HistoryButton icon="redo" status="redo" title="重做" />
       <MarkButton format={BOLD} icon="format_bold" title="加粗" />
       <MarkButton format={ITALIC} icon="format_italic" title="斜体" />
       <MarkButton format={UNDERLINE} icon="format_underlined" title="下划线" />

@@ -1,7 +1,7 @@
 import isUrl from "is-url";
 
 import { LINK } from "../constants";
-import { insertNewLink } from "../utils/link";
+import { insertLink } from "../helpers";
 
 export const withLinks = editor => {
   const { insertData, insertText, isInline } = editor;
@@ -12,7 +12,7 @@ export const withLinks = editor => {
 
   editor.insertText = text => {
     if (text && isUrl(text)) {
-      insertNewLink(editor, text, text);
+      insertLink(editor, text, text);
     } else {
       insertText(text);
     }
@@ -22,7 +22,7 @@ export const withLinks = editor => {
     const text = data.getData("text/plain");
 
     if (text && isUrl(text)) {
-      insertNewLink(editor, text, text);
+      insertLink(editor, text, text);
     } else {
       insertData(data);
     }

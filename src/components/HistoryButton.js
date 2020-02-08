@@ -3,9 +3,8 @@ import { useSlate } from "slate-react";
 
 import Icon from "./Icon";
 import Button from "./Button";
-import { REDO, UNDO } from "../constants";
 
-const StatusButton = ({ status = UNDO, title, icon }) => {
+const HistoryButton = ({ action = "undo", title, icon }) => {
   const editor = useSlate();
 
   return (
@@ -14,13 +13,13 @@ const StatusButton = ({ status = UNDO, title, icon }) => {
       handleMouseDown={event => {
         event.preventDefault();
 
-        switch (status) {
-          case REDO: {
+        switch (action) {
+          case "redo": {
             editor.redo();
             break;
           }
 
-          case UNDO: {
+          case "undo": {
             editor.undo();
             break;
           }
@@ -35,4 +34,4 @@ const StatusButton = ({ status = UNDO, title, icon }) => {
   );
 };
 
-export default StatusButton;
+export default HistoryButton;

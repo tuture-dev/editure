@@ -1,43 +1,7 @@
 import { Transforms, Editor, Point, Range, Element, Node } from "slate";
 
-import { isBlockActive } from "../blocks";
+import { isBlockActive, decreaseItemDepth } from "../helpers";
 import { LIST_ITEM, BULLETED_LIST, NUMBERED_LIST, PARAGRAPH } from "../constants";
-
-export const increaseItemDepth = editor => {
-  const [node] = Editor.above(editor, {
-    match: n => n.type === LIST_ITEM
-  });
-  const { level = 0, parent } = node;
-
-  Transforms.setNodes(
-    editor,
-    {
-      parent,
-      level: Math.min(level + 1, 8)
-    },
-    {
-      match: n => n.type === LIST_ITEM
-    }
-  );
-};
-
-export const decreaseItemDepth = editor => {
-  const [node] = Editor.above(editor, {
-    match: n => n.type === LIST_ITEM
-  });
-  const { level = 0, parent } = node;
-
-  Transforms.setNodes(
-    editor,
-    {
-      parent,
-      level: Math.max(level - 1, 0)
-    },
-    {
-      match: n => n.type === LIST_ITEM
-    }
-  );
-};
 
 export const withList = editor => {
   const { deleteBackward, normalizeNode } = editor;

@@ -1,7 +1,3 @@
-import { Transforms, Editor } from "slate";
-import { toggleMark } from "../marks";
-import { LINK } from "../constants";
-
 const initialState = {
   isEditing: false,
   text: "",
@@ -51,46 +47,4 @@ export const linkReducer = (state, action) => {
     default:
       return state;
   }
-};
-
-export const insertNewLink = (editor, text, url) => {
-  const { anchor } = editor.selection;
-  const focus = { ...anchor, offset: anchor.offset + text.length };
-  const range = { anchor, focus };
-
-  Transforms.insertText(editor, text);
-  Transforms.select(editor, range);
-  toggleMark(editor, LINK);
-
-  Transforms.setNodes(editor, { url }, { match: n => n.link });
-  Transforms.collapse(editor, { edge: "end" });
-
-  toggleMark(editor, LINK);
-};
-
-export const updateCurrentLink = (editor, text, url) => {
-  const { anchor } = editor.selection;
-  const { path } = anchor;
-
-  const start = Editor.start(editor, path);
-  const end = Editor.end(editor, path);
-  const range = { anchor: start, focus: end };
-  Transforms.select(editor, range);
-  Transforms.delete(editor);
-
-  Transforms.insertText(editor, text);
-
-  const focus = editor.selection.focus;
-  const { offset: newOffset, path: newPath } = focus;
-  const newRange = {
-    anchor: { path: newPath, offset: newOffset - text.length },
-    focus
-  };
-  Transforms.select(editor, newRange);
-  toggleMark(editor, LINK);
-
-  Transforms.setNodes(editor, { url }, { match: n => n.link });
-  Transforms.collapse(editor, { edge: "end" });
-
-  toggleMark(editor, LINK);
 };

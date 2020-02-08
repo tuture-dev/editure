@@ -1,182 +1,106 @@
-import { Transforms, Editor, Element } from "slate";
 import isHotkey from "is-hotkey";
 
-import { getBeforeText } from "./utils";
-import { toggleMark } from "./marks";
-import { toggleBlock, isBlockActive, detectBlockFormat } from "./blocks";
-import { decreaseItemDepth, increaseItemDepth } from "./plugins/list";
+import { getBeforeText } from "./helpers/utils";
+import { selectWithinBlock } from "./selection";
 import {
-  BOLD,
-  ITALIC,
-  UNDERLINE,
-  CODE,
-  STRIKETHROUGH,
-  PARAGRAPH,
-  H1,
-  H2,
-  H3,
-  H4,
-  CODE_BLOCK,
-  LINK,
-  IMAGE,
-  BLOCK_QUOTE,
-  BULLETED_LIST,
-  NUMBERED_LIST,
-  HR,
-  SHORT_CUTS,
-  NOTE
-} from "./constants";
+  toggleMark,
+  toggleBlock,
+  isBlockActive,
+  detectBlockFormat,
+  deleteLine,
+  decreaseItemDepth,
+  increaseItemDepth
+} from "./helpers";
+import * as F from "./constants";
 
 const MARK_HOTKEYS = {
-  "mod+b": BOLD,
-  "mod+i": ITALIC,
-  "mod+u": UNDERLINE,
-  "ctrl+`": CODE,
-  "mod+k": LINK,
-  "mod+shift+`": STRIKETHROUGH
+  "mod+b": F.BOLD,
+  "mod+i": F.ITALIC,
+  "mod+u": F.UNDERLINE,
+  "ctrl+`": F.CODE,
+  "mod+k": F.LINK,
+  "mod+shift+`": F.STRIKETHROUGH
 };
 
 const BLOCK_HOTKEYS = {
-  "mod+0": PARAGRAPH,
-  "mod+1": H1,
-  "mod+2": H2,
-  "mod+3": H3,
-  "mod+4": H4,
-  "mod+shift+c": CODE_BLOCK,
-  "mod+shift+i": IMAGE,
-  "mod+shift+u": BLOCK_QUOTE,
-  "mod+alt+u": BULLETED_LIST,
-  "mod+alt+o": NUMBERED_LIST,
-  "mod+alt+-": HR
+  "mod+0": F.PARAGRAPH,
+  "mod+1": F.H1,
+  "mod+2": F.H2,
+  "mod+3": F.H3,
+  "mod+4": F.H4,
+  "mod+shift+c": F.CODE_BLOCK,
+  "mod+shift+i": F.IMAGE,
+  "mod+shift+u": F.BLOCK_QUOTE,
+  "mod+alt+u": F.BULLETED_LIST,
+  "mod+alt+o": F.NUMBERED_LIST,
+  "mod+alt+-": F.HR
 };
+
+const containerBlocks = [F.BLOCK_QUOTE, F.CODE_BLOCK, F.NOTE];
 
 function handleTabKey(editor, event) {
   event.preventDefault();
 
   const { beforeText } = getBeforeText(editor);
-  const isInList = !!detectBlockFormat(editor, [BULLETED_LIST, NUMBERED_LIST]);
+  const isInList = !!detectBlockFormat(editor, [F.BULLETED_LIST, F.NUMBERED_LIST]);
 
   if (!beforeText.length && isInList) {
     increaseItemDepth(editor);
   } else if (beforeText.length && isInList) {
-    Transforms.insertText(editor, "\t");
-  } else if (isBlockActive(editor, CODE_BLOCK)) {
-    Transforms.insertText(editor, "  ");
+    editor.insertText("\t");
+  } else if (isBlockActive(editor, F.CODE_BLOCK)) {
+    editor.insertText("  ");
   } else {
-    Transforms.insertText(editor, "\t");
+    editor.insertText("\t");
   }
 }
 
 function handleShiftTabKey(editor, event) {
   event.preventDefault();
-  if (isBlockActive(editor, BULLETED_LIST) || isBlockActive(editor, NUMBERED_LIST)) {
+  if (isBlockActive(editor, F.LIST_ITEM)) {
     decreaseItemDepth(editor);
   }
 }
 
 function handleSelectAll(editor, event) {
-  const format = detectBlockFormat(editor, [BLOCK_QUOTE, CODE_BLOCK, NOTE]);
+  const format = detectBlockFormat(editor, containerBlocks);
   if (format) {
     event.preventDefault();
-
-    const match = Editor.above(editor, {
-      match: n => n.type === format
-    });
-
-    const path = match[1];
-
-    const anchor = Editor.start(editor, path);
-    const focus = Editor.end(editor, path);
-    const range = { anchor, focus };
-    Transforms.select(editor, range);
+    selectWithinBlock(editor, format, { how: "all" });
   }
 }
 
-function handleSelectLeftAll(editor, event) {
-  if (detectBlockFormat(editor, [CODE_BLOCK, BLOCK_QUOTE, NOTE])) {
+function handleSelectUpperLeftAll(editor, event) {
+  const format = detectBlockFormat(editor, containerBlocks);
+  if (format) {
     event.preventDefault();
-    const type = detectBlockFormat(editor, [CODE_BLOCK, BLOCK_QUOTE, NOTE]);
-
-    const { selection } = editor;
-    const { anchor } = selection;
-
-    const match = Editor.above(editor, {
-      match: n => Element.matches(n, { type })
-    });
-
-    const path = match[1];
-
-    const start = Editor.start(editor, path);
-    const range = { anchor: start, focus: anchor };
-    Transforms.select(editor, range);
+    selectWithinBlock(editor, format, { how: "upper-left" });
   }
 }
 
-function handleSelectRightAll(editor, event) {
-  if (detectBlockFormat(editor, [CODE_BLOCK, BLOCK_QUOTE, NOTE])) {
+function handleSelectLowerRightAll(editor, event) {
+  const format = detectBlockFormat(editor, containerBlocks);
+  if (detectBlockFormat(editor, [F.CODE_BLOCK, F.BLOCK_QUOTE, F.NOTE])) {
     event.preventDefault();
-    const type = detectBlockFormat(editor, [CODE_BLOCK, BLOCK_QUOTE, NOTE]);
-
-    const { selection } = editor;
-    const { anchor } = selection;
-
-    const match = Editor.above(editor, {
-      match: n => Element.matches(n, { type })
-    });
-
-    const path = match[1];
-
-    const end = Editor.end(editor, path);
-    const range = { anchor, focus: end };
-    Transforms.select(editor, range);
+    selectWithinBlock(editor, format, { how: "lower-right" });
   }
 }
 
 function handleDeleteLine(editor, event) {
   event.preventDefault();
-
-  // 具体就是遍历此代码块/引用的  children 数组
-  // 找到最近的一个 \n 字符，然后删除此 \n 之后的字符到光标此时选中的字符
-  const { selection, deleteBackward } = editor;
-  const { anchor } = selection;
-  const { path } = anchor;
-
-  const { beforeText } = getBeforeText(editor);
-
-  if (beforeText) {
-    const deletePath = path.slice(0, path.length - 1);
-    const start = Editor.start(editor, deletePath);
-
-    Transforms.select(editor, { anchor: start, focus: anchor });
-    Transforms.delete(editor);
-  } else {
-    deleteBackward();
-  }
+  deleteLine(editor);
 }
 
 function handleExitBlock(editor, event) {
-  const format = detectBlockFormat(editor, [CODE_BLOCK, BLOCK_QUOTE, NOTE]);
+  const format = detectBlockFormat(editor, [F.CODE_BLOCK, F.BLOCK_QUOTE, F.NOTE]);
 
   if (format) {
     event.preventDefault();
 
-    const match = Editor.above(editor, {
-      match: n => n.type === format
-    });
+    selectWithinBlock(editor, format, { how: "all", collapse: "end" });
+    editor.insertBreak();
 
-    const path = match[1];
-    const focus = Editor.end(editor, path);
-    const range = { anchor: focus, focus };
-    Transforms.select(editor, range);
-    Transforms.collapse(editor, {
-      edge: "end"
-    });
-
-    Editor.insertBreak(editor);
-
-    Editor.withoutNormalizing(editor, () => {
-      toggleBlock(editor, format, {}, SHORT_CUTS);
-    });
+    toggleBlock(editor, format, {}, { exit: true });
   }
 }
 
@@ -189,9 +113,7 @@ export default function createHotKeysHandler(editor, buttonRefs) {
         event.preventDefault();
         const mark = MARK_HOTKEYS[hotkey];
 
-        if (mark === LINK) {
-          console.log("detect hotkey for link");
-          console.log("linkBtn.current", linkBtnRef.current);
+        if (mark === F.LINK) {
           linkBtnRef.current.click();
         } else {
           toggleMark(editor, mark);
@@ -205,7 +127,7 @@ export default function createHotKeysHandler(editor, buttonRefs) {
         event.preventDefault();
         const mark = BLOCK_HOTKEYS[hotkey];
 
-        if (mark === IMAGE) {
+        if (mark === F.IMAGE) {
           imageBtnRef.current.click();
         } else {
           toggleBlock(editor, mark);
@@ -223,12 +145,12 @@ export default function createHotKeysHandler(editor, buttonRefs) {
     }
 
     if (isHotkey("mod+shift+up", event)) {
-      handleSelectLeftAll(editor, event);
+      handleSelectUpperLeftAll(editor, event);
       return;
     }
 
     if (isHotkey("mod+shift+down", event)) {
-      handleSelectRightAll(editor, event);
+      handleSelectLowerRightAll(editor, event);
       return;
     }
 

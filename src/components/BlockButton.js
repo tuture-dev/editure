@@ -3,8 +3,7 @@ import { useSlate } from "slate-react";
 
 import Icon from "./Icon";
 import Button from "./Button";
-import { isBlockActive, toggleBlock } from "../blocks";
-import { TOOL_BUTTON } from "../constants";
+import { isBlockActive, toggleBlock } from "../helpers";
 
 const BlockButton = ({ format = "", title, icon }) => {
   const editor = useSlate();
@@ -15,7 +14,7 @@ const BlockButton = ({ format = "", title, icon }) => {
       active={isBlockActive(editor, format)}
       handleMouseDown={event => {
         event.preventDefault();
-        toggleBlock(editor, format, {}, TOOL_BUTTON);
+        toggleBlock(editor, format, {}, { unwrap: true });
       }}>
       <Icon>{icon}</Icon>
     </Button>
