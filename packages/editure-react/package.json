@@ -1,0 +1,26 @@
+{
+  "name": "editure-react",
+  "description": "The react binding for editure.",
+  "version": "0.0.2",
+  "license": "MIT",
+  "repository": "https://github.com/tuture-dev/editure.git",
+  "main": "dist/index.js",
+  "files": [
+    "dist/"
+  ],
+  "dependencies": {
+    "editure": "^0.0.2",
+    "emotion": "^10.0.27",
+    "escape-html": "^1.0.3",
+    "is-hotkey": "^0.1.6",
+    "material-icons": "^0.3.1",
+    "react-modal": "^3.11.1",
+    "slate-history": "^0.57.1",
+    "slate-react": "^0.57.1"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0",
+    "slate": ">=0.55.0"
+  }
+}

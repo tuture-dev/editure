@@ -1,5 +1,5 @@
-/node_modules
-/dist
+node_modules
+dist
 
 # testing
 /coverage
@@ -14,3 +14,4 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+lerna-debug.log*

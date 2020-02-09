@@ -1,0 +1,11 @@
+{
+  "name": "editure-constants",
+  "description": "Constants for editure.",
+  "version": "0.0.2",
+  "license": "MIT",
+  "repository": "https://github.com/tuture-dev/editure.git",
+  "main": "dist/index.js",
+  "files": [
+    "dist/"
+  ]
+}
