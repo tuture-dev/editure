@@ -10,9 +10,11 @@
   ],
   "dependencies": {
     "is-url": "^1.2.4",
-    "editure-constants": "^0.0.2"
+    "editure-constants": "^0.0.2",
+    "markdown-it": "^10.0.0",
+    "slate-hyperscript": "^0.57.1"
   },
   "peerDependencies": {
-    "slate": "^0.57.1"
+    "slate": ">=0.55.0"
   }
 }

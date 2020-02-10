@@ -1,6 +1,6 @@
 import { Transforms, Editor, Element } from "slate";
 import { LINK, IMAGE, CODE_BLOCK, CODE_LINE } from "editure-constants";
-import { deserializeFromHtml, deserializeFromMarkdown } from "editure-serializers";
+import { parseHtml, parseMarkdown } from "../serializers";
 
 import { isBlockActive } from "../helpers";
 import { getBeforeText } from "../utils";
@@ -79,7 +79,7 @@ export default function withPaste(editor) {
 
     const text = data.getData("text/plain");
     if (containsMarkdownCode(text)) {
-      const parsed = deserializeFromMarkdown(text);
+      const parsed = parseMarkdown(text);
       Transforms.insertNodes(editor, parsed);
 
       if (!beforeText) {
@@ -95,7 +95,7 @@ export default function withPaste(editor) {
     const html = data.getData("text/html");
 
     if (html) {
-      const fragment = deserializeFromHtml(html);
+      const fragment = parseHtml(html);
       const { selection } = editor;
       const { focus } = selection;
 

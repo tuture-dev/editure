@@ -12,7 +12,7 @@ export default [
       format: "esm",
       sourcemap: true
     },
-    plugins: [resolve({ browser: true })],
+    plugins: [resolve({ browser: true }), json()],
     external: id => !id.startsWith(".") && !id.startsWith("/")
   },
   {
@@ -22,26 +22,6 @@ export default [
       format: "esm",
       sourcemap: true
     }
-  },
-  {
-    input: "packages/editure-serializers/src/index.js",
-    output: {
-      file: "packages/editure-serializers/dist/index.js",
-      format: "esm",
-      sourcemap: true
-    },
-    plugins: [
-      resolve({ preferBuiltins: true }),
-      commonjs({
-        exclude: ["src/**"],
-        namedExports: {
-          esrever: ["reverse"],
-          "react-dom": ["findDOMNode"],
-          "react-dom/server": ["renderToStaticMarkup"]
-        }
-      }),
-      json()
-    ]
   },
   {
     input: "packages/editure-react/src/index.js",

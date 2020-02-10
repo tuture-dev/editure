@@ -2,7 +2,7 @@ import { Text } from "slate";
 import MarkdownIt from "markdown-it";
 import * as F from "editure-constants";
 
-import { deserializeFromHtml } from "./html";
+import { parseHtml } from "./html";
 
 const MARK_DECORATORS = {
   [F.CODE]: node => ({ ...node, text: `\`${node.text}\`` }),
@@ -80,8 +80,8 @@ const serialize = node => {
 
 const md = new MarkdownIt({ linkify: true });
 
-export const serializeToMarkdown = serialize;
+export const toMarkdown = serialize;
 
-export const deserializeFromMarkdown = text => {
-  return deserializeFromHtml(md.render(text).replace(/\n/g, ""));
+export const parseMarkdown = text => {
+  return parseHtml(md.render(text).replace(/\n/g, ""));
 };

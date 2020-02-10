@@ -167,9 +167,9 @@ const deserialize = el => {
   return children;
 };
 
-export const serializeToHtml = serialize;
+export const toHtml = serialize;
 
-export const deserializeFromHtml = text => {
+export const parseHtml = text => {
   const parsed = new DOMParser().parseFromString(text, "text/html");
   return deserialize(parsed.body);
 };
