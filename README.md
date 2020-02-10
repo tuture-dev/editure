@@ -1,68 +1,99 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Editure
 
-## Available Scripts
+Editure is a richtext markdown editor built on top of [Slate](https://www.slatejs.org/), with out-of-the-box support for markdown **shortcuts**, **hotkeys**, **serialization**. It aims to provide editing experience on par with [Typora](https://typora.io/) or [Yuque](https://www.yuque.com/).
 
-In the project directory, you can run:
+> Warning: Editure is currently experimental. DO NOT USE IT IN PRODUCTION!
 
-### `yarn start`
+## Features
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- Hotkeys: e.g. toggle bold font with `Ctrl+B`
+- Shortcuts: trigger the full rendering of Markdown as you are entering
+- Toolbar: a toolbar for adjusting format with buttons
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+## Installation
 
-### `yarn test`
+Installing Editure is quite easy:
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+npm install editure editure-react
+# or if you prefer yarn:
+yarn add editure editure-react
+```
 
-### `yarn build`
+## Getting Started
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Using the Component
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+A quick demo:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```javascript
+import Editure from 'editure-react';
 
-### `yarn eject`
+class MyComponent extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { value: [] };
+  }
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+  handleChange = value => {
+    this.setState({ value });
+  };
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+  render() {
+    return <Editure value={this.state.value} onChange={this.handleChange} />;
+  }
+}
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+Or, if you prefer [Hooks](https://reactjs.org/docs/hooks-intro.html):
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+```javascript
+import Editure from 'editure-react';
 
-## Learn More
+function MyComponent() {
+  const [value, setValue] = useState([]);
+  return <Editure value={value} onChange={setValue} />;
+}
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Content Serialization
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+As in Slate, the `value` prop is a plain JavaScript object. You can perform serialization with `JSON` global object:
 
-### Code Splitting
+```javascript
+// serialize to JSON
+const serialized = JSON.stringify(value);
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+// parse from JSON
+const value = JSON.stringify(serialized);
+```
 
-### Analyzing the Bundle Size
+Moreover, Editure provides serialization support for HTML and Markdown, for example:
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+```javascript
+import { toHtml, toMarkdown, parseHtml, parseMarkdown } from 'editure';
 
-### Making a Progressive Web App
+// serialize to HTML
+const htmlString = toHtml(value);
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+// parse from HTML
+const value = parseHtml(htmlString);
 
-### Advanced Configuration
+// serialize to Markdown
+const markdownString = toMarkdown(value);
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+// parse from Markdown
+const value = parseMarkdown(markdownString);
+```
 
-### Deployment
+## API Reference
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+Here is a full list of props from `Editure` component:
 
-### `yarn build` fails to minify
+- `value`: the current value of the editor
+- `onChange`: handler called after the content changed
+- `readOnly`: if `true`, the editor won't allow changing its contents.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+## LICENSE
+
+MIT.
