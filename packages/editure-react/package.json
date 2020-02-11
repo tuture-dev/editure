@@ -1,6 +1,6 @@
 {
   "name": "editure-react",
-  "description": "The react binding for editure.",
+  "description": "The React component for editure.",
   "version": "0.0.2",
   "license": "MIT",
   "repository": "https://github.com/tuture-dev/editure.git",

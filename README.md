@@ -4,15 +4,19 @@ Editure is a richtext markdown editor built on top of [Slate](https://www.slatej
 
 > Warning: Editure is currently experimental. DO NOT USE IT IN PRODUCTION!
 
-## Features
+## Highlights
 
-- Hotkeys: e.g. toggle bold font with `Ctrl+B`
-- Shortcuts: trigger the full rendering of Markdown as you are entering
-- Toolbar: a toolbar for adjusting format with buttons
+- **Hotkeys**: e.g. toggle bold font with `Ctrl+B` or `Cmd+B`
+- **Shortcuts**: trigger the full rendering of Markdown as you are typing
+- **Toolbar**: a toolbar for adjusting format with buttons
+
+## Supported Formats
+
+Marks: **bold**, *italic*, <span style="text-decoration: underline; ">underline</span>, ~~strikethrough~~ and [link](https://tuture.co).
+
+Blocks: paragraphs, headings, blockquotes, code blocks, note blocks, bulleted lists, numbered lists, images, and horizontal lines.
 
 ## Installation
-
-Installing Editure is quite easy:
 
 ```bash
 npm install editure editure-react
@@ -88,10 +92,17 @@ const value = parseMarkdown(markdownString);
 
 ## API Reference
 
+### `editure`
+
+The `editure` package provides low-level utilities to work with Slate.
+
+### `editure-react`
+
 Here is a full list of props from `Editure` component:
 
 - `value`: the current value of the editor
 - `onChange`: handler called after the content changed
+- `placeholder`: placeholder string for the editor
 - `readOnly`: if `true`, the editor won't allow changing its contents.
 
 ## LICENSE
