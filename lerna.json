@@ -1,13 +1,19 @@
 {
-  "packages": ["packages/*"],
+  "packages": [
+    "packages/*"
+  ],
   "npmClient": "yarn",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "command": {
     "publish": {
-      "ignoreChanges": ["*.md"]
+      "ignoreChanges": [
+        "*.md"
+      ]
     },
     "bootstrap": {
-      "npmClientArgs": ["--no-lockfile"]
+      "npmClientArgs": [
+        "--no-lockfile"
+      ]
     }
   }
 }
