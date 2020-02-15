@@ -7,29 +7,53 @@ import json from "rollup-plugin-json";
 export default [
   {
     input: "packages/editure/src/index.js",
-    output: {
-      file: "packages/editure/dist/index.js",
-      format: "esm",
-      sourcemap: true
-    },
+    output: [
+      {
+        file: "packages/editure/dist/index.esm.js",
+        format: "esm",
+        sourcemap: true
+      },
+      {
+        file: "packages/editure/dist/index.js",
+        format: "cjs",
+        exports: "named",
+        sourcemap: true
+      }
+    ],
     plugins: [resolve({ browser: true }), json()],
     external: id => !id.startsWith(".") && !id.startsWith("/")
   },
   {
     input: "packages/editure-constants/src/index.js",
-    output: {
-      file: "packages/editure-constants/dist/index.js",
-      format: "esm",
-      sourcemap: true
-    }
+    output: [
+      {
+        file: "packages/editure-constants/dist/index.esm.js",
+        format: "esm",
+        sourcemap: true
+      },
+      {
+        file: "packages/editure-constants/dist/index.js",
+        format: "cjs",
+        exports: "named",
+        sourcemap: true
+      }
+    ]
   },
   {
     input: "packages/editure-react/src/index.js",
-    output: {
-      file: "packages/editure-react/dist/index.js",
-      format: "esm",
-      sourcemap: true
-    },
+    output: [
+      {
+        file: "packages/editure-react/dist/index.esm.js",
+        format: "esm",
+        sourcemap: true
+      },
+      {
+        file: "packages/editure-react/dist/index.js",
+        format: "cjs",
+        exports: "named",
+        sourcemap: true
+      }
+    ],
     plugins: [
       css({ output: "packages/editure-react/dist/index.css" }),
       resolve({ browser: true }),
