@@ -5,13 +5,15 @@
   "license": "MIT",
   "repository": "https://github.com/tuture-dev/editure.git",
   "main": "dist/index.js",
-  "module": "dis/index.esm.js",
+  "module": "dist/index.esm.js",
   "files": [
     "dist/"
   ],
   "dependencies": {
     "editure-constants": "^0.0.4",
+    "escape-html": "^1.0.3",
     "is-url": "^1.2.4",
+    "jsdom": "^16.1.0",
     "markdown-it": "^10.0.0",
     "slate-hyperscript": "^0.57.1"
   },

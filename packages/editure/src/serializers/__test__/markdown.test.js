@@ -14,39 +14,39 @@ import {
   CODE_BLOCK,
   CODE_LINE,
   LIST_ITEM
-} from "../../constants";
-import { serializeToMarkdown as serialize } from "../markdown";
+} from "editure-constants";
+import { toMarkdown } from "../markdown";
 
 describe("markdown serialization", () => {
   describe("pure mark", () => {
     test("bare text", () => {
       const node = { text: "test" };
       const output = "test";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("bold", () => {
       const node = { bold: true, text: "test" };
       const output = "**test**";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("italic", () => {
       const node = { italic: true, text: "test" };
       const output = "*test*";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("code", () => {
       const node = { code: true, text: "test" };
       const output = "`test`";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("strikethrough", () => {
       const node = { strikethrough: true, text: "test" };
       const output = "~~test~~";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("underline", () => {
@@ -54,13 +54,13 @@ describe("markdown serialization", () => {
 
       // Underlined text is simply rendered as plain text.
       const output = "test";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("link", () => {
       const node = { link: true, text: "test", url: "https://test.com" };
       const output = `[test](https://test.com)`;
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("sequential marks in a paragraph", () => {
@@ -77,7 +77,7 @@ describe("markdown serialization", () => {
         ]
       };
       const output = "This is **bold** and *italic* and `code`.";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
   });
 
@@ -85,31 +85,31 @@ describe("markdown serialization", () => {
     test("bold + italic", () => {
       const node = { bold: true, italic: true, text: "test" };
       const output = "***test***";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("bold + code", () => {
       const node = { bold: true, code: true, text: "test" };
       const output = "**`test`**";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("bold + underline", () => {
       const node = { bold: true, underline: true, text: "test" };
       const output = "**test**";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("bold + strikethrough", () => {
       const node = { bold: true, strikethrough: true, text: "test" };
       const output = "~~**test**~~";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("bold + link", () => {
       const node = { bold: true, link: true, url: "https://test.com", text: "test" };
       const output = `[**test**](${node.url})`;
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("bold + italic + code + underline + strikethrough + link", () => {
@@ -124,7 +124,7 @@ describe("markdown serialization", () => {
         text: "test"
       };
       const output = `[~~***\`test\`***~~](${node.url})`;
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("sequential mixed marks", () => {
@@ -141,7 +141,7 @@ describe("markdown serialization", () => {
         ]
       };
       const output = `This is ***mixed*** and ~~mixed~~ and [\`code\`](https://test.com).`;
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
   });
 
@@ -149,49 +149,49 @@ describe("markdown serialization", () => {
     test("bare paragraph", () => {
       const node = { children: [{ text: "test" }] };
       const output = "test";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("paragraph", () => {
       const node = { type: PARAGRAPH, children: [{ text: "test" }] };
       const output = "test";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("h1", () => {
       const node = { type: H1, children: [{ text: "test" }] };
       const output = "# test";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("h2", () => {
       const node = { type: H2, children: [{ text: "test" }] };
       const output = "## test";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("h3", () => {
       const node = { type: H3, children: [{ text: "test" }] };
       const output = "### test";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("h4", () => {
       const node = { type: H4, children: [{ text: "test" }] };
       const output = "#### test";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("h5", () => {
       const node = { type: H5, children: [{ text: "test" }] };
       const output = "##### test";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("hr", () => {
       const node = { type: HR, children: [{ text: "" }] };
       const output = "---";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("image", () => {
@@ -201,7 +201,7 @@ describe("markdown serialization", () => {
         children: [{ text: "" }]
       };
       const output = `![](${node.url})`;
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("blockquote (single line)", () => {
@@ -210,7 +210,7 @@ describe("markdown serialization", () => {
         children: [{ type: PARAGRAPH, children: [{ text: "test" }] }]
       };
       const output = "> test";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("blockquote (multiple lines)", () => {
@@ -222,7 +222,7 @@ describe("markdown serialization", () => {
         ]
       };
       const output = "> foo\n>\n> bar";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("note (single line)", () => {
@@ -234,7 +234,7 @@ describe("markdown serialization", () => {
 
       // Should degrade to blockquote.
       const output = "> test";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("note (multiple lines)", () => {
@@ -249,7 +249,7 @@ describe("markdown serialization", () => {
 
       // Should degrade to blockquote.
       const output = "> foo\n>\n> bar";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("code-block (single line)", () => {
@@ -259,7 +259,7 @@ describe("markdown serialization", () => {
         children: [{ type: CODE_LINE, children: [{ text: "test" }] }]
       };
       const output = "```\ntest\n```";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("code-block (multiple lines)", () => {
@@ -272,7 +272,7 @@ describe("markdown serialization", () => {
         ]
       };
       const output = "```\nfoo\nbar\n```";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("code-block (with lang)", () => {
@@ -285,7 +285,7 @@ describe("markdown serialization", () => {
         ]
       };
       const output = "```javascript\nfoo\nbar\n```";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("bulleted-list (no level)", () => {
@@ -297,7 +297,7 @@ describe("markdown serialization", () => {
         ]
       };
       const output = "- foo\n- bar";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("bulleted-list (with level)", () => {
@@ -310,7 +310,7 @@ describe("markdown serialization", () => {
         ]
       };
       const output = "  - foo\n  - bar";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("bulleted-list (with mixed level)", () => {
@@ -346,7 +346,7 @@ describe("markdown serialization", () => {
 
 - test`;
 
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("numbered-list (no level)", () => {
@@ -358,7 +358,7 @@ describe("markdown serialization", () => {
         ]
       };
       const output = "1. foo\n2. bar";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("numbered-list (with level)", () => {
@@ -371,7 +371,7 @@ describe("markdown serialization", () => {
         ]
       };
       const output = "  1. foo\n  2. bar";
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("numbered-list (with mixed level)", () => {
@@ -410,7 +410,7 @@ describe("markdown serialization", () => {
   2. world
 
 - test`;
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("sequential blocks", () => {
@@ -443,7 +443,7 @@ const a = 1;
 console.log('hello');
 \`\`\``;
 
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
   });
 
@@ -473,7 +473,7 @@ console.log('hello');
 >
 > Bye.`;
 
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
 
     test("note as a container", () => {
@@ -495,7 +495,7 @@ console.log('hello');
 >
 > Bye.`;
 
-      expect(serialize(node)).toBe(output);
+      expect(toMarkdown(node)).toBe(output);
     });
   });
 });

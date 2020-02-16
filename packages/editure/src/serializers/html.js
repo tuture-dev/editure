@@ -1,4 +1,5 @@
 import escapeHtml from "escape-html";
+import { JSDOM } from "jsdom";
 import { Text } from "slate";
 import { jsx } from "slate-hyperscript";
 import * as F from "editure-constants";
@@ -59,7 +60,7 @@ const ELEMENT_TAGS = {
   HR: () => ({ type: F.HR }),
   IMG: el => ({ type: F.IMAGE, url: el.getAttribute("src") }),
   LI: el => ({
-    type: LIST_ITEM,
+    type: F.LIST_ITEM,
     parent: el.parentNode.nodeName === "UL" ? F.BULLETED_LIST : F.NUMBERED_LIST
   }),
   OL: () => ({ type: F.NUMBERED_LIST }),
@@ -170,6 +171,10 @@ const deserialize = el => {
 export const toHtml = serialize;
 
 export const parseHtml = text => {
-  const parsed = new DOMParser().parseFromString(text, "text/html");
+  const parsed =
+    typeof process === "object"
+      ? new JSDOM(text).window.document
+      : new DOMParser().parseFromString(text, "text/html");
+
   return deserialize(parsed.body);
 };
