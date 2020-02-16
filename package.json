@@ -3,32 +3,37 @@
   "private": true,
   "repository": "https://github.com/tuture-dev/editure.git",
   "scripts": {
+    "test": "jest",
     "bootstrap": "lerna bootstrap",
     "build": "rollup -c"
   },
   "devDependencies": {
     "@babel/core": "7.7.4",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/preset-env": "^7.8.4",
     "@babel/preset-react": "^7.8.3",
     "@rollup/plugin-node-resolve": "^7.1.1",
     "@testing-library/dom": "^6.12.2",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
-    "babel-jest": "^24.9.0",
+    "babel-jest": "^25.1.0",
     "babel-loader": "8.0.6",
-    "jest": "24.9.0",
+    "jest": "^25.1.0",
     "jest-environment-jsdom-fourteen": "0.1.0",
     "jest-resolve": "24.9.0",
     "jest-watch-typeahead": "0.4.2",
     "lerna": "^3.20.2",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
+    "react-test-renderer": "^16.12.0",
     "rollup": "^1.31.0",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-css-only": "^2.0.0",
     "rollup-plugin-json": "^4.0.0",
-    "rollup-plugin-jsx": "^1.0.3"
+    "rollup-plugin-jsx": "^1.0.3",
+    "slate": "^0.57.1",
+    "slate-react": "^0.57.1"
   }
 }
