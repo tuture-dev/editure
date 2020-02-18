@@ -1,5 +1,4 @@
 import escapeHtml from "escape-html";
-import { JSDOM } from "jsdom";
 import { Text } from "slate";
 import { jsx } from "slate-hyperscript";
 import * as F from "editure-constants";
@@ -171,10 +170,15 @@ const deserialize = el => {
 export const toHtml = serialize;
 
 export const parseHtml = text => {
-  const parsed =
-    typeof process === "object"
-      ? new JSDOM(text).window.document
-      : new DOMParser().parseFromString(text, "text/html");
+  let parsed;
+
+  if (typeof process === "object") {
+    // Use JSDOM in node environment.
+    const { JSDOM } = require("jsdom");
+    parsed = new JSDOM(text).window.document;
+  } else {
+    parsed = new DOMParser().parseFromString(text, "text/html");
+  }
 
   return deserialize(parsed.body);
 };
