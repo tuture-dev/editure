@@ -115,17 +115,21 @@ export const detectBlockFormat = (editor, formats = BLOCK_TYPES) => {
   let pathLength = -1;
   let realFormat = null;
 
-  for (const format of formats) {
-    if (isBlockActive(editor, format)) {
-      const [, path] = Editor.above(editor, {
-        match: n => n.type === format
-      });
+  try {
+    for (const format of formats) {
+      if (isBlockActive(editor, format)) {
+        const [, path] = Editor.above(editor, {
+          match: n => n.type === format
+        });
 
-      if (path.length > pathLength) {
-        pathLength = path.length;
-        realFormat = format;
+        if (path.length > pathLength) {
+          pathLength = path.length;
+          realFormat = format;
+        }
       }
     }
+  } catch {
+    realFormat = null;
   }
 
   return realFormat;
