@@ -1,4 +1,5 @@
 import { Editor, Transforms } from "slate";
+import shortid from "shortid";
 import * as F from "editure-constants";
 
 const LIST_TYPES = [F.NUMBERED_LIST, F.BULLETED_LIST];
@@ -143,6 +144,9 @@ export const toggleBlock = (editor, format, props, options) => {
     let nodeProps = props;
     if (isList) {
       nodeProps = { ...nodeProps, level: 0, parent: format, type: F.LIST_ITEM };
+    }
+    if ([F.H1, F.H2, F.H3, F.H4, F.H5, F.H6].includes(format)) {
+      nodeProps = { ...nodeProps, id: shortid.generate() };
     }
 
     Transforms.unwrapNodes(editor, {
