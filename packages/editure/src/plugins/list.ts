@@ -1,9 +1,9 @@
-import { Transforms, Editor, Point, Range, Element, Node } from "slate";
-import { LIST_ITEM, BULLETED_LIST, NUMBERED_LIST, PARAGRAPH } from "editure-constants";
+import { Transforms, Editor, Point, Range, Element, Node } from 'slate';
+import { LIST_ITEM, BULLETED_LIST, NUMBERED_LIST, PARAGRAPH } from 'editure-constants';
 
-import { isBlockActive, decreaseItemDepth } from "../helpers";
+import { isBlockActive, decreaseItemDepth } from '../helpers';
 
-export default function withList(editor) {
+export default function withList(editor: Editor) {
   const { deleteBackward, normalizeNode } = editor;
 
   editor.deleteBackward = (...args) => {
@@ -31,22 +31,24 @@ export default function withList(editor) {
             ? BULLETED_LIST
             : NUMBERED_LIST;
 
-          const [node] = Editor.above(editor, {
+          const block = Editor.above(editor, {
             match: n => n.type === type
           });
 
-          const { level = 0 } = node;
+          if (block) {
+            const [node] = block;
+            const { level = 0 } = node;
 
-          if (level === 0) {
-            Transforms.liftNodes(editor, {
-              match: n => n.type === LIST_ITEM
-            });
+            if (level === 0) {
+              Transforms.liftNodes(editor, {
+                match: n => n.type === LIST_ITEM
+              });
 
-            Transforms.setNodes(editor, { type: PARAGRAPH });
-          } else {
-            decreaseItemDepth(editor);
+              Transforms.setNodes(editor, { type: PARAGRAPH });
+            } else {
+              decreaseItemDepth(editor);
+            }
           }
-
           return;
         } else if (block.type !== PARAGRAPH && Point.equals(selection.anchor, start)) {
           Transforms.setNodes(editor, { type: PARAGRAPH });
@@ -79,7 +81,7 @@ export default function withList(editor) {
 
     // If the element is a numbered-list, ensure each item has correct number.
     if (node.type === NUMBERED_LIST) {
-      const counterStack = [];
+      const counterStack: number[] = [];
       let counter = 0;
       let lastLevel = 0;
 
@@ -90,7 +92,7 @@ export default function withList(editor) {
           counter = 1;
         } else if (level < lastLevel) {
           while (level < lastLevel) {
-            counter = counterStack.pop() + 1;
+            counter = Number(counterStack.pop()) + 1;
             lastLevel--;
           }
         } else {

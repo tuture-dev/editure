@@ -1,6 +1,6 @@
-import { Editor } from "slate";
+import { Editor, Node, Location } from 'slate';
 
-export const getBeforeText = editor => {
+export const getBeforeText = (editor: Editor) => {
   if (!editor.selection) {
     return {};
   }
@@ -18,21 +18,7 @@ export const getBeforeText = editor => {
   return { beforeText, range };
 };
 
-export const getAfterText = editor => {
-  const { anchor } = editor.selection;
-  const match = Editor.above(editor, {
-    match: n => Editor.isBlock(editor, n)
-  });
-
-  const path = match ? match[1] : [];
-  const end = Editor.end(editor, path);
-  const range = { anchor, focus: end };
-  const afterText = Editor.string(editor, range);
-
-  return { afterText, range };
-};
-
-export const getLineText = editor => {
+export const getLineText = (editor: Editor) => {
   const match = Editor.above(editor, {
     match: n => Editor.isBlock(editor, n)
   });
@@ -46,7 +32,7 @@ export const getLineText = editor => {
   return { wholeLineText, range };
 };
 
-export const getChildrenText = (children, path) => {
+export const getChildrenText = (children: Node[], path: Location): string => {
   let childrenItem = children;
   let i = 0;
   for (; i < path.length - 1; i++) {
@@ -56,7 +42,7 @@ export const getChildrenText = (children, path) => {
   return childrenItem[path[i]].text;
 };
 
-export const compareNode = (nodeOnePath = [], nodeTwoPath = []) => {
+export const compareNode = (nodeOnePath: Location, nodeTwoPath: Location) => {
   if (nodeOnePath.length !== nodeTwoPath.length) {
     return false;
   }

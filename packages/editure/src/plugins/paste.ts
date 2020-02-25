@@ -1,11 +1,11 @@
-import { Transforms, Editor, Element } from "slate";
-import { LINK, IMAGE, CODE_BLOCK, CODE_LINE } from "editure-constants";
-import { parseHtml, parseMarkdown } from "../serializers";
+import { Transforms, Editor, Element, Node } from 'slate';
+import { LINK, IMAGE, CODE_BLOCK, CODE_LINE } from 'editure-constants';
+import { parseHtml, parseMarkdown } from '../serializers';
 
-import { isBlockActive } from "../helpers";
-import { getBeforeText } from "../utils";
+import { isBlockActive } from '../helpers';
+import { getBeforeText } from '../utils';
 
-const containsMarkdownCode = text => {
+const containsMarkdownCode = (text: string) => {
   const testRegexes = [
     // Marks.
     /`[^`]+`/,
@@ -32,7 +32,7 @@ const containsMarkdownCode = text => {
   return false;
 };
 
-export default function withPaste(editor) {
+export default function withPaste(editor: Editor) {
   const { insertData, insertText, isInline, isVoid } = editor;
 
   editor.isInline = element => {
@@ -43,9 +43,9 @@ export default function withPaste(editor) {
     return element.type === IMAGE ? true : isVoid(element);
   };
 
-  editor.insertData = data => {
+  editor.insertData = (data: DataTransfer) => {
     const dataTypes = Array.from(data.types);
-    if (!dataTypes.includes("text/plain")) {
+    if (!dataTypes.includes('text/plain')) {
       return insertData(data);
     }
 
@@ -54,9 +54,9 @@ export default function withPaste(editor) {
 
     if (isBlockActive(editor, CODE_BLOCK)) {
       data
-        .getData("text/plain")
+        .getData('text/plain')
         .trim()
-        .split("\n")
+        .split('\n')
         .forEach(line => {
           Transforms.insertNodes(editor, {
             type: CODE_LINE,
@@ -64,8 +64,8 @@ export default function withPaste(editor) {
           });
         });
 
-      // 如果粘贴时所在 code-line 为空，则删除此空行
-      if (!beforeText) {
+      // Delete this empty line if current code-line is empty.
+      if (!beforeText && selection) {
         Transforms.removeNodes(editor, { at: selection });
       }
 
@@ -73,46 +73,55 @@ export default function withPaste(editor) {
     }
 
     // Paste slate fragment data directly.
-    if (dataTypes.includes("application/x-editure-fragment")) {
+    if (dataTypes.includes('application/x-editure-fragment')) {
       return insertData(data);
     }
 
-    const text = data.getData("text/plain");
+    const text = data.getData('text/plain');
     if (containsMarkdownCode(text)) {
       const parsed = parseMarkdown(text);
-      Transforms.insertNodes(editor, parsed);
+      if (parsed) {
+        Transforms.insertNodes(editor, parsed as Node[]);
 
-      if (!beforeText) {
-        Transforms.removeNodes(editor, { at: selection });
+        if (!beforeText && selection) {
+          Transforms.removeNodes(editor, { at: selection });
+        }
       }
+
       return;
     }
 
-    if (dataTypes.length === 1 && dataTypes[0] === "text/plain") {
-      return insertText(data.getData("text/plain"));
+    if (dataTypes.length === 1 && dataTypes[0] === 'text/plain') {
+      return insertText(data.getData('text/plain'));
     }
 
-    const html = data.getData("text/html");
+    const html = data.getData('text/html');
 
     if (html) {
-      const fragment = parseHtml(html);
+      const fragment = parseHtml(html) as Node[];
       const { selection } = editor;
+
+      if (!selection) {
+        return;
+      }
+
       const { focus } = selection;
 
       Transforms.insertNodes(editor, fragment);
 
       const nodeLen = fragment
-        .map(node => Editor.isBlock(editor, node))
+        .map(node => Number(Editor.isBlock(editor, node)))
         .reduce((a, b) => a + b, 0);
 
       Transforms.select(editor, Editor.end(editor, [focus.path[0] + nodeLen]));
 
       const numOfElements = fragment
-        .map(node => Element.isElement(node))
+        .map(node => Number(Element.isElement(node)))
         .reduce((a, b) => a + b, 0);
 
-      // 如果插入的 node 至少有一个 element，并且粘贴时所在行为空，则删除此空行
-      if (numOfElements >= 1 && !beforeText) {
+      // If nodes to be inserted have at least one element and the line being pasted is empty,
+      // delete this empty line.
+      if (numOfElements >= 1 && !beforeText && selection) {
         Transforms.removeNodes(editor, { at: selection });
       }
 

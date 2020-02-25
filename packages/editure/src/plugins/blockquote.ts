@@ -1,14 +1,15 @@
+import { Editor } from 'slate';
 import {
   BLOCK_QUOTE,
   CODE_BLOCK,
   NOTE,
   BULLETED_LIST,
   NUMBERED_LIST
-} from "editure-constants";
-import { toggleBlock, detectBlockFormat } from "../helpers";
-import { getLineText } from "../utils";
+} from 'editure-constants';
+import { toggleBlock, detectBlockFormat } from '../helpers';
+import { getLineText } from '../utils';
 
-export default function withBlockquote(editor) {
+export default function withBlockquote(editor: Editor) {
   const { insertBreak } = editor;
 
   editor.insertBreak = () => {
@@ -24,7 +25,7 @@ export default function withBlockquote(editor) {
       const { wholeLineText } = getLineText(editor);
 
       if (!wholeLineText) {
-        // 如果最后一行为空，退出块状引用
+        // Exit the blockquote if last line is empty.
         toggleBlock(editor, BLOCK_QUOTE, {}, { exit: true });
       } else {
         insertBreak();

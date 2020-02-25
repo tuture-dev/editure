@@ -1,9 +1,14 @@
-import escapeHtml from "escape-html";
-import { Text } from "slate";
-import { jsx } from "slate-hyperscript";
-import * as F from "editure-constants";
+import escapeHtml from 'escape-html';
+import { Text, Element, Node, Descendant } from 'slate';
+import { jsx } from 'slate-hyperscript';
+import * as F from 'editure-constants';
 
-const MARK_DECORATORS = {
+import { MarkDecoratorGroup, BlockConverterGroup } from './types';
+
+const joinChildren = (node: Element): string =>
+  node.children.map(n => serialize(n)).join('');
+
+let markDecorators: MarkDecoratorGroup = {
   [F.CODE]: node => ({ ...node, text: `<code>${node.text}</code>` }),
   [F.BOLD]: node => ({ ...node, text: `<strong>${node.text}</strong>` }),
   [F.ITALIC]: node => ({ ...node, text: `<em>${node.text}</em>` }),
@@ -18,9 +23,7 @@ const MARK_DECORATORS = {
   })
 };
 
-const joinChildren = node => node.children.map(n => serialize(n)).join("");
-
-const BLOCK_CONVERTERS = {
+let blockConverters: BlockConverterGroup = {
   [F.H1]: node => `<h1>${joinChildren(node)}</h1>`,
   [F.H2]: node => `<h2>${joinChildren(node)}</h2>`,
   [F.H3]: node => `<h3>${joinChildren(node)}</h3>`,
@@ -28,27 +31,27 @@ const BLOCK_CONVERTERS = {
   [F.H5]: node => `<h5>${joinChildren(node)}</h5>`,
   [F.PARAGRAPH]: node => `<p>${joinChildren(node)}</p>`,
   [F.IMAGE]: node => `<img src="${escapeHtml(node.url)}" alt="" />`,
-  [F.HR]: () => "<hr />",
+  [F.HR]: () => '<hr />',
   [F.BLOCK_QUOTE]: node => `<blockquote>${joinChildren(node)}</blockquote>`,
   [F.NOTE]: node => `<blockquote>${joinChildren(node)}</blockquote>`,
   [F.BULLETED_LIST]: node => {
     const { children } = node;
     const items = children.map(item => `<li>${item.children[0].text}</li>`);
-    return `<ul>${items.join("")}</ul>`;
+    return `<ul>${items.join('')}</ul>`;
   },
   [F.NUMBERED_LIST]: node => {
     const { children } = node;
     const items = children.map(item => `<li>${item.children[0].text}</li>`);
-    return `<ol>${items.join("")}</ol>`;
+    return `<ol>${items.join('')}</ol>`;
   },
   [F.CODE_BLOCK]: node => {
     const { children } = node;
     const codeLines = children.map(line => `<code>${line.children[0].text}</code>`);
-    return `<pre>${codeLines.join("")}</pre>`;
+    return `<pre>${codeLines.join('')}</pre>`;
   }
 };
 
-const ELEMENT_TAGS = {
+const ELEMENT_TAGS: {} = {
   BLOCKQUOTE: () => ({ type: F.BLOCK_QUOTE }),
   H1: () => ({ type: F.H1 }),
   H2: () => ({ type: F.H2 }),
@@ -57,10 +60,11 @@ const ELEMENT_TAGS = {
   H5: () => ({ type: F.H5 }),
   H6: () => ({ type: F.PARAGRAPH }),
   HR: () => ({ type: F.HR }),
-  IMG: el => ({ type: F.IMAGE, url: el.getAttribute("src") }),
-  LI: el => ({
+  IMG: (el: HTMLElement) => ({ type: F.IMAGE, url: el.getAttribute('src') }),
+  LI: (el: HTMLElement) => ({
     type: F.LIST_ITEM,
-    parent: el.parentNode.nodeName === "UL" ? F.BULLETED_LIST : F.NUMBERED_LIST
+    parent:
+      el.parentNode && el.parentNode.nodeName === 'UL' ? F.BULLETED_LIST : F.NUMBERED_LIST
   }),
   OL: () => ({ type: F.NUMBERED_LIST }),
   P: () => ({ type: F.PARAGRAPH }),
@@ -71,7 +75,7 @@ const ELEMENT_TAGS = {
 
 // COMPAT: `B` is omitted here because Google Docs uses `<b>` in weird ways.
 const TEXT_TAGS = {
-  A: el => ({ link: true, url: el.getAttribute("href") }),
+  A: (el: HTMLElement) => ({ link: true, url: el.getAttribute('href') }),
   CODE: () => ({ code: true }),
   DEL: () => ({ strikethrough: true }),
   EM: () => ({ italic: true }),
@@ -81,12 +85,12 @@ const TEXT_TAGS = {
   U: () => ({ underline: true })
 };
 
-const serialize = node => {
+const serialize = (node: Node) => {
   if (Text.isText(node)) {
-    const markedNode = Object.keys(MARK_DECORATORS).reduce(
+    const markedNode = Object.keys(markDecorators).reduce(
       (decoratedNode, currentMark) => {
         return node[currentMark]
-          ? MARK_DECORATORS[currentMark](decoratedNode)
+          ? markDecorators[currentMark](decoratedNode)
           : decoratedNode;
       },
       { ...node, text: escapeHtml(node.text) }
@@ -95,57 +99,57 @@ const serialize = node => {
     return markedNode.text;
   }
 
-  const converter = BLOCK_CONVERTERS[node.type];
-  if (typeof converter === "function") {
+  const converter = blockConverters[node.type];
+  if (typeof converter === 'function') {
     return converter(node);
   }
 
-  return joinChildren(node, "");
+  return joinChildren(node);
 };
 
-const deserialize = el => {
+const deserialize = (el: HTMLElement): Descendant[] | Element | string | null => {
   if (el.nodeType === 3) {
     return el.textContent;
   } else if (el.nodeType !== 1) {
     return null;
-  } else if (el.nodeName === "BR") {
-    return jsx("element", { type: F.PARAGRAPH }, [{ text: "" }]);
+  } else if (el.nodeName === 'BR') {
+    return jsx('element', { type: F.PARAGRAPH }, [{ text: '' }]);
   }
 
   const { nodeName } = el;
 
-  if (nodeName === "PRE") {
-    const attrs = ELEMENT_TAGS["PRE"]();
+  if (nodeName === 'PRE') {
+    const attrs = ELEMENT_TAGS['PRE']();
 
     try {
       return jsx(
-        "element",
+        'element',
         attrs,
         Array.from(el.childNodes).map(child =>
-          jsx("element", { type: F.CODE_LINE }, [{ text: child.textContent }])
+          jsx('element', { type: F.CODE_LINE }, [{ text: child.textContent }])
         )
       );
     } catch {
-      return jsx("element", attrs, [
-        jsx("element", F.CODE_LINE, [{ text: el.textContent }])
+      return jsx('element', attrs, [
+        jsx('element', F.CODE_LINE, [{ text: el.textContent }])
       ]);
     }
   }
 
   const children = Array.from(el.childNodes)
-    .map(deserialize)
+    .map(el => deserialize(el as HTMLElement))
     .flat();
 
   // Ensure that children is not empty.
   if (children.length === 0) {
-    children.push({ text: "" });
+    children.push({ text: '' });
   }
 
-  if (nodeName === "BODY") {
-    return jsx("fragment", {}, children);
+  if (nodeName === 'BODY') {
+    return jsx('fragment', {}, children);
   }
 
-  if (["P", "DIV"].includes(nodeName)) {
+  if (['P', 'DIV'].includes(nodeName)) {
     // If any child is a block, return all children directly without adding any type.
     for (const child of children) {
       if (child.type) {
@@ -156,28 +160,37 @@ const deserialize = el => {
 
   if (ELEMENT_TAGS[nodeName]) {
     const attrs = ELEMENT_TAGS[nodeName](el);
-    return jsx("element", attrs, children);
+    return jsx('element', attrs, children);
   }
 
   if (TEXT_TAGS[nodeName]) {
     const attrs = TEXT_TAGS[nodeName](el);
-    return children.map(child => jsx("text", attrs, child));
+    return children.map((child: any) => jsx('text', attrs, child));
   }
 
   return children;
 };
 
-export const toHtml = serialize;
+export const toHtml = (
+  node: Node,
+  customMarkDecorators?: MarkDecoratorGroup,
+  customBlockConverters?: BlockConverterGroup
+) => {
+  markDecorators = { ...markDecorators, ...customMarkDecorators };
+  blockConverters = { ...blockConverters, ...customBlockConverters };
 
-export const parseHtml = text => {
+  return serialize(node);
+};
+
+export const parseHtml = (text: string) => {
   let parsed;
 
-  if (typeof process === "object") {
+  if (typeof process === 'object') {
     // Use JSDOM in node environment.
-    const { JSDOM } = require("jsdom");
+    const { JSDOM } = require('jsdom');
     parsed = new JSDOM(text).window.document;
   } else {
-    parsed = new DOMParser().parseFromString(text, "text/html");
+    parsed = new DOMParser().parseFromString(text, 'text/html');
   }
 
   return deserialize(parsed.body);

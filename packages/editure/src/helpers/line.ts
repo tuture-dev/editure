@@ -1,10 +1,12 @@
-import { Editor, Transforms } from "slate";
-import { getBeforeText } from "../utils";
+import { Editor, Transforms } from 'slate';
+import { getBeforeText } from '../utils';
 
-export const deleteLine = editor => {
-  // 具体就是遍历此代码块/引用的  children 数组
-  // 找到最近的一个 \n 字符，然后删除此 \n 之后的字符到光标此时选中的字符
+export const deleteLine = (editor: Editor) => {
   const { selection, deleteBackward } = editor;
+  if (!selection) {
+    return;
+  }
+
   const { anchor } = selection;
   const { path } = anchor;
 
@@ -17,6 +19,6 @@ export const deleteLine = editor => {
     Transforms.select(editor, { anchor: start, focus: anchor });
     Transforms.delete(editor);
   } else {
-    deleteBackward();
+    deleteBackward('character');
   }
 };

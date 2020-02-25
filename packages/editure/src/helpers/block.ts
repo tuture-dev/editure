@@ -1,6 +1,6 @@
-import { Editor, Transforms } from "slate";
-import shortid from "shortid";
-import * as F from "editure-constants";
+import { Editor, Transforms } from 'slate';
+import shortid from 'shortid';
+import F from 'editure-constants';
 
 const LIST_TYPES = [F.NUMBERED_LIST, F.BULLETED_LIST];
 
@@ -20,12 +20,12 @@ export const BLOCK_TYPES = [
   F.HR
 ];
 
-const wrapBlock = (editor, format, props) => {
+const wrapBlock = (editor: Editor, format: string, props: any) => {
   if (![F.BLOCK_QUOTE, F.CODE_BLOCK, F.NOTE].includes(format)) {
     return;
   }
 
-  const text = { text: "" };
+  const text = { text: '' };
   const childType = format === F.CODE_BLOCK ? F.CODE_LINE : F.PARAGRAPH;
   const node = { type: format, ...props, children: [text] };
 
@@ -35,32 +35,35 @@ const wrapBlock = (editor, format, props) => {
   });
 };
 
-const unwrapBlock = (editor, format) => {
+const unwrapBlock = (editor: Editor, format: string) => {
   if (![F.BLOCK_QUOTE, F.CODE_BLOCK, F.NOTE].includes(format)) {
     return;
   }
 
   if (format === F.CODE_BLOCK) {
-    const [, path] = Editor.above(editor, {
+    const block = Editor.above(editor, {
       match: n => n.type === F.CODE_BLOCK
     });
 
-    const anchor = Editor.start(editor, path);
-    const focus = Editor.end(editor, path);
-    const range = { anchor, focus };
+    if (block) {
+      const [, path] = block;
+      const anchor = Editor.start(editor, path);
+      const focus = Editor.end(editor, path);
+      const range = { anchor, focus };
 
-    Transforms.setNodes(
-      editor,
-      { type: F.PARAGRAPH },
-      {
+      Transforms.setNodes(
+        editor,
+        { type: F.PARAGRAPH },
+        {
+          at: range,
+          match: n => n.type === F.CODE_LINE
+        }
+      );
+      Transforms.unwrapNodes(editor, {
         at: range,
-        match: n => n.type === F.CODE_LINE
-      }
-    );
-    Transforms.unwrapNodes(editor, {
-      at: range,
-      match: n => n.type === F.CODE_BLOCK
-    });
+        match: n => n.type === F.CODE_BLOCK
+      });
+    }
 
     return;
   }
@@ -70,7 +73,7 @@ const unwrapBlock = (editor, format) => {
   });
 };
 
-const exitBlock = (editor, format) => {
+const exitBlock = (editor: Editor, format: string) => {
   if (![F.BLOCK_QUOTE, F.CODE_BLOCK, F.NOTE].includes(format)) {
     return;
   }
@@ -90,21 +93,24 @@ const exitBlock = (editor, format) => {
     return;
   }
 
-  const [, path] = Editor.above(editor, {
+  const block = Editor.above(editor, {
     match: n => n.type === F.PARAGRAPH
   });
 
-  Transforms.unwrapNodes(editor, {
-    at: {
-      anchor: Editor.start(editor, path),
-      focus: Editor.end(editor, path)
-    },
-    match: n => n.type === format,
-    split: true
-  });
+  if (block) {
+    const [, path] = block;
+    Transforms.unwrapNodes(editor, {
+      at: {
+        anchor: Editor.start(editor, path),
+        focus: Editor.end(editor, path)
+      },
+      match: n => n.type === format,
+      split: true
+    });
+  }
 };
 
-export const isBlockActive = (editor, format) => {
+export const isBlockActive = (editor: Editor, format: string) => {
   const [match] = Editor.nodes(editor, {
     match: n => n.type === format
   });
@@ -112,20 +118,24 @@ export const isBlockActive = (editor, format) => {
   return !!match;
 };
 
-export const detectBlockFormat = (editor, formats = BLOCK_TYPES) => {
+export const detectBlockFormat = (editor: Editor, formats = BLOCK_TYPES) => {
   let pathLength = -1;
   let realFormat = null;
 
   try {
     for (const format of formats) {
       if (isBlockActive(editor, format)) {
-        const [, path] = Editor.above(editor, {
+        const block = Editor.above(editor, {
           match: n => n.type === format
         });
 
-        if (path.length > pathLength) {
-          pathLength = path.length;
-          realFormat = format;
+        if (block) {
+          const [, path] = block;
+
+          if (path.length > pathLength) {
+            pathLength = path.length;
+            realFormat = format;
+          }
         }
       }
     }
@@ -136,7 +146,17 @@ export const detectBlockFormat = (editor, formats = BLOCK_TYPES) => {
   return realFormat;
 };
 
-export const toggleBlock = (editor, format, props, options) => {
+type ToggleBlockOptions = {
+  exit?: boolean;
+  unwrap?: boolean;
+};
+
+export const toggleBlock = (
+  editor: Editor,
+  format: string,
+  props?: any,
+  options?: ToggleBlockOptions
+) => {
   Editor.withoutNormalizing(editor, () => {
     const isActive = isBlockActive(editor, format);
     const isList = LIST_TYPES.includes(format);
@@ -179,7 +199,7 @@ export const toggleBlock = (editor, format, props, options) => {
   });
 };
 
-export const updateBlock = (editor, format, props) => {
+export const updateBlock = (editor: Editor, format: string, props: any) => {
   Transforms.setNodes(editor, props, {
     match: n => n.type === format
   });

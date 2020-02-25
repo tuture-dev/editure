@@ -1,7 +1,7 @@
-import { Editor, Transforms, Range } from "slate";
-import * as F from "editure-constants";
+import { Editor, Transforms, Range } from 'slate';
+import * as F from 'editure-constants';
 
-import { isBlockActive } from "./block";
+import { isBlockActive } from './block';
 
 export const MARK_TYPES = [
   F.BOLD,
@@ -12,12 +12,12 @@ export const MARK_TYPES = [
   F.LINK
 ];
 
-export const isMarkActive = (editor, format) => {
+export const isMarkActive = (editor: Editor, format: string) => {
   const marks = Editor.marks(editor);
   return marks ? marks[format] === true : false;
 };
 
-export const detectMarkFormat = (editor, marks = MARK_TYPES) => {
+export const detectMarkFormat = (editor: Editor, marks = MARK_TYPES) => {
   let realMarks = [];
 
   for (const mark of marks) {
@@ -29,7 +29,7 @@ export const detectMarkFormat = (editor, marks = MARK_TYPES) => {
   return realMarks;
 };
 
-export const toggleMark = (editor, format) => {
+export const toggleMark = (editor: Editor, format: string) => {
   const isActive = isMarkActive(editor, format);
 
   if (isBlockActive(editor, F.CODE_BLOCK)) {
@@ -53,7 +53,7 @@ export const toggleMark = (editor, format) => {
   ) {
     Transforms.insertNodes(editor, {
       type: F.PARAGRAPH,
-      children: [{ text: "" }]
+      children: [{ text: '' }]
     });
   }
 };

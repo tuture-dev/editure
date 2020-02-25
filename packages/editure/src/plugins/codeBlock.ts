@@ -1,10 +1,10 @@
-import { Transforms, Editor, Point, Range, Element, Node } from "slate";
-import { CODE_BLOCK, CODE_LINE, PARAGRAPH } from "editure-constants";
+import { Transforms, Editor, Point, Range, Element, Node } from 'slate';
+import { CODE_BLOCK, CODE_LINE, PARAGRAPH } from 'editure-constants';
 
-import { isBlockActive, toggleBlock } from "../helpers";
-import { getLineText } from "../utils";
+import { isBlockActive, toggleBlock } from '../helpers';
+import { getLineText } from '../utils';
 
-export default function withCodeBlock(editor) {
+export default function withCodeBlock(editor: Editor) {
   const { deleteBackward, normalizeNode } = editor;
 
   editor.deleteBackward = (...args) => {
@@ -24,20 +24,26 @@ export default function withCodeBlock(editor) {
           Point.equals(selection.anchor, start) &&
           isBlockActive(editor, CODE_LINE)
         ) {
-          const [node] = Editor.above(editor, {
+          const block = Editor.above(editor, {
             match: n => n.type === CODE_BLOCK
           });
 
-          const { wholeLineText } = getLineText(editor);
-          const { children = [] } = node;
+          if (block) {
+            const [node] = block;
 
-          return Editor.withoutNormalizing(editor, () => {
-            if (children.length === 1 && !wholeLineText) {
-              toggleBlock(editor, CODE_BLOCK, {}, { unwrap: true });
-            } else if (children.length > 1) {
-              Transforms.mergeNodes(editor);
-            }
-          });
+            const { wholeLineText } = getLineText(editor);
+            const { children = [] } = node;
+
+            Editor.withoutNormalizing(editor, () => {
+              if (children.length === 1 && !wholeLineText) {
+                toggleBlock(editor, CODE_BLOCK, {}, { unwrap: true });
+              } else if (children.length > 1) {
+                Transforms.mergeNodes(editor);
+              }
+            });
+          }
+
+          return;
         }
       }
 
