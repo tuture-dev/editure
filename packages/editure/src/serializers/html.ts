@@ -3,9 +3,12 @@ import { Text, Element, Node, Descendant } from 'slate';
 import { jsx } from 'slate-hyperscript';
 import * as F from 'editure-constants';
 
-import { MarkDecorator, BlockConverter } from './types';
+import { MarkDecoratorGroup, BlockConverterGroup } from './types';
 
-const MARK_DECORATORS: { [format: string]: MarkDecorator } = {
+const joinChildren = (node: Element): string =>
+  node.children.map(n => serialize(n)).join('');
+
+let markDecorators: MarkDecoratorGroup = {
   [F.CODE]: node => ({ ...node, text: `<code>${node.text}</code>` }),
   [F.BOLD]: node => ({ ...node, text: `<strong>${node.text}</strong>` }),
   [F.ITALIC]: node => ({ ...node, text: `<em>${node.text}</em>` }),
@@ -20,10 +23,7 @@ const MARK_DECORATORS: { [format: string]: MarkDecorator } = {
   })
 };
 
-const joinChildren = (node: Element): string =>
-  node.children.map(n => serialize(n)).join('');
-
-const BLOCK_CONVERTERS: { [format: string]: BlockConverter } = {
+let blockConverters: BlockConverterGroup = {
   [F.H1]: node => `<h1>${joinChildren(node)}</h1>`,
   [F.H2]: node => `<h2>${joinChildren(node)}</h2>`,
   [F.H3]: node => `<h3>${joinChildren(node)}</h3>`,
@@ -87,10 +87,10 @@ const TEXT_TAGS = {
 
 const serialize = (node: Node) => {
   if (Text.isText(node)) {
-    const markedNode = Object.keys(MARK_DECORATORS).reduce(
+    const markedNode = Object.keys(markDecorators).reduce(
       (decoratedNode, currentMark) => {
         return node[currentMark]
-          ? MARK_DECORATORS[currentMark](decoratedNode)
+          ? markDecorators[currentMark](decoratedNode)
           : decoratedNode;
       },
       { ...node, text: escapeHtml(node.text) }
@@ -99,7 +99,7 @@ const serialize = (node: Node) => {
     return markedNode.text;
   }
 
-  const converter = BLOCK_CONVERTERS[node.type];
+  const converter = blockConverters[node.type];
   if (typeof converter === 'function') {
     return converter(node);
   }
@@ -171,7 +171,16 @@ const deserialize = (el: HTMLElement): Descendant[] | Element | string | null =>
   return children;
 };
 
-export const toHtml = serialize;
+export const toHtml = (
+  node: Node,
+  customMarkDecorators?: MarkDecoratorGroup,
+  customBlockConverters?: BlockConverterGroup
+) => {
+  markDecorators = { ...markDecorators, ...customMarkDecorators };
+  blockConverters = { ...blockConverters, ...customBlockConverters };
+
+  return serialize(node);
+};
 
 export const parseHtml = (text: string) => {
   let parsed;

@@ -3,9 +3,12 @@ import MarkdownIt from 'markdown-it';
 import * as F from 'editure-constants';
 
 import { parseHtml } from './html';
-import { MarkDecorator, BlockConverter } from './types';
+import { MarkDecoratorGroup, BlockConverterGroup } from './types';
 
-const MARK_DECORATORS: { [format: string]: MarkDecorator } = {
+const joinChildren = (node: Element, joinChar: string): string =>
+  node.children.map(n => serialize(n)).join(joinChar);
+
+let markDecorators: MarkDecoratorGroup = {
   [F.CODE]: node => ({ ...node, text: `\`${node.text}\`` }),
   [F.BOLD]: node => ({ ...node, text: `**${node.text}**` }),
   [F.ITALIC]: node => ({ ...node, text: `*${node.text}*` }),
@@ -14,10 +17,7 @@ const MARK_DECORATORS: { [format: string]: MarkDecorator } = {
   [F.LINK]: node => ({ ...node, text: `[${node.text}](${node.url})` })
 };
 
-const joinChildren = (node: Element, joinChar: string): string =>
-  node.children.map(n => serialize(n)).join(joinChar);
-
-const BLOCK_CONVERTERS: { [format: string]: BlockConverter } = {
+let blockConverters: BlockConverterGroup = {
   [F.H1]: node => `# ${joinChildren(node, '')}`,
   [F.H2]: node => `## ${joinChildren(node, '')}`,
   [F.H3]: node => `### ${joinChildren(node, '')}`,
@@ -59,10 +59,10 @@ const BLOCK_CONVERTERS: { [format: string]: BlockConverter } = {
 
 const serialize = (node: Node) => {
   if (Text.isText(node)) {
-    const markedNode = Object.keys(MARK_DECORATORS).reduce(
+    const markedNode = Object.keys(markDecorators).reduce(
       (decoratedNode, currentMark) => {
         return node[currentMark]
-          ? MARK_DECORATORS[currentMark](decoratedNode)
+          ? markDecorators[currentMark](decoratedNode)
           : decoratedNode;
       },
       node
@@ -71,7 +71,7 @@ const serialize = (node: Node) => {
     return markedNode.text;
   }
 
-  const converter = BLOCK_CONVERTERS[node.type];
+  const converter = blockConverters[node.type];
   if (typeof converter === 'function') {
     return converter(node);
   }
@@ -81,7 +81,16 @@ const serialize = (node: Node) => {
 
 const md = new MarkdownIt({ linkify: true });
 
-export const toMarkdown = serialize;
+export const toMarkdown = (
+  node: Node,
+  customMarkDecorators?: MarkDecoratorGroup,
+  customBlockConverters?: BlockConverterGroup
+) => {
+  markDecorators = { ...markDecorators, ...customMarkDecorators };
+  blockConverters = { ...blockConverters, ...customBlockConverters };
+
+  return serialize(node);
+};
 
 export const parseMarkdown = (text: string) => {
   return parseHtml(md.render(text).replace(/\n/g, ''));
