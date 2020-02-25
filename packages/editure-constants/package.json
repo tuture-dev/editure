@@ -6,6 +6,7 @@
   "repository": "https://github.com/tuture-dev/editure.git",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
   "files": [
     "dist/"
   ]

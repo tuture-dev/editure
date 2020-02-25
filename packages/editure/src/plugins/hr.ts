@@ -1,6 +1,7 @@
-import { HR } from "editure-constants";
+import { Editor } from 'slate';
+import { HR } from 'editure-constants';
 
-export default function withHr(editor) {
+export default function withHr(editor: Editor) {
   const { isVoid } = editor;
 
   editor.isVoid = element => {

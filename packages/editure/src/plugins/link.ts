@@ -1,9 +1,10 @@
-import isUrl from "is-url";
-import { LINK } from "editure-constants";
+import { Editor } from 'slate';
+import isUrl from 'is-url';
+import { LINK } from 'editure-constants';
 
-import { insertLink } from "../helpers";
+import { insertLink } from '../helpers';
 
-export default function withLinks(editor) {
+export default function withLinks(editor: Editor) {
   const { insertData, insertText, isInline } = editor;
 
   editor.isInline = element => {
@@ -18,8 +19,8 @@ export default function withLinks(editor) {
     }
   };
 
-  editor.insertData = data => {
-    const text = data.getData("text/plain");
+  editor.insertData = (data: DataTransfer) => {
+    const text = data.getData('text/plain');
 
     if (text && isUrl(text)) {
       insertLink(editor, text, text);
