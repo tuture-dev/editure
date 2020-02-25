@@ -7,6 +7,27 @@ import typescript from 'rollup-plugin-typescript2';
 
 export default [
   {
+    input: 'packages/editure-constants/src/index.ts',
+    output: [
+      {
+        file: 'packages/editure-constants/dist/index.esm.js',
+        format: 'esm',
+        sourcemap: true
+      },
+      {
+        file: 'packages/editure-constants/dist/index.js',
+        format: 'cjs',
+        exports: 'named',
+        sourcemap: true
+      }
+    ],
+    plugins: [
+      typescript({
+        tsconfig: 'packages/editure-constants/tsconfig.json'
+      })
+    ]
+  },
+  {
     input: 'packages/editure/src/index.ts',
     output: [
       {
@@ -29,27 +50,6 @@ export default [
       })
     ],
     external: id => !id.startsWith('.') && !id.startsWith('/')
-  },
-  {
-    input: 'packages/editure-constants/src/index.ts',
-    output: [
-      {
-        file: 'packages/editure-constants/dist/index.esm.js',
-        format: 'esm',
-        sourcemap: true
-      },
-      {
-        file: 'packages/editure-constants/dist/index.js',
-        format: 'cjs',
-        exports: 'named',
-        sourcemap: true
-      }
-    ],
-    plugins: [
-      typescript({
-        tsconfig: 'packages/editure-constants/tsconfig.json'
-      })
-    ]
   },
   {
     input: 'packages/editure-react/src/index.js',
