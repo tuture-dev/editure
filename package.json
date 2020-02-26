@@ -5,7 +5,8 @@
   "scripts": {
     "test": "jest",
     "bootstrap": "lerna bootstrap",
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "release": "rollup -c && lerna publish"
   },
   "devDependencies": {
     "@babel/core": "7.7.4",
