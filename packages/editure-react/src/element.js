@@ -1,13 +1,13 @@
-import React, { useState } from "react";
-import { css, cx } from "emotion";
-import { updateBlock } from "editure";
-import * as F from "editure-constants";
-import { useSlate, useSelected, useFocused } from "slate-react";
+import React, { useState } from 'react';
+import { css, cx } from 'emotion';
+import { updateBlock } from 'editure';
+import * as F from 'editure-constants';
+import { useSlate, useSelected, useFocused } from 'slate-react';
 
-import { languages, enumPrismLangToLanguage } from "./utils/code";
-import { palette, icons, levels } from "./utils/note";
+import { languages, enumPrismLangToLanguage } from './utils/code';
+import { palette, icons, levels } from './utils/note';
 
-const bulletedListStyleType = ["disc", "circle", "square"];
+const bulletedListStyleType = ['disc', 'circle', 'square'];
 
 const ListItemElement = props => {
   const { attributes, children, element } = props;
@@ -37,7 +37,7 @@ const ListItemElement = props => {
 
 const CodeBlockElement = props => {
   const { element } = props;
-  const { lang: defaultLang = "Plain Text" } = element;
+  const { lang: defaultLang = 'Plain Text' } = element;
 
   const [lang, setLang] = useState(defaultLang);
   const editor = useSlate();
@@ -85,7 +85,7 @@ const HrElement = ({ attributes, children }) => {
       {...attributes}
       className={css`
         border-bottom: 2px solid #ddd;
-        box-shadow: ${selected && focused ? "0 0 0 3px #B4D5FF" : "none"};
+        box-shadow: ${selected && focused ? '0 0 0 3px #B4D5FF' : 'none'};
       `}>
       {children}
     </div>
@@ -109,7 +109,7 @@ const ImageElement = props => {
             margin-right: auto;
             max-width: 100%;
             max-height: 20em;
-            box-shadow: ${selected && focused ? "0 0 0 3px #B4D5FF" : "none"};
+            box-shadow: ${selected && focused ? '0 0 0 3px #B4D5FF' : 'none'};
           `}
         />
       </div>
@@ -120,9 +120,9 @@ const ImageElement = props => {
 
 const NoteElement = props => {
   const { attributes, children, element } = props;
-  const { level: defaultLevel = "default" } = element;
+  const { level: defaultLevel = 'default' } = element;
 
-  const realLevel = levels.includes(defaultLevel) ? defaultLevel : "default";
+  const realLevel = levels.includes(defaultLevel) ? defaultLevel : 'default';
 
   const [level, setLevel] = useState(realLevel);
   const editor = useSlate();
@@ -143,7 +143,7 @@ const NoteElement = props => {
     border-left-width: 5px;
     border-radius: 0px;
     &::before {
-      font-family: "FontAwesome";
+      font-family: 'FontAwesome';
       font-size: larger;
       left: 15px;
       position: absolute;
@@ -155,8 +155,8 @@ const NoteElement = props => {
     background-color: ${palette[level].background};
   `;
   const iconStyle =
-    level === "default"
-      ? ""
+    level === 'default'
+      ? ''
       : css`
     &::before {
       content: "${icons[level].content}";

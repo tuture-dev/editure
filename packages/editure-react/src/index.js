@@ -1,18 +1,17 @@
-import React, { useMemo, useCallback, useReducer } from "react";
-import { createEditor } from "slate";
-import { Slate, Editable, withReact } from "slate-react";
-import { withHistory } from "slate-history";
-import { updateLastSelection, defaultPlugins } from "editure";
+import React, { useMemo, useCallback, useReducer } from 'react';
+import { createEditor } from 'slate';
+import { Slate, Editable, withReact } from 'slate-react';
+import { withHistory } from 'slate-history';
+import { updateLastSelection, defaultPlugins } from 'editure';
 
-import Leaf from "./leaf";
-import Element from "./element";
-import createHotKeysHandler from "./hotkeys";
-import { Toolbar, EditLink, HoverLink } from "./components";
-import { createDropListener, withImages } from "./utils/image";
-import { linkReducer } from "./utils/link";
+import Leaf from './leaf';
+import Element from './element';
+import createHotKeysHandler from './hotkeys';
+import { Toolbar, EditLink, HoverLink } from './components';
+import { createDropListener, withImages } from './utils/image';
+import { linkReducer } from './utils/link';
 
-import "./index.css";
-import "material-icons/iconfont/material-icons.css";
+import 'material-icons/iconfont/material-icons.css';
 
 const plugins = [withReact, withHistory, withImages, ...defaultPlugins];
 
@@ -35,8 +34,8 @@ const Editure = ({ value, onChange, placeholder, readOnly = false }) => {
 
   const [linkStatus, linkDispatch] = useReducer(linkReducer, {
     isEditing: false,
-    text: "",
-    url: ""
+    text: '',
+    url: ''
   });
 
   updateLastSelection(editor.selection);
@@ -53,7 +52,7 @@ const Editure = ({ value, onChange, placeholder, readOnly = false }) => {
         renderLeaf={renderLeaf}
         onKeyDown={hotKeyHandler}
         onCopy={e => {
-          e.clipboardData.setData("application/x-editure-fragment", true);
+          e.clipboardData.setData('application/x-editure-fragment', true);
         }}
         onDrop={createDropListener(editor)}
         autoFocus
