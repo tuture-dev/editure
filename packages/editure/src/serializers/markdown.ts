@@ -36,18 +36,17 @@ let blockConverters: BlockConverterGroup = {
       .split('\n')
       .map(line => (line ? `> ${line}` : '>'))
       .join('\n'),
+  [F.LIST_ITEM]: node => joinChildren(node, ''),
   [F.BULLETED_LIST]: node => {
     const { children, level = 0 } = node;
     return children
-      .map(item => `${' '.repeat(level * 2)}- ${item.children[0].text}`)
+      .map(item => `${' '.repeat(level * 2)}- ${serialize(item)}`)
       .join('\n');
   },
   [F.NUMBERED_LIST]: node => {
     const { children, level = 0 } = node;
     return children
-      .map(
-        (item, index) => `${' '.repeat(level * 2)}${index + 1}. ${item.children[0].text}`
-      )
+      .map((item, index) => `${' '.repeat(level * 2)}${index + 1}. ${serialize(item)}`)
       .join('\n');
   },
   [F.CODE_BLOCK]: node => {
@@ -83,8 +82,8 @@ const md = new MarkdownIt({ linkify: true });
 
 export const toMarkdown = (
   node: Node,
-  customMarkDecorators?: MarkDecoratorGroup,
-  customBlockConverters?: BlockConverterGroup
+  customMarkDecorators?: MarkDecoratorGroup | null,
+  customBlockConverters?: BlockConverterGroup | null
 ) => {
   markDecorators = { ...markDecorators, ...customMarkDecorators };
   blockConverters = { ...blockConverters, ...customBlockConverters };

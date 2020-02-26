@@ -34,14 +34,15 @@ let blockConverters: BlockConverterGroup = {
   [F.HR]: () => '<hr />',
   [F.BLOCK_QUOTE]: node => `<blockquote>${joinChildren(node)}</blockquote>`,
   [F.NOTE]: node => `<blockquote>${joinChildren(node)}</blockquote>`,
+  [F.LIST_ITEM]: node => joinChildren(node),
   [F.BULLETED_LIST]: node => {
     const { children } = node;
-    const items = children.map(item => `<li>${item.children[0].text}</li>`);
+    const items = children.map(item => `<li>${serialize(item)}</li>`);
     return `<ul>${items.join('')}</ul>`;
   },
   [F.NUMBERED_LIST]: node => {
     const { children } = node;
-    const items = children.map(item => `<li>${item.children[0].text}</li>`);
+    const items = children.map(item => `<li>${serialize(item)}</li>`);
     return `<ol>${items.join('')}</ol>`;
   },
   [F.CODE_BLOCK]: node => {
