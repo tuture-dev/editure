@@ -13,8 +13,12 @@ export const MARK_TYPES = [
 ];
 
 export const isMarkActive = (editor: Editor, format: string) => {
-  const marks = Editor.marks(editor);
-  return marks ? marks[format] === true : false;
+  try {
+    const marks = Editor.marks(editor);
+    return marks ? marks[format] === true : false;
+  } catch {
+    return false;
+  }
 };
 
 export const detectMarkFormat = (editor: Editor, marks = MARK_TYPES) => {

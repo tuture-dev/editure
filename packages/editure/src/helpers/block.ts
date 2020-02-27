@@ -111,11 +111,14 @@ const exitBlock = (editor: Editor, format: string) => {
 };
 
 export const isBlockActive = (editor: Editor, format: string) => {
-  const [match] = Editor.nodes(editor, {
-    match: n => n.type === format
-  });
-
-  return !!match;
+  try {
+    const [match] = Editor.nodes(editor, {
+      match: n => n.type === format
+    });
+    return !!match;
+  } catch {
+    return false;
+  }
 };
 
 export const detectBlockFormat = (editor: Editor, formats = BLOCK_TYPES) => {
