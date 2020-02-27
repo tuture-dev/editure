@@ -1,5 +1,5 @@
 import { Range, Editor, Transforms, Point } from 'slate';
-import F from 'editure-constants';
+import * as F from 'editure-constants';
 
 import {
   toggleMark,

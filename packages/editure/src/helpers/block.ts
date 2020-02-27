@@ -1,6 +1,6 @@
 import { Editor, Transforms } from 'slate';
 import shortid from 'shortid';
-import F from 'editure-constants';
+import * as F from 'editure-constants';
 
 const LIST_TYPES = [F.NUMBERED_LIST, F.BULLETED_LIST];
 
