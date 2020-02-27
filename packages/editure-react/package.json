@@ -1,7 +1,7 @@
 {
   "name": "editure-react",
   "description": "The React component for editure.",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "license": "MIT",
   "repository": "https://github.com/tuture-dev/editure.git",
   "main": "dist/index.js",
@@ -10,7 +10,7 @@
     "dist/"
   ],
   "dependencies": {
-    "editure": "^0.0.12",
+    "editure": "^0.0.13",
     "emotion": "^10.0.27",
     "escape-html": "^1.0.3",
     "is-hotkey": "^0.1.6",
