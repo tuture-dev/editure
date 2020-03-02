@@ -1,4 +1,4 @@
-import { Transforms, Editor, Element, Node } from 'slate';
+import { Transforms, Editor, Node } from 'slate';
 import { LINK, IMAGE, CODE_BLOCK, CODE_LINE } from 'editure-constants';
 import { parseHtml, parseMarkdown } from '../serializers';
 
@@ -105,25 +105,7 @@ export default function withPaste(editor: Editor) {
         return;
       }
 
-      const { focus } = selection;
-
       Transforms.insertNodes(editor, fragment);
-
-      const nodeLen = fragment
-        .map(node => Number(Editor.isBlock(editor, node)))
-        .reduce((a, b) => a + b, 0);
-
-      Transforms.select(editor, Editor.end(editor, [focus.path[0] + nodeLen]));
-
-      const numOfElements = fragment
-        .map(node => Number(Element.isElement(node)))
-        .reduce((a, b) => a + b, 0);
-
-      // If nodes to be inserted have at least one element and the line being pasted is empty,
-      // delete this empty line.
-      if (numOfElements >= 1 && !beforeText && selection) {
-        Transforms.removeNodes(editor, { at: selection });
-      }
 
       return;
     }
