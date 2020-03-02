@@ -114,7 +114,7 @@ const deserialize = (el: HTMLElement): Descendant[] | Element | string | null =>
   } else if (el.nodeType !== 1) {
     return null;
   } else if (el.nodeName === 'BR') {
-    return jsx('element', { type: F.PARAGRAPH }, [{ text: '' }]);
+    return '\n';
   }
 
   const { nodeName } = el;

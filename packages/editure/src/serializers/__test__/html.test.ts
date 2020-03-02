@@ -503,8 +503,8 @@ describe('html deserialization', () => {
     });
 
     test('br', () => {
-      const html = '<br />';
-      const fragment = [{ type: PARAGRAPH, children: [{ text: '' }] }];
+      const html = '<p>foo<br />bar</p>';
+      const fragment = [{ type: PARAGRAPH, children: [{ text: 'foo\nbar' }] }];
       expect(parseHtml(html)).toStrictEqual(fragment);
     });
 
@@ -644,15 +644,15 @@ describe('html deserialization', () => {
 
     test('sequential blocks', () => {
       const html =
-        "<h1>title</h1><p>paragraph1</p><br /><blockquote><p>blockquote</p></blockquote><pre><code>const a = 1;</code><code>console.log('hello');</code></pre>";
+        "<h1>title</h1><p>paragraph1</p><blockquote><p>blockquote</p></blockquote><p>paragraph2</p><pre><code>const a = 1;</code><code>console.log('hello');</code></pre>";
       const fragment = [
         { type: H1, children: [{ text: 'title' }] },
         { type: PARAGRAPH, children: [{ text: 'paragraph1' }] },
-        { type: PARAGRAPH, children: [{ text: '' }] },
         {
           type: BLOCK_QUOTE,
           children: [{ type: PARAGRAPH, children: [{ text: 'blockquote' }] }]
         },
+        { type: PARAGRAPH, children: [{ text: 'paragraph2' }] },
         {
           type: CODE_BLOCK,
           children: [
