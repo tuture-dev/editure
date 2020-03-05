@@ -171,7 +171,6 @@ function handleMarkShortcut(editor: Editor, shortcut: Shortcut) {
     edge: 'end'
   });
 
-  // 插入空格后，取消 mark 样式
   // Remove marks after inserting spaces.
   insertText(' ');
   const { focus } = editor.selection;
@@ -199,8 +198,6 @@ function handleBlockShortcut(editor: Editor, shortcut: Shortcut) {
     } else if (format === F.NOTE) {
       nodeProp = { ...nodeProp, level: matchArr[1] };
     }
-
-    Transforms.insertNodes(editor, { type: F.PARAGRAPH, children: [{ text: '' }] });
 
     if (editor.selection) {
       Transforms.setSelection(editor, editor.selection);
