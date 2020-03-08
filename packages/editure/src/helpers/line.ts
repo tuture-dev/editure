@@ -1,4 +1,4 @@
-import { Editor, Transforms } from 'slate';
+import { Editor, Transforms } from 'tuture-slate';
 import { getBeforeText } from '../utils';
 
 export const deleteLine = (editor: Editor) => {

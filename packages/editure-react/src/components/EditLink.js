@@ -1,26 +1,26 @@
-import React, { useRef } from "react";
-import Modal from "react-modal";
-import { useSlate } from "slate-react";
-import { css } from "emotion";
-import { isMarkActive, insertLink, updateLink, selectLastPoint } from "editure";
-import { LINK } from "editure-constants";
+import React, { useRef } from 'react';
+import Modal from 'react-modal';
+import { useSlate } from 'tuture-slate-react';
+import { css } from 'emotion';
+import { isMarkActive, insertLink, updateLink, selectLastPoint } from 'editure';
+import { LINK } from 'editure-constants';
 
 import {
   updateLinkText,
   updateLinkUrl,
   finishEditLink,
   cancelEditLink
-} from "../utils/link";
+} from '../utils/link';
 
 const customStyles = {
   content: {
-    width: "400px",
-    top: "50%",
-    left: "50%",
-    right: "auto",
-    bottom: "auto",
-    marginRight: "-50%",
-    transform: "translate(-50%, -50%)"
+    width: '400px',
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)'
   }
 };
 
@@ -112,7 +112,7 @@ const EditLink = ({ link, dispatch }) => {
             display: inline-block;
             width: 32px;
           `}>
-          {" "}
+          {' '}
         </span>
         <button
           className={css`

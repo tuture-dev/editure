@@ -1,4 +1,4 @@
-import { Transforms, Editor } from 'slate';
+import { Transforms, Editor } from 'tuture-slate';
 import { LINK } from 'editure-constants';
 
 import { toggleMark } from './mark';

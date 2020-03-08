@@ -1,4 +1,4 @@
-import { Node, Element, Text } from 'slate';
+import { Node, Element, Text } from 'tuture-slate';
 import MarkdownIt from 'markdown-it';
 import * as F from 'editure-constants';
 

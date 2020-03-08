@@ -1,4 +1,4 @@
-import { Editor, Transforms } from 'slate';
+import { Editor, Transforms } from 'tuture-slate';
 import shortid from 'shortid';
 import * as F from 'editure-constants';
 

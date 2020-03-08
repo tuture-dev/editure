@@ -1,4 +1,4 @@
-import { Transforms, Editor, Point, Range, Element, Node } from 'slate';
+import { Transforms, Editor, Point, Range, Element, Node } from 'tuture-slate';
 import { CODE_BLOCK, CODE_LINE, PARAGRAPH } from 'editure-constants';
 
 import { isBlockActive, toggleBlock } from '../helpers';

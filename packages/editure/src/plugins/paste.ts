@@ -1,4 +1,4 @@
-import { Transforms, Editor, Node } from 'slate';
+import { Transforms, Editor, Node } from 'tuture-slate';
 import { LINK, IMAGE, CODE_BLOCK, CODE_LINE } from 'editure-constants';
 import { parseHtml, parseMarkdown } from '../serializers';
 

@@ -1,4 +1,4 @@
-import { Transforms, Editor } from 'slate';
+import { Transforms, Editor } from 'tuture-slate';
 import { LIST_ITEM } from 'editure-constants';
 
 export const increaseItemDepth = (editor: Editor) => {

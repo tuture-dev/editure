@@ -1,4 +1,4 @@
-import { Editor } from 'slate';
+import { Editor } from 'tuture-slate';
 import {
   BLOCK_QUOTE,
   CODE_BLOCK,

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { css, cx } from 'emotion';
 import { updateBlock } from 'editure';
 import * as F from 'editure-constants';
-import { useSlate, useSelected, useFocused } from 'slate-react';
+import { useSlate, useSelected, useFocused } from 'tuture-slate-react';
 
 import { languages, enumPrismLangToLanguage } from './utils/code';
 import { palette, icons, levels } from './utils/note';

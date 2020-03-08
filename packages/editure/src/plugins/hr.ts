@@ -1,4 +1,4 @@
-import { Editor } from 'slate';
+import { Editor } from 'tuture-slate';
 import { HR } from 'editure-constants';
 
 export default function withHr(editor: Editor) {

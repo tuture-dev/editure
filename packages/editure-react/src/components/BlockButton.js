@@ -1,11 +1,11 @@
-import React from "react";
-import { useSlate } from "slate-react";
-import { isBlockActive, toggleBlock } from "editure";
+import React from 'react';
+import { useSlate } from 'tuture-slate-react';
+import { isBlockActive, toggleBlock } from 'editure';
 
-import Icon from "./Icon";
-import Button from "./Button";
+import Icon from './Icon';
+import Button from './Button';
 
-const BlockButton = ({ format = "", title, icon }) => {
+const BlockButton = ({ format = '', title, icon }) => {
   const editor = useSlate();
 
   return (

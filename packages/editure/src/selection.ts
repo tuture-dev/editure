@@ -1,4 +1,4 @@
-import { Editor, Range, Transforms, Location } from 'slate';
+import { Editor, Range, Transforms, Location } from 'tuture-slate';
 
 type Selection = Range | null;
 
