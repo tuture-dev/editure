@@ -16,6 +16,15 @@ function inputText(editor: Editor, text: string) {
     } else {
       editor.insertText(c);
     }
+
+    Editor.normalize(editor);
+  });
+}
+
+function deleteNTimes(editor: Editor, times: number) {
+  [...Array(times)].forEach(() => {
+    editor.deleteBackward('character');
+    Editor.normalize(editor);
   });
 }
 
@@ -362,6 +371,104 @@ describe('shortcuts plugin', () => {
       const nodes = [
         { type: F.HR, children: [{ text: '' }] },
         { type: F.PARAGRAPH, children: [{ text: '' }] }
+      ];
+
+      expect(editor.children).toStrictEqual(nodes);
+      expect(editor.selection!.anchor).toStrictEqual(editor.selection!.focus);
+    });
+  });
+
+  describe('deleteBackward', () => {
+    const editor = withShortcuts(createEditor());
+    reset(editor);
+
+    afterEach(() => {
+      reset(editor);
+    });
+
+    test('delete regular text', () => {
+      editor.children = [{ type: F.PARAGRAPH, children: [{ text: 'foo bar' }] }];
+
+      const point = { path: [0, 0], offset: 7 };
+      Transforms.select(editor, point);
+      deleteNTimes(editor, 4);
+
+      const nodes = [{ type: F.PARAGRAPH, children: [{ text: 'foo' }] }];
+
+      expect(editor.children).toStrictEqual(nodes);
+    });
+
+    test('delete bold mark', () => {
+      editor.children = [{ type: F.PARAGRAPH, children: [{ text: 'foo', bold: true }] }];
+
+      const point = { path: [0, 0], offset: 3 };
+      Transforms.select(editor, point);
+
+      // Text should be deleted but bold mark is still there.
+      deleteNTimes(editor, 3);
+      expect(editor.children).toStrictEqual([
+        { type: F.PARAGRAPH, children: [{ text: '', bold: true }] }
+      ]);
+
+      // Both text and bold mark are gone.
+      deleteNTimes(editor, 1);
+      expect(editor.children).toStrictEqual([
+        { type: F.PARAGRAPH, children: [{ text: '' }] }
+      ]);
+    });
+
+    test('delete code mark', () => {
+      editor.children = [{ type: F.PARAGRAPH, children: [{ text: 'foo', code: true }] }];
+
+      const point = { path: [0, 0], offset: 3 };
+      Transforms.select(editor, point);
+
+      deleteNTimes(editor, 3);
+      expect(editor.children).toStrictEqual([
+        { type: F.PARAGRAPH, children: [{ text: '', code: true }] }
+      ]);
+
+      deleteNTimes(editor, 1);
+      expect(editor.children).toStrictEqual([
+        { type: F.PARAGRAPH, children: [{ text: '' }] }
+      ]);
+    });
+  });
+
+  describe('deleteFragment', () => {
+    const editor = withShortcuts(createEditor());
+    reset(editor);
+
+    afterEach(() => {
+      reset(editor);
+    });
+
+    test('bulleted list', () => {
+      editor.children = [
+        {
+          type: F.BULLETED_LIST,
+          children: [
+            {
+              type: F.LIST_ITEM,
+              parent: F.BULLETED_LIST,
+              children: [{ text: 'foo bar' }]
+            }
+          ]
+        }
+      ];
+
+      const path = [0, 0, 0];
+      const selection = { anchor: { path, offset: 3 }, focus: { path, offset: 7 } };
+      Transforms.select(editor, selection);
+      Editor.deleteFragment(editor);
+
+      const nodes = [
+        {
+          type: F.BULLETED_LIST,
+          children: [
+            { type: F.LIST_ITEM, parent: F.BULLETED_LIST, children: [{ text: 'foo' }] }
+          ]
+        }
       ];
 
       expect(editor.children).toStrictEqual(nodes);

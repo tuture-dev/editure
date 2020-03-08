@@ -334,23 +334,6 @@ export default function withShortcuts(editor: Editor) {
       return;
     }
 
-    const match = Editor.above(editor, {
-      match: n => n.type === F.LIST_ITEM
-    });
-
-    // If it's list item, transform it into a paragraph.
-    if (match) {
-      Transforms.setNodes(
-        editor,
-        {
-          type: F.PARAGRAPH
-        },
-        {
-          match: n => n.type === F.LIST_ITEM
-        }
-      );
-    }
-
     let res = selection.focus.path[0] === children.length - 1;
 
     // Detect is deleting all within BLOCK_QUOTE | CODE_BLOCK | NOTE
