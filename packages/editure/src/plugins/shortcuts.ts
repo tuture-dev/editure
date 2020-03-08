@@ -171,19 +171,9 @@ function handleMarkShortcut(editor: Editor, shortcut: Shortcut) {
     edge: 'end'
   });
 
-  // 插入空格后，取消 mark 样式
-  // Remove marks after inserting spaces.
-  insertText(' ');
-  const { focus } = editor.selection;
-  Transforms.select(editor, {
-    anchor: { path: focus.path, offset: focus.offset - 1 },
-    focus
-  });
+  // Remove marks and insert the space.
   toggleMark(editor, format);
-
-  Transforms.collapse(editor, {
-    edge: 'end'
-  });
+  insertText(' ');
 }
 
 function handleBlockShortcut(editor: Editor, shortcut: Shortcut) {
@@ -200,8 +190,6 @@ function handleBlockShortcut(editor: Editor, shortcut: Shortcut) {
       nodeProp = { ...nodeProp, level: matchArr[1] };
     }
 
-    Transforms.insertNodes(editor, { type: F.PARAGRAPH, children: [{ text: '' }] });
-
     if (editor.selection) {
       Transforms.setSelection(editor, editor.selection);
     }
@@ -217,7 +205,7 @@ function handleBlockShortcut(editor: Editor, shortcut: Shortcut) {
       match: n => n.children && !n.children[0].text
     });
     Transforms.insertNodes(editor, { type: F.HR, children: [text] });
-    Transforms.insertNodes(editor, { children: [text] });
+    Transforms.insertNodes(editor, { type: F.PARAGRAPH, children: [text] });
   } else {
     toggleBlock(editor, format, nodeProp);
   }
@@ -344,23 +332,6 @@ export default function withShortcuts(editor: Editor) {
 
     if (!selection) {
       return;
-    }
-
-    const match = Editor.above(editor, {
-      match: n => n.type === F.LIST_ITEM
-    });
-
-    // If it's list item, transform it into a paragraph.
-    if (match) {
-      Transforms.setNodes(
-        editor,
-        {
-          type: F.PARAGRAPH
-        },
-        {
-          match: n => n.type === F.LIST_ITEM
-        }
-      );
     }
 
     let res = selection.focus.path[0] === children.length - 1;
