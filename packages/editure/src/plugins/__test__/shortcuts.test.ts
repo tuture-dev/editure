@@ -20,12 +20,227 @@ function inputText(editor: Editor, text: string) {
 }
 
 describe('shortcuts plugin', () => {
+  describe('mark shortcuts', () => {
+    const editor = withShortcuts(createEditor());
+    reset(editor);
+
+    afterEach(() => {
+      reset(editor);
+    });
+
+    test('regular text', () => {
+      inputText(editor, 'foo* bar` _baz');
+
+      const nodes = [{ type: F.PARAGRAPH, children: [{ text: 'foo* bar` _baz' }] }];
+
+      expect(editor.children).toStrictEqual(nodes);
+
+      // Make sure the selection is collapsed.
+      expect(editor.selection!.anchor).toStrictEqual(editor.selection!.focus);
+
+      // Make sure the current marks is correct.
+      expect(editor.marks).toBe(null);
+    });
+
+    test('bold (syntax 1)', () => {
+      inputText(editor, '**bold** ');
+
+      const nodes = [
+        { type: F.PARAGRAPH, children: [{ text: 'bold', bold: true }, { text: ' ' }] }
+      ];
+
+      expect(editor.children).toStrictEqual(nodes);
+      expect(editor.selection!.anchor).toStrictEqual(editor.selection!.focus);
+      expect(editor.marks).toBe(null);
+    });
+
+    test('bold (syntax 2)', () => {
+      inputText(editor, '__bold__ ');
+
+      const nodes = [
+        { type: F.PARAGRAPH, children: [{ text: 'bold', bold: true }, { text: ' ' }] }
+      ];
+
+      expect(editor.children).toStrictEqual(nodes);
+      expect(editor.selection!.anchor).toStrictEqual(editor.selection!.focus);
+      expect(editor.marks).toBe(null);
+    });
+
+    test('italic (syntax 1)', () => {
+      inputText(editor, '*italic* ');
+
+      const nodes = [
+        { type: F.PARAGRAPH, children: [{ text: 'italic', italic: true }, { text: ' ' }] }
+      ];
+
+      expect(editor.children).toStrictEqual(nodes);
+      expect(editor.selection!.anchor).toStrictEqual(editor.selection!.focus);
+      expect(editor.marks).toBe(null);
+    });
+
+    test('italic (syntax 2)', () => {
+      inputText(editor, '_italic_ ');
+
+      const nodes = [
+        { type: F.PARAGRAPH, children: [{ text: 'italic', italic: true }, { text: ' ' }] }
+      ];
+
+      expect(editor.children).toStrictEqual(nodes);
+      expect(editor.selection!.anchor).toStrictEqual(editor.selection!.focus);
+      expect(editor.marks).toBe(null);
+    });
+
+    test('inline code', () => {
+      inputText(editor, '`code` ');
+
+      const nodes = [
+        { type: F.PARAGRAPH, children: [{ text: 'code', code: true }, { text: ' ' }] }
+      ];
+
+      expect(editor.children).toStrictEqual(nodes);
+      expect(editor.selection!.anchor).toStrictEqual(editor.selection!.focus);
+      expect(editor.marks).toBe(null);
+    });
+
+    test('strikethrough', () => {
+      inputText(editor, '~~strike~~ ');
+
+      const nodes = [
+        {
+          type: F.PARAGRAPH,
+          children: [{ text: 'strike', strikethrough: true }, { text: ' ' }]
+        }
+      ];
+
+      expect(editor.children).toStrictEqual(nodes);
+      expect(editor.selection!.anchor).toStrictEqual(editor.selection!.focus);
+      expect(editor.marks).toBe(null);
+    });
+
+    test('link', () => {
+      inputText(editor, '[Test](https://test.com) ');
+
+      const nodes = [
+        {
+          type: F.PARAGRAPH,
+          children: [{ text: 'Test', link: true, url: 'https://test.com' }, { text: ' ' }]
+        }
+      ];
+
+      // TODO: Remove `url` attribute right after the link leaf
+      //  and change `toMatchObject` to `toStrictEqual`.
+      expect(editor.children).toMatchObject(nodes);
+
+      expect(editor.selection!.anchor).toStrictEqual(editor.selection!.focus);
+      expect(editor.marks).toBe(null);
+    });
+
+    test('sequential marks', () => {
+      inputText(editor, 'This is **bold** and *italic* and `code` ');
+
+      const nodes = [
+        {
+          type: F.PARAGRAPH,
+          children: [
+            { text: 'This is ' },
+            { text: 'bold', bold: true },
+            { text: ' and ' },
+            { text: 'italic', italic: true },
+            { text: ' and ' },
+            { text: 'code', code: true },
+            { text: ' ' }
+          ]
+        }
+      ];
+
+      expect(editor.children).toStrictEqual(nodes);
+      expect(editor.selection!.anchor).toStrictEqual(editor.selection!.focus);
+      expect(editor.marks).toBe(null);
+    });
+  });
+
   describe('block shortcuts', () => {
     const editor = withShortcuts(createEditor());
     reset(editor);
 
     afterEach(() => {
       reset(editor);
+    });
+
+    test('h1', () => {
+      inputText(editor, '# test\n');
+
+      const nodes = [
+        {
+          type: F.H1,
+          children: [{ text: 'test' }]
+        },
+        {
+          type: F.PARAGRAPH,
+          children: [{ text: '' }]
+        }
+      ];
+
+      expect(editor.children[0].id).toBeTruthy();
+      expect(editor.children).toMatchObject(nodes);
+      expect(editor.selection!.anchor).toStrictEqual(editor.selection!.focus);
+    });
+
+    test('h2', () => {
+      inputText(editor, '## test\n');
+
+      const nodes = [
+        {
+          type: F.H2,
+          children: [{ text: 'test' }]
+        },
+        {
+          type: F.PARAGRAPH,
+          children: [{ text: '' }]
+        }
+      ];
+
+      expect(editor.children[0].id).toBeTruthy();
+      expect(editor.children).toMatchObject(nodes);
+      expect(editor.selection!.anchor).toStrictEqual(editor.selection!.focus);
+    });
+
+    test('h3', () => {
+      inputText(editor, '### test\n');
+
+      const nodes = [
+        {
+          type: F.H3,
+          children: [{ text: 'test' }]
+        },
+        {
+          type: F.PARAGRAPH,
+          children: [{ text: '' }]
+        }
+      ];
+
+      expect(editor.children[0].id).toBeTruthy();
+      expect(editor.children).toMatchObject(nodes);
+      expect(editor.selection!.anchor).toStrictEqual(editor.selection!.focus);
+    });
+
+    test('h4', () => {
+      inputText(editor, '#### test\n');
+
+      const nodes = [
+        {
+          type: F.H4,
+          children: [{ text: 'test' }]
+        },
+        {
+          type: F.PARAGRAPH,
+          children: [{ text: '' }]
+        }
+      ];
+
+      expect(editor.children[0].id).toBeTruthy();
+      expect(editor.children).toMatchObject(nodes);
+      expect(editor.selection!.anchor).toStrictEqual(editor.selection!.focus);
     });
 
     test('blockquote', () => {
@@ -39,20 +254,25 @@ describe('shortcuts plugin', () => {
       ];
 
       expect(editor.children).toStrictEqual(nodes);
+      expect(editor.selection!.anchor).toStrictEqual(editor.selection!.focus);
     });
 
     test('code block', () => {
-      inputText(editor, '```\ntest');
+      inputText(editor, '```\nfoo bar\nbaz');
 
       const nodes = [
         {
           type: F.CODE_BLOCK,
           lang: '',
-          children: [{ type: F.CODE_LINE, children: [{ text: 'test' }] }]
+          children: [
+            { type: F.CODE_LINE, children: [{ text: 'foo bar' }] },
+            { type: F.CODE_LINE, children: [{ text: 'baz' }] }
+          ]
         }
       ];
 
       expect(editor.children).toStrictEqual(nodes);
+      expect(editor.selection!.anchor).toStrictEqual(editor.selection!.focus);
     });
 
     test('note block', () => {
@@ -67,6 +287,7 @@ describe('shortcuts plugin', () => {
       ];
 
       expect(editor.children).toStrictEqual(nodes);
+      expect(editor.selection!.anchor).toStrictEqual(editor.selection!.focus);
     });
 
     test('bulleted list', () => {
@@ -87,6 +308,7 @@ describe('shortcuts plugin', () => {
       ];
 
       expect(editor.children).toStrictEqual(nodes);
+      expect(editor.selection!.anchor).toStrictEqual(editor.selection!.focus);
     });
 
     test('numbered list', () => {
@@ -107,6 +329,43 @@ describe('shortcuts plugin', () => {
       ];
 
       expect(editor.children).toStrictEqual(nodes);
+      expect(editor.selection!.anchor).toStrictEqual(editor.selection!.focus);
+    });
+
+    test('hr (syntax 1)', () => {
+      inputText(editor, '---\n');
+
+      const nodes = [
+        { type: F.HR, children: [{ text: '' }] },
+        { type: F.PARAGRAPH, children: [{ text: '' }] }
+      ];
+
+      expect(editor.children).toStrictEqual(nodes);
+      expect(editor.selection!.anchor).toStrictEqual(editor.selection!.focus);
+    });
+
+    test('hr (syntax 2)', () => {
+      inputText(editor, '***\n');
+
+      const nodes = [
+        { type: F.HR, children: [{ text: '' }] },
+        { type: F.PARAGRAPH, children: [{ text: '' }] }
+      ];
+
+      expect(editor.children).toStrictEqual(nodes);
+      expect(editor.selection!.anchor).toStrictEqual(editor.selection!.focus);
+    });
+
+    test('hr (syntax 3)', () => {
+      inputText(editor, '___\n');
+
+      const nodes = [
+        { type: F.HR, children: [{ text: '' }] },
+        { type: F.PARAGRAPH, children: [{ text: '' }] }
+      ];
+
+      expect(editor.children).toStrictEqual(nodes);
+      expect(editor.selection!.anchor).toStrictEqual(editor.selection!.focus);
     });
   });
 });

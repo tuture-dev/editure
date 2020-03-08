@@ -171,18 +171,9 @@ function handleMarkShortcut(editor: Editor, shortcut: Shortcut) {
     edge: 'end'
   });
 
-  // Remove marks after inserting spaces.
-  insertText(' ');
-  const { focus } = editor.selection;
-  Transforms.select(editor, {
-    anchor: { path: focus.path, offset: focus.offset - 1 },
-    focus
-  });
+  // Remove marks and insert the space.
   toggleMark(editor, format);
-
-  Transforms.collapse(editor, {
-    edge: 'end'
-  });
+  insertText(' ');
 }
 
 function handleBlockShortcut(editor: Editor, shortcut: Shortcut) {
@@ -214,7 +205,7 @@ function handleBlockShortcut(editor: Editor, shortcut: Shortcut) {
       match: n => n.children && !n.children[0].text
     });
     Transforms.insertNodes(editor, { type: F.HR, children: [text] });
-    Transforms.insertNodes(editor, { children: [text] });
+    Transforms.insertNodes(editor, { type: F.PARAGRAPH, children: [text] });
   } else {
     toggleBlock(editor, format, nodeProp);
   }
