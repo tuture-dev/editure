@@ -1,4 +1,4 @@
-import { createEditor, Transforms, Editor } from 'slate';
+import { createEditor, Transforms, Editor } from 'tuture-slate';
 import * as F from 'editure-constants';
 
 import withShortcuts from '../shortcuts';
