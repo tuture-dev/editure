@@ -1,6 +1,6 @@
 import escapeHtml from 'escape-html';
-import { Text, Element, Node, Descendant } from 'slate';
-import { jsx } from 'slate-hyperscript';
+import { Text, Element, Node, Descendant } from 'tuture-slate';
+import { jsx } from 'tuture-slate-hyperscript';
 import * as F from 'editure-constants';
 
 import { MarkDecoratorGroup, BlockConverterGroup } from './types';

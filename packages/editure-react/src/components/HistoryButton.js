@@ -1,10 +1,10 @@
-import React from "react";
-import { useSlate } from "slate-react";
+import React from 'react';
+import { useSlate } from 'tuture-slate-react';
 
-import Icon from "./Icon";
-import Button from "./Button";
+import Icon from './Icon';
+import Button from './Button';
 
-const HistoryButton = ({ action = "undo", title, icon }) => {
+const HistoryButton = ({ action = 'undo', title, icon }) => {
   const editor = useSlate();
 
   return (
@@ -14,12 +14,12 @@ const HistoryButton = ({ action = "undo", title, icon }) => {
         event.preventDefault();
 
         switch (action) {
-          case "redo": {
+          case 'redo': {
             editor.redo();
             break;
           }
 
-          case "undo": {
+          case 'undo': {
             editor.undo();
             break;
           }

@@ -36,8 +36,8 @@
     "rollup-plugin-json": "^4.0.0",
     "rollup-plugin-jsx": "^1.0.3",
     "rollup-plugin-typescript2": "^0.26.0",
-    "slate": "^0.57.1",
-    "slate-react": "^0.57.1",
+    "tuture-slate": "^0.57.3",
+    "tuture-slate-react": "^0.57.3",
     "ts-jest": "^25.2.1",
     "tslib": "^1.11.0",
     "typescript": "^3.8.2"

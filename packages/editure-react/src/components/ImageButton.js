@@ -1,10 +1,10 @@
-import React from "react";
-import { useSlate } from "slate-react";
-import { css } from "emotion";
+import React from 'react';
+import { useSlate } from 'tuture-slate-react';
+import { css } from 'emotion';
 
-import Icon from "./Icon";
-import Button from "./Button";
-import { uploadImage, createInsertImageCallback } from "../utils/image";
+import Icon from './Icon';
+import Button from './Button';
+import { uploadImage, createInsertImageCallback } from '../utils/image';
 
 const ImageButton = React.forwardRef((_, ref) => {
   const editor = useSlate();

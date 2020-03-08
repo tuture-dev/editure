@@ -1,12 +1,12 @@
-import React, { useState } from "react";
-import { useSlate } from "slate-react";
-import { css } from "emotion";
-import { toggleBlock } from "editure";
-import { NOTE } from "editure-constants";
+import React, { useState } from 'react';
+import { useSlate } from 'tuture-slate-react';
+import { css } from 'emotion';
+import { toggleBlock } from 'editure';
+import { NOTE } from 'editure-constants';
 
-import Icon from "./Icon";
-import Button from "./Button";
-import { levels } from "../utils/note";
+import Icon from './Icon';
+import Button from './Button';
+import { levels } from '../utils/note';
 
 const NoteButton = () => {
   const editor = useSlate();

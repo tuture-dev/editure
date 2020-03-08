@@ -1,19 +1,19 @@
-import React, { useState, useRef, useEffect } from "react";
-import ReactDOM from "react-dom";
-import { css } from "emotion";
-import { useSlate } from "slate-react";
-import { LINK } from "editure-constants";
-import { isMarkActive, removeLink, getLinkData } from "editure";
+import React, { useState, useRef, useEffect } from 'react';
+import ReactDOM from 'react-dom';
+import { css } from 'emotion';
+import { useSlate } from 'tuture-slate-react';
+import { LINK } from 'editure-constants';
+import { isMarkActive, removeLink, getLinkData } from 'editure';
 
-import Icon from "./Icon";
-import { startEditLink, updateLinkText, updateLinkUrl } from "../utils/link";
+import Icon from './Icon';
+import { startEditLink, updateLinkText, updateLinkUrl } from '../utils/link';
 
 const Portal = ({ children }) => {
   return ReactDOM.createPortal(children, document.body);
 };
 
 const HoverLink = ({ dispatch }) => {
-  const [url, setUrl] = useState("");
+  const [url, setUrl] = useState('');
   const ref = useRef(null);
   const editor = useSlate();
 
@@ -26,7 +26,7 @@ const HoverLink = ({ dispatch }) => {
     }
 
     if (!editor.selection || !isMarkActive(editor, LINK)) {
-      el.removeAttribute("style");
+      el.removeAttribute('style');
       return;
     }
 
@@ -49,7 +49,7 @@ const HoverLink = ({ dispatch }) => {
 
     // 点击编辑，隐藏此组件
     const el = ref.current;
-    el.removeAttribute("style");
+    el.removeAttribute('style');
 
     dispatch(startEditLink());
 

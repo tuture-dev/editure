@@ -1,4 +1,4 @@
-import { Transforms, Editor, Point, Range, Element, Node } from 'slate';
+import { Transforms, Editor, Point, Range, Element, Node } from 'tuture-slate';
 import { LIST_ITEM, BULLETED_LIST, NUMBERED_LIST, PARAGRAPH } from 'editure-constants';
 
 import { isBlockActive, decreaseItemDepth } from '../helpers';

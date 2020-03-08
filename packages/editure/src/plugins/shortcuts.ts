@@ -1,4 +1,4 @@
-import { Range, Editor, Transforms, Point } from 'slate';
+import { Range, Editor, Transforms, Point } from 'tuture-slate';
 import * as F from 'editure-constants';
 
 import {

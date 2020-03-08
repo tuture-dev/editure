@@ -1,4 +1,4 @@
-import { Element, Text } from 'slate';
+import { Element, Text } from 'tuture-slate';
 
 export type MarkDecorator = (node: Text) => Text;
 export type BlockConverter = (node: Element) => string;

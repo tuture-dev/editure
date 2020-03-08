@@ -1,4 +1,4 @@
-import { Editor, Node, Location } from 'slate';
+import { Editor, Node, Location } from 'tuture-slate';
 
 export const getBeforeText = (editor: Editor) => {
   if (!editor.selection) {

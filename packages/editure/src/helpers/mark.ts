@@ -1,4 +1,4 @@
-import { Editor, Transforms, Range } from 'slate';
+import { Editor, Transforms, Range } from 'tuture-slate';
 import * as F from 'editure-constants';
 
 import { isBlockActive } from './block';

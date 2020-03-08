@@ -1,4 +1,4 @@
-import { Editor } from 'slate';
+import { Editor } from 'tuture-slate';
 import isUrl from 'is-url';
 import { LINK } from 'editure-constants';
 

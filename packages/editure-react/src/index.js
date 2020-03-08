@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback, useReducer } from 'react';
-import { createEditor } from 'slate';
-import { Slate, Editable, withReact } from 'slate-react';
-import { withHistory } from 'slate-history';
+import { createEditor } from 'tuture-slate';
+import { Slate, Editable, withReact } from 'tuture-slate-react';
+import { withHistory } from 'tuture-slate-history';
 import { updateLastSelection, defaultPlugins } from 'editure';
 
 import Leaf from './leaf';
