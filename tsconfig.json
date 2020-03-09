@@ -13,5 +13,9 @@
     "strict": true,
     "suppressImplicitAnyIndexErrors": true,
     "target": "esnext"
-  }
+  },
+  "references": [
+    { "path": "./packages/editure" },
+    { "path": "./packages/editure-constants" }
+  ]
 }
