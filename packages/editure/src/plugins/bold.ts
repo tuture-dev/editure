@@ -3,11 +3,6 @@ import { BOLD } from 'editure-constants';
 
 import { detectShortcut, handleMarkShortcut } from '../shortcuts';
 
-export type BoldNode = {
-  bold: true;
-  text: string;
-};
-
 const shortcutRegexes = [/\*\*([^\*]+)\*\*/, /__([^_]+)__/];
 
 export default function withBold(editor: Editor) {
