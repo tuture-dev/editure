@@ -10,6 +10,7 @@
     "test:watch": "jest --watch",
     "bootstrap": "lerna bootstrap",
     "build": "rollup -c",
+    "build:watch": "rollup -c --watch",
     "release": "rollup -c && lerna publish"
   },
   "devDependencies": {
