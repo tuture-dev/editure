@@ -7,7 +7,58 @@ import { defaultPlugins } from 'editure';
 import Leaf from './leaf';
 import Element from './element';
 
-const plugins = [withReact, ...defaultPlugins];
+import './index.css';
+
+const withDebug = editor => {
+  const {
+    insertText,
+    insertData,
+    insertBreak,
+    deleteForward,
+    deleteBackward,
+    deleteFragment,
+    normalizeNode
+  } = editor;
+
+  editor.insertText = text => {
+    console.log('insertText', text);
+    insertText(text);
+  };
+
+  editor.insertData = data => {
+    console.log('insertData', data);
+    insertData(data);
+  };
+
+  editor.insertBreak = () => {
+    console.log('insertBreak');
+    insertBreak();
+  };
+
+  editor.deleteForward = (...args) => {
+    console.log('deleteForward', args);
+    deleteForward(...args);
+  };
+
+  editor.deleteBackward = (...args) => {
+    console.log('deleteBackward', args);
+    deleteBackward(...args);
+  };
+
+  editor.deleteFragment = () => {
+    console.log('deleteFragment');
+    deleteFragment();
+  };
+
+  editor.normalizeNode = (...args) => {
+    // console.log("normalizeNode", args);
+    normalizeNode(...args);
+  };
+
+  return editor;
+};
+
+const plugins = [withReact, withDebug, ...defaultPlugins];
 
 function App() {
   const editor = useMemo(
