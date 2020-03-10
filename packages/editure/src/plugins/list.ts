@@ -1,10 +1,56 @@
 import { Transforms, Editor, Point, Range, Element, Node } from 'tuture-slate';
 import { LIST_ITEM, BULLETED_LIST, NUMBERED_LIST, PARAGRAPH } from 'editure-constants';
 
-import { isBlockActive, decreaseItemDepth } from '../helpers';
+import { getBeforeText } from '../utils';
+import { detectShortcut } from '../shortcuts';
+import { isBlockActive, decreaseItemDepth, toggleBlock } from '../helpers';
+
+const shortcutRegexes: [string, RegExp[]][] = [
+  [BULLETED_LIST, [/^\*$/, /^-$/, /^\+$/]],
+  [NUMBERED_LIST, [/^[0-9]\.$/]]
+];
 
 export default function withList(editor: Editor) {
-  const { deleteBackward, normalizeNode } = editor;
+  const { insertText, insertBreak, deleteBackward, normalizeNode } = editor;
+
+  editor.insertText = text => {
+    const { selection } = editor;
+
+    if (text === ' ' && selection && Range.isCollapsed(selection)) {
+      for (const [format, regexes] of shortcutRegexes) {
+        const matchArr = detectShortcut(editor, regexes);
+
+        if (matchArr) {
+          Transforms.select(editor, getBeforeText(editor).range!);
+          Transforms.delete(editor);
+
+          const nodeProp = { type: LIST_ITEM, level: 0, parent: format };
+          return toggleBlock(editor, format, nodeProp);
+        }
+      }
+
+      return insertText(' ');
+    }
+
+    insertText(text);
+  };
+
+  editor.insertBreak = () => {
+    for (const format of [BULLETED_LIST, NUMBERED_LIST]) {
+      if (isBlockActive(editor, format)) {
+        const { beforeText } = getBeforeText(editor);
+
+        // Exit the list if empty.
+        if (!beforeText) {
+          return toggleBlock(editor, format);
+        }
+
+        return insertBreak();
+      }
+    }
+
+    insertBreak();
+  };
 
   editor.deleteBackward = (...args) => {
     const { selection } = editor;
