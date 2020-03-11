@@ -1,6 +1,11 @@
 import { Editor, Transforms } from 'tuture-slate';
 import shortid from 'shortid';
 import * as F from 'editure-constants';
+import {
+  BULLETED_LIST,
+  NUMBERED_LIST,
+  PARAGRAPH
+} from '../../../editure-constants/src/index';
 
 const LIST_TYPES = [F.NUMBERED_LIST, F.BULLETED_LIST];
 
@@ -162,42 +167,78 @@ export const toggleBlock = (
 ) => {
   Editor.withoutNormalizing(editor, () => {
     const isActive = isBlockActive(editor, format);
-    const isList = LIST_TYPES.includes(format);
 
-    let nodeProps = props;
-    if (isList) {
-      nodeProps = { ...nodeProps, level: 0, parent: format, type: F.LIST_ITEM };
-    }
-    if ([F.H1, F.H2, F.H3, F.H4, F.H5, F.H6].includes(format)) {
-      nodeProps = { ...nodeProps, id: shortid.generate() };
-    }
+    switch (format) {
+      case BULLETED_LIST:
+      case NUMBERED_LIST: {
+        let nodeProps = props;
+        if (!isActive) {
+          nodeProps = { ...nodeProps, level: 0, parent: format, type: F.LIST_ITEM };
 
-    Transforms.unwrapNodes(editor, {
-      match: n => LIST_TYPES.includes(n.type),
-      split: true
-    });
+          Transforms.setNodes(editor, {
+            ...nodeProps,
+            type: F.LIST_ITEM
+          });
 
-    if ([F.BLOCK_QUOTE, F.CODE_BLOCK, F.NOTE].includes(format)) {
-      if (isActive && options) {
-        const { exit, unwrap } = options;
-        if (exit) {
-          exitBlock(editor, format);
-        } else if (unwrap) {
-          unwrapBlock(editor, format);
+          const block = { type: format, children: [] };
+          Transforms.wrapNodes(editor, block, nodeProps);
+        } else {
+          Transforms.unwrapNodes(editor, {
+            match: n => LIST_TYPES.includes(n.type),
+            split: true
+          });
+
+          Transforms.setNodes(editor, {
+            type: PARAGRAPH
+          });
+          Transforms.unsetNodes(editor, ['level', 'parent']);
         }
-      } else {
-        wrapBlock(editor, format, nodeProps);
-      }
-    } else {
-      Transforms.setNodes(editor, {
-        ...nodeProps,
-        type: isActive ? F.PARAGRAPH : isList ? F.LIST_ITEM : format
-      });
-    }
 
-    if (!isActive && isList) {
-      const block = { type: format, children: [] };
-      Transforms.wrapNodes(editor, block, nodeProps);
+        break;
+      }
+
+      case F.H1:
+      case F.H2:
+      case F.H3:
+      case F.H4:
+      case F.H5:
+      case F.H6: {
+        if (isActive) {
+          Transforms.setNodes(editor, {
+            type: PARAGRAPH
+          });
+        } else {
+          Transforms.setNodes(editor, {
+            id: shortid.generate(),
+            type: format
+          });
+        }
+
+        break;
+      }
+
+      case F.BLOCK_QUOTE:
+      case F.CODE_BLOCK:
+      case F.NOTE: {
+        if (isActive && options) {
+          const { exit, unwrap } = options;
+          if (exit) {
+            exitBlock(editor, format);
+          } else if (unwrap) {
+            unwrapBlock(editor, format);
+          }
+        } else {
+          wrapBlock(editor, format, props);
+        }
+
+        break;
+      }
+
+      default: {
+        Transforms.setNodes(editor, {
+          type: isActive ? PARAGRAPH : format
+        });
+      }
     }
   });
 };
