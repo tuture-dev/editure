@@ -19,15 +19,20 @@ export default function withParagraph(editor: Editor) {
 
   editor.normalizeNode = entry => {
     const [node, path] = entry;
+
+    if (!Element.isElement(node)) {
+      return normalizeNode(entry);
+    }
+
     const keys = Object.keys(node);
 
     // If a node is an element without any other keys, then it's a paragraph.
     if (keys.length === 1 && keys[0] === 'children') {
-      node.type = PARAGRAPH;
+      Transforms.setNodes(editor, { type: PARAGRAPH }, { at: path });
     }
 
     // If the element is a paragraph, ensure it's children are valid.
-    if (Element.isElement(node) && node.type === 'paragraph') {
+    if (node.type === PARAGRAPH) {
       for (const [child, childPath] of Node.children(editor, path)) {
         if (Element.isElement(child) && !editor.isInline(child)) {
           Transforms.unwrapNodes(editor, { at: childPath });
