@@ -91,18 +91,25 @@ export default function withList(editor: Editor) {
               });
 
               Transforms.setNodes(editor, { type: PARAGRAPH });
+              Transforms.unsetNodes(editor, ['level', 'parent', 'number']);
+
+              return;
             } else {
               decreaseItemDepth(editor);
+
+              return;
             }
           }
-          return;
         } else if (block.type !== PARAGRAPH && Point.equals(selection.anchor, start)) {
           Transforms.setNodes(editor, { type: PARAGRAPH });
+          Transforms.unsetNodes(editor, ['level', 'parent', 'number']);
+
+          return;
         }
       }
-
-      deleteBackward(...args);
     }
+
+    deleteBackward(...args);
   };
 
   editor.normalizeNode = entry => {

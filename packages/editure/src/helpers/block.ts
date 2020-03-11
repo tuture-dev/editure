@@ -172,6 +172,7 @@ export const toggleBlock = (
       case BULLETED_LIST:
       case NUMBERED_LIST: {
         let nodeProps = props;
+
         if (!isActive) {
           nodeProps = { ...nodeProps, level: 0, parent: format, type: F.LIST_ITEM };
 
@@ -191,7 +192,8 @@ export const toggleBlock = (
           Transforms.setNodes(editor, {
             type: PARAGRAPH
           });
-          Transforms.unsetNodes(editor, ['level', 'parent']);
+
+          Transforms.unsetNodes(editor, ['parent', 'number', 'level']);
         }
 
         break;
