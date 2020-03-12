@@ -186,7 +186,7 @@ export const toHtml = (
 export const parseHtml = (text: string) => {
   let parsed;
 
-  if (typeof process === 'object') {
+  if (typeof process === 'object' && typeof require === 'object') {
     // Use JSDOM in node environment.
     const { JSDOM } = eval('require')('jsdom');
     parsed = new JSDOM(text).window.document;
