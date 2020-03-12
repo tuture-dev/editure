@@ -1,6 +1,6 @@
-import { Range, Editor, Transforms } from 'tuture-slate';
+import { Editor, Transforms } from 'tuture-slate';
 
-import { toggleMark } from './helpers';
+import { EditorWithMark } from './interfaces';
 import { getBeforeText, getChildrenText } from './utils';
 
 export function detectShortcut(editor: Editor, regexes: RegExp[]) {
@@ -21,7 +21,7 @@ export function detectShortcut(editor: Editor, regexes: RegExp[]) {
 }
 
 export function handleMarkShortcut(
-  editor: Editor,
+  editor: EditorWithMark,
   format: string,
   matchArr: RegExpExecArray
 ) {
@@ -65,12 +65,12 @@ export function handleMarkShortcut(
   };
 
   Transforms.select(editor, needMarkRange);
-  toggleMark(editor, format);
+  editor.toggleMark(format);
 
   Transforms.collapse(editor, {
     edge: 'end'
   });
 
   // Remove marks and insert the space.
-  toggleMark(editor, format);
+  editor.toggleMark(format);
 }

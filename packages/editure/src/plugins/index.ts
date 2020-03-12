@@ -1,8 +1,8 @@
-import withBold from './bold';
-import withItalic from './italic';
-import withInlineCode from './inline-code';
-import withStrikethrough from './strikethrough';
-import withLink from './link';
+import { withBold } from './bold';
+import { withItalic } from './italic';
+import { withInlineCode } from './inline-code';
+import { withStrikethrough } from './strikethrough';
+import { withLink } from './link';
 
 import withParagraph from './paragraph';
 import withList from './list';

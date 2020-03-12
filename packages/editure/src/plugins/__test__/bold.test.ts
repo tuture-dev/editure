@@ -1,7 +1,7 @@
 import { createEditor, Editor, Transforms, Range } from 'tuture-slate';
 import * as F from 'editure-constants';
 
-import withBold from '../bold';
+import { withBold } from '../bold';
 import { reset, inputText } from './utils';
 
 describe('withBold', () => {

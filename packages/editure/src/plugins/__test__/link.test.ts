@@ -1,7 +1,7 @@
 import { createEditor, Editor, Transforms, Range } from 'tuture-slate';
 import * as F from 'editure-constants';
 
-import withLink from '../link';
+import { withLink } from '../link';
 import { reset, inputText } from './utils';
 
 describe('withInlineCode', () => {

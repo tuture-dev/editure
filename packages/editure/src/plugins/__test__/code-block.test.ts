@@ -2,7 +2,7 @@ import { createEditor, Editor, Range } from 'tuture-slate';
 import * as F from 'editure-constants';
 
 import withCodeBlock from '../code-block';
-import withBold from '../bold';
+import { withBold } from '../bold';
 import { reset, inputText, deleteNTimes } from './utils';
 
 describe('withCodeBlock', () => {

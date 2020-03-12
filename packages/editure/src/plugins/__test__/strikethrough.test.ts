@@ -1,7 +1,7 @@
 import { createEditor, Editor, Transforms, Range } from 'tuture-slate';
 import * as F from 'editure-constants';
 
-import withStrikethrough from '../strikethrough';
+import { withStrikethrough } from '../strikethrough';
 import { reset, inputText } from './utils';
 
 describe('withStrikethrough', () => {

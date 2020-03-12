@@ -2,7 +2,7 @@ import { createEditor, Editor, Transforms, Range } from 'tuture-slate';
 import * as F from 'editure-constants';
 
 import withParagraph from '../paragraph';
-import withBold from '../bold';
+import { withBold } from '../bold';
 import { reset, inputText, deleteNTimes } from './utils';
 
 describe('withParagraph', () => {

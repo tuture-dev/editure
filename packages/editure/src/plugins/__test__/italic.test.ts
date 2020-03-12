@@ -1,7 +1,7 @@
 import { createEditor, Editor, Transforms, Range } from 'tuture-slate';
 import * as F from 'editure-constants';
 
-import withItalic from '../italic';
+import { withItalic } from '../italic';
 import { reset, inputText } from './utils';
 
 describe('withItalic', () => {
