@@ -1,11 +1,7 @@
 import { Editor, Transforms } from 'tuture-slate';
 import shortid from 'shortid';
 import * as F from 'editure-constants';
-import {
-  BULLETED_LIST,
-  NUMBERED_LIST,
-  PARAGRAPH
-} from '../../../editure-constants/src/index';
+import { BULLETED_LIST, NUMBERED_LIST, PARAGRAPH } from 'editure-constants';
 
 const LIST_TYPES = [F.NUMBERED_LIST, F.BULLETED_LIST];
 
