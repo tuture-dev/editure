@@ -1,4 +1,4 @@
-import { createEditor, Transforms, Range } from 'tuture-slate';
+import { createEditor, Editor, Transforms, Range } from 'tuture-slate';
 import * as F from 'editure-constants';
 
 import withItalic from '../italic';
@@ -20,7 +20,7 @@ describe('withItalic', () => {
 
       expect(editor.children).toStrictEqual(nodes);
       expect(Range.isCollapsed(editor.selection!)).toBe(true);
-      expect(editor.marks).toBe(null);
+      expect(Editor.marks(editor)).toStrictEqual({});
     });
 
     test('regular (syntax 2)', () => {
@@ -32,7 +32,7 @@ describe('withItalic', () => {
 
       expect(editor.children).toStrictEqual(nodes);
       expect(Range.isCollapsed(editor.selection!)).toBe(true);
-      expect(editor.marks).toBe(null);
+      expect(Editor.marks(editor)).toStrictEqual({});
     });
 
     test('end of a sentence', () => {
@@ -47,7 +47,7 @@ describe('withItalic', () => {
 
       expect(editor.children).toStrictEqual(nodes);
       expect(Range.isCollapsed(editor.selection!)).toBe(true);
-      expect(editor.marks).toBe(null);
+      expect(Editor.marks(editor)).toStrictEqual({});
     });
 
     test('start of a sentence', () => {
@@ -71,7 +71,7 @@ describe('withItalic', () => {
 
       expect(editor.children).toStrictEqual(nodes);
       expect(Range.isCollapsed(editor.selection!)).toBe(true);
-      expect(editor.marks).toBe(null);
+      expect(Editor.marks(editor)).toStrictEqual({});
     });
 
     test('middle of a sentence', () => {
@@ -95,7 +95,7 @@ describe('withItalic', () => {
 
       expect(editor.children).toStrictEqual(nodes);
       expect(Range.isCollapsed(editor.selection!)).toBe(true);
-      expect(editor.marks).toBe(null);
+      expect(Editor.marks(editor)).toStrictEqual({});
     });
   });
 });
