@@ -1,7 +1,7 @@
 import { createEditor, Range } from 'tuture-slate';
 import * as F from 'editure-constants';
 
-import withNote from '../note';
+import { withNote } from '../note';
 import { withBold } from '../bold';
 import { reset, inputText, deleteNTimes } from './utils';
 

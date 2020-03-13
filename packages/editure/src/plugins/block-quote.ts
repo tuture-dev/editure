@@ -1,27 +1,27 @@
 import { Editor, Transforms, Range, Point } from 'tuture-slate';
 import { BLOCK_QUOTE, PARAGRAPH } from 'editure-constants';
 
-import { toggleBlock, isBlockActive } from '../helpers';
+import { withBaseContainer } from './base-container';
 import { getLineText, getBeforeText } from '../utils';
 import { detectShortcut } from '../shortcuts';
 
 const shortcutRegexes = [/^\s*>$/];
 
-export default function withBlockquote(editor: Editor) {
-  const { insertText, insertBreak, deleteBackward } = editor;
+export const withBlockquote = (editor: Editor) => {
+  const e = withBaseContainer(editor);
+  const { insertText, insertBreak, deleteBackward } = e;
 
-  editor.insertText = text => {
-    const { selection } = editor;
+  e.insertText = text => {
+    const { selection } = e;
 
     if (text === ' ' && selection && Range.isCollapsed(selection)) {
-      const matchArr = detectShortcut(editor, shortcutRegexes);
+      const matchArr = detectShortcut(e, shortcutRegexes);
 
       if (matchArr) {
-        Transforms.select(editor, getBeforeText(editor).range!);
-        Transforms.delete(editor);
+        Transforms.select(e, getBeforeText(e).range!);
+        Transforms.delete(e);
 
-        const nodeProp = { type: BLOCK_QUOTE };
-        return toggleBlock(editor, BLOCK_QUOTE, nodeProp);
+        return e.toggleBlock(BLOCK_QUOTE);
       }
 
       return insertText(' ');
@@ -30,13 +30,13 @@ export default function withBlockquote(editor: Editor) {
     insertText(text);
   };
 
-  editor.insertBreak = () => {
-    if (isBlockActive(editor, BLOCK_QUOTE)) {
-      const { wholeLineText } = getLineText(editor);
+  e.insertBreak = () => {
+    if (e.isBlockActive(BLOCK_QUOTE)) {
+      const { wholeLineText } = getLineText(e);
 
       if (!wholeLineText) {
         // Exit the blockquote if last line is empty.
-        toggleBlock(editor, BLOCK_QUOTE, {}, { exit: true });
+        e.exitBlock(BLOCK_QUOTE);
       } else {
         insertBreak();
       }
@@ -47,38 +47,38 @@ export default function withBlockquote(editor: Editor) {
     insertBreak();
   };
 
-  editor.deleteBackward = (...args) => {
-    const { selection } = editor;
+  e.deleteBackward = (...args) => {
+    const { selection } = e;
 
     if (selection && Range.isCollapsed(selection)) {
-      const match = Editor.above(editor, {
+      const match = Editor.above(e, {
         match: n => n.type === BLOCK_QUOTE
       });
 
       if (match) {
         const [block, path] = match;
-        const start = Editor.start(editor, path);
+        const start = Editor.start(e, path);
 
         if (
           block.type !== PARAGRAPH &&
           Point.equals(selection.anchor, start) &&
-          isBlockActive(editor, PARAGRAPH)
+          e.isBlockActive(PARAGRAPH)
         ) {
-          const block = Editor.above(editor, {
+          const block = Editor.above(e, {
             match: n => n.type === BLOCK_QUOTE
           });
 
           if (block) {
             const [node] = block;
 
-            const { wholeLineText } = getLineText(editor);
+            const { wholeLineText } = getLineText(e);
             const { children = [] } = node;
 
-            Editor.withoutNormalizing(editor, () => {
+            Editor.withoutNormalizing(e, () => {
               if (children.length === 1 && !wholeLineText) {
-                toggleBlock(editor, BLOCK_QUOTE, {}, { unwrap: true });
+                e.toggleBlock(BLOCK_QUOTE);
               } else if (children.length > 1) {
-                Transforms.mergeNodes(editor);
+                Transforms.mergeNodes(e);
               }
             });
           }
@@ -91,5 +91,5 @@ export default function withBlockquote(editor: Editor) {
     }
   };
 
-  return editor;
-}
+  return e;
+};

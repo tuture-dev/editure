@@ -1,7 +1,7 @@
 import { createEditor, Transforms, Range } from 'tuture-slate';
 import * as F from 'editure-constants';
 
-import withHeading from '../heading';
+import { withHeading } from '../heading';
 import { withBold } from '../bold';
 import { reset, inputText, deleteNTimes } from './utils';
 

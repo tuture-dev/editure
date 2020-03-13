@@ -1,7 +1,8 @@
+import shortid from 'shortid';
 import { Editor, Transforms, Range, Point } from 'tuture-slate';
 import { H1, H2, H3, H4, H5, H6, PARAGRAPH } from 'editure-constants';
 
-import { toggleBlock, detectBlockFormat } from '../helpers';
+import { withBaseBlock } from './base-block';
 import { getBeforeText } from '../utils';
 import { detectShortcut } from '../shortcuts';
 
@@ -14,22 +15,22 @@ const shortcutRegexes: [string, RegExp[]][] = [
   [H6, [/^\s*######$/]]
 ];
 
-export default function withHeading(editor: Editor) {
-  const { insertText, insertBreak, deleteBackward } = editor;
+export const withHeading = (editor: Editor) => {
+  const e = withBaseBlock(editor);
+  const { insertText, insertBreak, deleteBackward } = e;
 
-  editor.insertText = text => {
-    const { selection } = editor;
+  e.insertText = text => {
+    const { selection } = e;
 
     if (text === ' ' && selection && Range.isCollapsed(selection)) {
       for (const [format, regexes] of shortcutRegexes) {
-        const matchArr = detectShortcut(editor, regexes);
+        const matchArr = detectShortcut(e, regexes);
 
         if (matchArr) {
-          Transforms.select(editor, getBeforeText(editor).range!);
-          Transforms.delete(editor);
+          Transforms.select(e, getBeforeText(e).range!);
+          Transforms.delete(e);
 
-          const nodeProp = { type: format };
-          return toggleBlock(editor, format, nodeProp);
+          return e.toggleBlock(format, { id: shortid.generate() });
         }
       }
 
@@ -39,38 +40,38 @@ export default function withHeading(editor: Editor) {
     insertText(text);
   };
 
-  editor.insertBreak = () => {
+  e.insertBreak = () => {
     insertBreak();
 
-    // Toggle heading after inserting breaks.
-    const headingFormat = detectBlockFormat(editor, [H1, H2, H3, H4, H5]);
-    if (headingFormat) {
-      toggleBlock(editor, headingFormat);
-    }
+    [H1, H2, H3, H4, H5].forEach(format => {
+      if (e.isBlockActive(format)) {
+        e.toggleBlock(format);
+      }
+    });
   };
 
-  editor.deleteBackward = (...args) => {
-    const { selection } = editor;
+  e.deleteBackward = (...args) => {
+    const { selection } = e;
 
-    const match = Editor.above(editor, {
-      match: n => Editor.isBlock(editor, n)
+    const match = Editor.above(e, {
+      match: n => Editor.isBlock(e, n)
     });
 
     if (match) {
       const [block, path] = match;
-      const start = Editor.start(editor, path);
+      const start = Editor.start(e, path);
 
       if (
         block.type !== PARAGRAPH &&
         Point.equals(selection!.anchor, start) &&
-        detectBlockFormat(editor, [H1, H2, H3, H4, H5, H6])
+        e.detectBlockFormat([H1, H2, H3, H4, H5, H6])
       ) {
-        return Transforms.setNodes(editor, { type: PARAGRAPH });
+        return Transforms.setNodes(e, { type: PARAGRAPH });
       }
     }
 
     deleteBackward(...args);
   };
 
-  return editor;
-}
+  return e;
+};

@@ -1,11 +1,11 @@
 import { createEditor, Range } from 'tuture-slate';
 import * as F from 'editure-constants';
 
-import withBlockQuote from '../block-quote';
+import { withBlockquote } from '../block-quote';
 import { reset, inputText, deleteNTimes } from './utils';
 
-describe('withBlockQuote', () => {
-  const editor = withBlockQuote(createEditor());
+describe('withBlockquote', () => {
+  const editor = withBlockquote(createEditor());
   reset(editor);
 
   afterEach(() => reset(editor));

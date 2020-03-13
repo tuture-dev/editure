@@ -3,7 +3,7 @@ import { PARAGRAPH } from 'editure-constants';
 
 import { getBeforeText } from '../utils';
 
-export default function withParagraph(editor: Editor) {
+export const withParagraph = (editor: Editor) => {
   const { deleteBackward, normalizeNode } = editor;
 
   editor.deleteBackward = unit => {
@@ -45,4 +45,4 @@ export default function withParagraph(editor: Editor) {
   };
 
   return editor;
-}
+};

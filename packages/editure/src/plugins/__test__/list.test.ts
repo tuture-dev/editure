@@ -1,8 +1,8 @@
 import { createEditor, Range, Editor } from 'tuture-slate';
 import * as F from 'editure-constants';
 
-import withList from '../list';
-import withParagraph from '../paragraph';
+import { withList } from '../list';
+import { withParagraph } from '../paragraph';
 import { reset, inputText, deleteNTimes } from './utils';
 
 describe('withList', () => {

@@ -1,41 +1,49 @@
 import { Transforms, Editor, Point, Range, Element, Node } from 'tuture-slate';
 import { CODE_BLOCK, CODE_LINE, PARAGRAPH } from 'editure-constants';
 
-import { isBlockActive, toggleBlock } from '../helpers';
+import { withBaseContainer } from './base-container';
 import { getLineText, getBeforeText } from '../utils';
 import { detectShortcut } from '../shortcuts';
 
 const shortcutRegexes = [/^\s*```\s*([a-zA-Z]*)$/];
 
-export default function withCodeBlock(editor: Editor) {
-  const { insertText, insertBreak, deleteBackward, normalizeNode } = editor;
+export const withCodeBlock = (editor: Editor) => {
+  const e = withBaseContainer(editor);
+  const {
+    insertText,
+    insertBreak,
+    deleteBackward,
+    normalizeNode,
+    getChildFormat,
+    unwrapBlock,
+    exitBlock
+  } = e;
 
-  editor.insertText = text => {
+  e.insertText = text => {
     // Disable any shortcuts in code blocks.
-    if (text === ' ' && isBlockActive(editor, CODE_BLOCK)) {
-      return Transforms.insertText(editor, ' ');
+    if (text === ' ' && e.isBlockActive(CODE_BLOCK)) {
+      return Transforms.insertText(e, ' ');
     }
 
     insertText(text);
   };
 
-  editor.insertBreak = () => {
-    const { selection } = editor;
+  e.insertBreak = () => {
+    const { selection } = e;
 
     if (selection && Range.isCollapsed(selection)) {
-      const matchArr = detectShortcut(editor, shortcutRegexes);
+      const matchArr = detectShortcut(e, shortcutRegexes);
 
       if (matchArr) {
-        if (isBlockActive(editor, CODE_BLOCK)) {
+        if (e.isBlockActive(CODE_BLOCK)) {
           // Already in a code block.
           return insertBreak();
         }
 
-        Transforms.select(editor, getBeforeText(editor).range!);
-        Transforms.delete(editor);
+        Transforms.select(e, getBeforeText(e).range!);
+        Transforms.delete(e);
 
-        const nodeProp = { type: CODE_BLOCK, lang: matchArr[1] };
-        return toggleBlock(editor, CODE_BLOCK, nodeProp);
+        return e.toggleBlock(CODE_BLOCK, { lang: matchArr[1] });
       }
 
       return insertBreak();
@@ -44,38 +52,38 @@ export default function withCodeBlock(editor: Editor) {
     insertBreak();
   };
 
-  editor.deleteBackward = (...args) => {
-    const { selection } = editor;
+  e.deleteBackward = (...args) => {
+    const { selection } = e;
 
     if (selection && Range.isCollapsed(selection)) {
-      const match = Editor.above(editor, {
+      const match = Editor.above(e, {
         match: n => n.type === CODE_BLOCK
       });
 
       if (match) {
         const [block, path] = match;
-        const start = Editor.start(editor, path);
+        const start = Editor.start(e, path);
 
         if (
           block.type !== PARAGRAPH &&
           Point.equals(selection.anchor, start) &&
-          isBlockActive(editor, CODE_LINE)
+          e.isBlockActive(CODE_LINE)
         ) {
-          const block = Editor.above(editor, {
+          const block = Editor.above(e, {
             match: n => n.type === CODE_BLOCK
           });
 
           if (block) {
             const [node] = block;
 
-            const { wholeLineText } = getLineText(editor);
+            const { wholeLineText } = getLineText(e);
             const { children = [] } = node;
 
-            Editor.withoutNormalizing(editor, () => {
+            Editor.withoutNormalizing(e, () => {
               if (children.length === 1 && !wholeLineText) {
-                toggleBlock(editor, CODE_BLOCK, {}, { unwrap: true });
+                e.toggleBlock(CODE_BLOCK);
               } else if (children.length > 1) {
-                Transforms.mergeNodes(editor);
+                Transforms.mergeNodes(e);
               }
             });
           }
@@ -88,13 +96,13 @@ export default function withCodeBlock(editor: Editor) {
     }
   };
 
-  editor.normalizeNode = entry => {
+  e.normalizeNode = entry => {
     const [node, path] = entry;
 
     if (Element.isElement(node) && node.type === CODE_BLOCK) {
-      for (const [child, childPath] of Node.children(editor, path)) {
+      for (const [child, childPath] of Node.children(e, path)) {
         if (Element.isElement(child) && child.type !== CODE_LINE) {
-          Transforms.setNodes(editor, { type: CODE_LINE }, { at: childPath });
+          Transforms.setNodes(e, { type: CODE_LINE }, { at: childPath });
         }
       }
       return;
@@ -103,5 +111,60 @@ export default function withCodeBlock(editor: Editor) {
     normalizeNode(entry);
   };
 
-  return editor;
-}
+  e.getChildFormat = format => {
+    return format === CODE_BLOCK ? CODE_LINE : getChildFormat(format);
+  };
+
+  e.unwrapBlock = format => {
+    if (format === CODE_BLOCK) {
+      const block = Editor.above(editor, {
+        match: n => n.type === CODE_BLOCK
+      });
+
+      if (block) {
+        const [, path] = block;
+        const anchor = Editor.start(editor, path);
+        const focus = Editor.end(editor, path);
+        const range = { anchor, focus };
+
+        Transforms.setNodes(
+          editor,
+          { type: PARAGRAPH },
+          {
+            at: range,
+            match: n => n.type === CODE_LINE
+          }
+        );
+        Transforms.unwrapNodes(editor, {
+          at: range,
+          match: n => n.type === CODE_BLOCK
+        });
+      }
+
+      return;
+    }
+
+    unwrapBlock(format);
+  };
+
+  e.exitBlock = format => {
+    if (format === CODE_BLOCK) {
+      Transforms.setNodes(
+        editor,
+        { type: PARAGRAPH },
+        { match: n => n.type === CODE_LINE }
+      );
+
+      Transforms.unwrapNodes(editor, {
+        match: n => n.type === CODE_BLOCK,
+        split: true
+      });
+
+      return;
+    }
+
+    exitBlock(format);
+  };
+
+  return e;
+};

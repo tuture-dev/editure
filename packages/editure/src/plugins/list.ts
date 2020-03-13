@@ -1,31 +1,33 @@
 import { Transforms, Editor, Point, Range, Element, Node } from 'tuture-slate';
 import { LIST_ITEM, BULLETED_LIST, NUMBERED_LIST, PARAGRAPH } from 'editure-constants';
 
+import { withBaseBlock } from './base-block';
 import { getBeforeText } from '../utils';
 import { detectShortcut } from '../shortcuts';
-import { isBlockActive, decreaseItemDepth, toggleBlock } from '../helpers';
+import { decreaseItemDepth } from '../helpers';
 
 const shortcutRegexes: [string, RegExp[]][] = [
   [BULLETED_LIST, [/^\*$/, /^-$/, /^\+$/]],
   [NUMBERED_LIST, [/^[0-9]\.$/]]
 ];
 
-export default function withList(editor: Editor) {
-  const { insertText, insertBreak, deleteBackward, normalizeNode } = editor;
+export const withList = (editor: Editor) => {
+  const e = withBaseBlock(editor);
+  const { insertText, insertBreak, deleteBackward, normalizeNode, toggleBlock } = e;
 
-  editor.insertText = text => {
-    const { selection } = editor;
+  e.insertText = text => {
+    const { selection } = e;
 
     if (text === ' ' && selection && Range.isCollapsed(selection)) {
       for (const [format, regexes] of shortcutRegexes) {
-        const matchArr = detectShortcut(editor, regexes);
+        const matchArr = detectShortcut(e, regexes);
 
         if (matchArr) {
-          Transforms.select(editor, getBeforeText(editor).range!);
-          Transforms.delete(editor);
+          Transforms.select(e, getBeforeText(e).range!);
+          Transforms.delete(e);
 
           const nodeProp = { type: LIST_ITEM, level: 0, parent: format };
-          return toggleBlock(editor, format, nodeProp);
+          return e.toggleBlock(format, nodeProp);
         }
       }
 
@@ -35,14 +37,17 @@ export default function withList(editor: Editor) {
     insertText(text);
   };
 
-  editor.insertBreak = () => {
+  e.insertBreak = () => {
     for (const format of [BULLETED_LIST, NUMBERED_LIST]) {
-      if (isBlockActive(editor, format)) {
-        const { beforeText } = getBeforeText(editor);
+      if (e.isBlockActive(format)) {
+        const { beforeText } = getBeforeText(e);
 
         // Exit the list if empty.
         if (!beforeText) {
-          return toggleBlock(editor, format);
+          e.toggleBlock(format);
+          Transforms.unsetNodes(editor, ['parent', 'number', 'level']);
+
+          return;
         }
 
         return insertBreak();
@@ -52,19 +57,19 @@ export default function withList(editor: Editor) {
     insertBreak();
   };
 
-  editor.deleteBackward = (...args) => {
-    const { selection } = editor;
+  e.deleteBackward = (...args) => {
+    const { selection } = e;
 
     if (selection && Range.isCollapsed(selection)) {
-      const match = Editor.above(editor, {
+      const match = Editor.above(e, {
         match: n => n.type === LIST_ITEM
       });
 
       if (match) {
         const [block, path] = match;
-        const start = Editor.start(editor, path);
+        const start = Editor.start(e, path);
 
-        const parentAbove = Editor.above(editor, {
+        const parentAbove = Editor.above(e, {
           match: n => n.type === BULLETED_LIST || n.type === NUMBERED_LIST
         });
 
@@ -73,11 +78,9 @@ export default function withList(editor: Editor) {
           Point.equals(selection.anchor, start) &&
           parentAbove
         ) {
-          const type = isBlockActive(editor, BULLETED_LIST)
-            ? BULLETED_LIST
-            : NUMBERED_LIST;
+          const type = e.isBlockActive(BULLETED_LIST) ? BULLETED_LIST : NUMBERED_LIST;
 
-          const block = Editor.above(editor, {
+          const block = Editor.above(e, {
             match: n => n.type === type
           });
 
@@ -86,23 +89,23 @@ export default function withList(editor: Editor) {
             const { level = 0 } = node;
 
             if (level === 0) {
-              Transforms.liftNodes(editor, {
+              Transforms.liftNodes(e, {
                 match: n => n.type === LIST_ITEM
               });
 
-              Transforms.setNodes(editor, { type: PARAGRAPH });
-              Transforms.unsetNodes(editor, ['level', 'parent', 'number']);
+              Transforms.setNodes(e, { type: PARAGRAPH });
+              Transforms.unsetNodes(e, ['level', 'parent', 'number']);
 
               return;
             } else {
-              decreaseItemDepth(editor);
+              decreaseItemDepth(e);
 
               return;
             }
           }
         } else if (block.type !== PARAGRAPH && Point.equals(selection.anchor, start)) {
-          Transforms.setNodes(editor, { type: PARAGRAPH });
-          Transforms.unsetNodes(editor, ['level', 'parent', 'number']);
+          Transforms.setNodes(e, { type: PARAGRAPH });
+          Transforms.unsetNodes(e, ['level', 'parent', 'number']);
 
           return;
         }
@@ -112,7 +115,7 @@ export default function withList(editor: Editor) {
     deleteBackward(...args);
   };
 
-  editor.normalizeNode = entry => {
+  e.normalizeNode = entry => {
     const [node, path] = entry;
 
     if (!Element.isElement(node)) {
@@ -120,13 +123,13 @@ export default function withList(editor: Editor) {
     }
 
     if (node.type === BULLETED_LIST) {
-      for (const [child, childPath] of Node.children(editor, path)) {
+      for (const [child, childPath] of Node.children(e, path)) {
         const { level = 0, children } = child;
-        Transforms.setNodes(editor, { level, parent: node.type }, { at: childPath });
+        Transforms.setNodes(e, { level, parent: node.type }, { at: childPath });
 
         // List item should not have any block child.
         if (children.length === 1 && Element.isElement(children[0])) {
-          Transforms.unwrapNodes(editor, { at: [...childPath, 0] });
+          Transforms.unwrapNodes(e, { at: [...childPath, 0] });
         }
       }
       return;
@@ -138,7 +141,7 @@ export default function withList(editor: Editor) {
       let counter = 0;
       let lastLevel = 0;
 
-      for (const [child, childPath] of Node.children(editor, path)) {
+      for (const [child, childPath] of Node.children(e, path)) {
         const { level = 0, children } = child;
         if (level > lastLevel) {
           counterStack.push(counter);
@@ -153,7 +156,7 @@ export default function withList(editor: Editor) {
         }
 
         Transforms.setNodes(
-          editor,
+          e,
           { level, parent: node.type, number: counter },
           { at: childPath }
         );
@@ -162,7 +165,7 @@ export default function withList(editor: Editor) {
 
         // List item should not have any block child.
         if (children.length === 1 && Element.isElement(children[0])) {
-          Transforms.unwrapNodes(editor, { at: [...childPath, 0] });
+          Transforms.unwrapNodes(e, { at: [...childPath, 0] });
         }
       }
       return;
@@ -172,5 +175,35 @@ export default function withList(editor: Editor) {
     normalizeNode(entry);
   };
 
-  return editor;
-}
+  e.toggleBlock = (format, props) => {
+    const isActive = !!e.detectBlockFormat([BULLETED_LIST, NUMBERED_LIST]);
+    if ([BULLETED_LIST, NUMBERED_LIST].includes(format)) {
+      if (!isActive) {
+        Transforms.setNodes(editor, {
+          ...props,
+          type: LIST_ITEM
+        });
+
+        const block = { type: format, children: [] };
+        Transforms.wrapNodes(editor, block, props);
+      } else {
+        Transforms.unwrapNodes(editor, {
+          match: n => [BULLETED_LIST, NUMBERED_LIST].includes(n.type),
+          split: true
+        });
+
+        Transforms.setNodes(editor, {
+          type: PARAGRAPH
+        });
+
+        Transforms.unsetNodes(editor, ['parent', 'number', 'level']);
+      }
+
+      return;
+    }
+
+    toggleBlock(format, props);
+  };
+
+  return e;
+};
