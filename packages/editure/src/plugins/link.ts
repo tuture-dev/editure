@@ -16,92 +16,18 @@ type Link = {
 interface EditorWithLink extends EditorWithMark {
   insertLink(link: Link): void;
   getLinkData(): Link;
+  selectLink(): void;
   updateLink(link: Link): void;
   removeLink(): void;
 }
 
-const insertLink = (editor: EditorWithLink, link: Link) => {
-  if (!editor.selection) {
-    return;
-  }
-
-  const { text, url } = link;
-
-  const { anchor } = editor.selection;
-  const focus = { ...anchor, offset: anchor.offset + text.length };
-  const range = { anchor, focus };
-
-  Transforms.insertText(editor, text);
-  Transforms.select(editor, range);
-  editor.toggleMark(LINK);
-
-  Transforms.setNodes(editor, { url }, { match: n => n.link });
-  Transforms.collapse(editor, { edge: 'end' });
-
-  editor.toggleMark(LINK);
-};
-
-const getLinkData = (editor: EditorWithLink): Link => {
-  const [match] = Editor.nodes(editor, { match: n => n.link });
-  if (match) {
-    const { text, url } = match[0];
-    return { text, url };
-  }
-  return { text: '', url: '' };
-};
-
-const updateLink = (editor: EditorWithLink, link: Link) => {
-  if (!editor.selection) {
-    return;
-  }
-
-  const { anchor } = editor.selection;
-  const { path } = anchor;
-
-  const start = Editor.start(editor, path);
-  const end = Editor.end(editor, path);
-  const range = { anchor: start, focus: end };
-  Transforms.select(editor, range);
-  Transforms.delete(editor);
-
-  insertLink(editor, link);
-};
-
-const removeLink = (editor: EditorWithLink) => {
-  if (!editor.selection) {
-    return;
-  }
-
-  const { selection } = editor;
-  const [match] = Editor.nodes(editor, { match: n => n.link });
-
-  // Select the entire link and cancel it.
-  if (match) {
-    const { path } = selection.anchor;
-    const linkRange = {
-      anchor: { path, offset: 0 },
-      focus: { path, offset: match[0].text.length }
-    };
-
-    Transforms.select(editor, linkRange);
-    editor.toggleMark(LINK);
-    Transforms.collapse(editor, {
-      edge: 'focus'
-    });
-  }
-};
-
 export const withLink = (editor: Editor) => {
   const e = withBaseMark(editor) as EditorWithLink;
-  const { insertText, isInline } = e;
-
-  e.isInline = element => {
-    return element.link ? true : isInline(element);
-  };
+  const { insertText } = e;
 
   e.insertText = text => {
     if (text && isUrl(text)) {
-      return insertLink(e, { text, url: text });
+      return e.insertLink({ text, url: text });
     }
 
     const { selection } = e;
@@ -121,19 +47,71 @@ export const withLink = (editor: Editor) => {
   };
 
   e.insertLink = (link: Link) => {
-    insertLink(e, link);
+    if (!e.selection) {
+      return;
+    }
+
+    const { text, url } = link;
+
+    const { anchor } = e.selection;
+    const focus = { ...anchor, offset: anchor.offset + text.length };
+    const range = { anchor, focus };
+
+    Transforms.insertText(e, text);
+    Transforms.select(e, range);
+    e.toggleMark(LINK);
+
+    Transforms.collapse(e, { edge: 'end' });
+    e.toggleMark(LINK);
+
+    Transforms.setNodes(e, { url }, { match: n => n.link });
   };
 
   e.getLinkData = () => {
-    return getLinkData(e);
+    const [match] = Editor.nodes(e, { match: n => n.link });
+    if (match) {
+      const { text, url } = match[0];
+      return { text, url };
+    }
+    return { text: '', url: '' };
+  };
+
+  e.selectLink = () => {
+    if (!e.selection || !e.isMarkActive(LINK)) {
+      return;
+    }
+
+    const { anchor } = e.selection;
+    const { path } = anchor;
+
+    const start = Editor.start(e, path);
+    const end = Editor.end(e, path);
+    const range = { anchor: start, focus: end };
+
+    Transforms.select(e, range);
   };
 
   e.updateLink = (link: Link) => {
-    updateLink(e, link);
+    if (!e.selection || !e.isMarkActive(LINK)) {
+      return;
+    }
+
+    e.selectLink();
+    Transforms.delete(e);
+
+    e.insertLink(link);
   };
 
   e.removeLink = () => {
-    removeLink(e);
+    if (!e.selection || !e.isMarkActive(LINK)) {
+      return;
+    }
+
+    e.selectLink();
+    e.toggleMark(LINK);
+    Editor.removeMark(e, 'url');
+
+    Transforms.collapse(e, { edge: 'focus' });
   };
 
   return e;
