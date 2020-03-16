@@ -12,25 +12,19 @@ import { withBlockquote } from './block-quote';
 import { withNote } from './note';
 import withHr from './hr';
 
-import withPaste from './paste';
-
 export {
-  // Mark plugins.
   withBold,
   withItalic,
   withInlineCode,
   withStrikethrough,
   withLink,
-  // Block plugins.
   withParagraph,
   withList,
   withHeading,
   withCodeBlock,
   withBlockquote,
   withNote,
-  withHr,
-  // Misc.
-  withPaste
+  withHr
 };
 
 export const defaultPlugins = [
@@ -48,8 +42,5 @@ export const defaultPlugins = [
   withCodeBlock,
   withBlockquote,
   withNote,
-  withHr,
-
-  // Misc.
-  withPaste
+  withHr
 ];
