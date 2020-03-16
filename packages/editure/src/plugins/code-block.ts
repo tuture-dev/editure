@@ -1,8 +1,8 @@
-import { Transforms, Editor, Point, Range, Element, Node } from 'tuture-slate';
+import { Transforms, Editor, Range, Element, Node } from 'tuture-slate';
 import { CODE_BLOCK, CODE_LINE, PARAGRAPH } from 'editure-constants';
 
 import { withBaseContainer } from './base-container';
-import { getLineText, getBeforeText } from '../utils';
+import { getBeforeText } from '../utils';
 import { detectShortcut } from '../shortcuts';
 
 const shortcutRegexes = [/^\s*```\s*([a-zA-Z]*)$/];
@@ -31,7 +31,9 @@ export const withCodeBlock = (editor: Editor) => {
   e.insertBreak = () => {
     const { selection } = e;
 
-    if (selection && Range.isCollapsed(selection)) {
+    if (!selection) return;
+
+    if (Range.isCollapsed(selection)) {
       const matchArr = detectShortcut(e, shortcutRegexes);
 
       if (matchArr) {
@@ -52,48 +54,16 @@ export const withCodeBlock = (editor: Editor) => {
     insertBreak();
   };
 
-  e.deleteBackward = (...args) => {
+  e.deleteBackward = unit => {
     const { selection } = e;
 
-    if (selection && Range.isCollapsed(selection)) {
-      const match = Editor.above(e, {
-        match: n => n.type === CODE_BLOCK
-      });
+    if (!selection) return;
 
-      if (match) {
-        const [block, path] = match;
-        const start = Editor.start(e, path);
-
-        if (
-          block.type !== PARAGRAPH &&
-          Point.equals(selection.anchor, start) &&
-          e.isBlockActive(CODE_LINE)
-        ) {
-          const block = Editor.above(e, {
-            match: n => n.type === CODE_BLOCK
-          });
-
-          if (block) {
-            const [node] = block;
-
-            const { wholeLineText } = getLineText(e);
-            const { children = [] } = node;
-
-            Editor.withoutNormalizing(e, () => {
-              if (children.length === 1 && !wholeLineText) {
-                e.toggleBlock(CODE_BLOCK);
-              } else if (children.length > 1) {
-                Transforms.mergeNodes(e);
-              }
-            });
-          }
-
-          return;
-        }
-      }
-
-      deleteBackward(...args);
+    if (unit !== 'character') {
+      return deleteBackward(unit);
     }
+
+    e.deleteByCharacter(CODE_BLOCK);
   };
 
   e.normalizeNode = entry => {

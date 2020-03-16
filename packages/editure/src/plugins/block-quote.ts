@@ -1,5 +1,5 @@
-import { Editor, Transforms, Range, Point } from 'tuture-slate';
-import { BLOCK_QUOTE, PARAGRAPH } from 'editure-constants';
+import { Editor, Transforms, Range } from 'tuture-slate';
+import { BLOCK_QUOTE } from 'editure-constants';
 
 import { withBaseContainer } from './base-container';
 import { getLineText, getBeforeText } from '../utils';
@@ -47,48 +47,16 @@ export const withBlockquote = (editor: Editor) => {
     insertBreak();
   };
 
-  e.deleteBackward = (...args) => {
+  e.deleteBackward = unit => {
     const { selection } = e;
 
-    if (selection && Range.isCollapsed(selection)) {
-      const match = Editor.above(e, {
-        match: n => n.type === BLOCK_QUOTE
-      });
+    if (!selection) return;
 
-      if (match) {
-        const [block, path] = match;
-        const start = Editor.start(e, path);
-
-        if (
-          block.type !== PARAGRAPH &&
-          Point.equals(selection.anchor, start) &&
-          e.isBlockActive(PARAGRAPH)
-        ) {
-          const block = Editor.above(e, {
-            match: n => n.type === BLOCK_QUOTE
-          });
-
-          if (block) {
-            const [node] = block;
-
-            const { wholeLineText } = getLineText(e);
-            const { children = [] } = node;
-
-            Editor.withoutNormalizing(e, () => {
-              if (children.length === 1 && !wholeLineText) {
-                e.toggleBlock(BLOCK_QUOTE);
-              } else if (children.length > 1) {
-                Transforms.mergeNodes(e);
-              }
-            });
-          }
-
-          return;
-        }
-      }
-
-      deleteBackward(...args);
+    if (unit !== 'character') {
+      return deleteBackward(unit);
     }
+
+    e.deleteByCharacter(BLOCK_QUOTE);
   };
 
   return e;

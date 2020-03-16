@@ -1,8 +1,8 @@
-import { Transforms, Editor, Range, Point } from 'tuture-slate';
-import { NOTE, PARAGRAPH } from 'editure-constants';
+import { Transforms, Editor, Range } from 'tuture-slate';
+import { NOTE } from 'editure-constants';
 
 import { withBaseContainer } from './base-container';
-import { getBeforeText, getLineText } from '../utils';
+import { getBeforeText } from '../utils';
 import { detectShortcut } from '../shortcuts';
 
 const shortcutRegexes = [/^\s*:::\s*([a-zA-Z]*)$/];
@@ -14,7 +14,9 @@ export const withNote = (editor: Editor) => {
   e.insertBreak = () => {
     const { selection } = e;
 
-    if (selection && Range.isCollapsed(selection)) {
+    if (!selection) return;
+
+    if (Range.isCollapsed(selection)) {
       const matchArr = detectShortcut(e, shortcutRegexes);
 
       if (matchArr) {
@@ -35,48 +37,16 @@ export const withNote = (editor: Editor) => {
     insertBreak();
   };
 
-  e.deleteBackward = (...args) => {
+  e.deleteBackward = unit => {
     const { selection } = e;
 
-    if (selection && Range.isCollapsed(selection)) {
-      const match = Editor.above(e, {
-        match: n => n.type === NOTE
-      });
+    if (!selection) return;
 
-      if (match) {
-        const [block, path] = match;
-        const start = Editor.start(e, path);
-
-        if (
-          block.type !== PARAGRAPH &&
-          Point.equals(selection.anchor, start) &&
-          e.isBlockActive(PARAGRAPH)
-        ) {
-          const block = Editor.above(e, {
-            match: n => n.type === NOTE
-          });
-
-          if (block) {
-            const [node] = block;
-
-            const { wholeLineText } = getLineText(e);
-            const { children = [] } = node;
-
-            Editor.withoutNormalizing(e, () => {
-              if (children.length === 1 && !wholeLineText) {
-                e.toggleBlock(NOTE);
-              } else if (children.length > 1) {
-                Transforms.mergeNodes(e);
-              }
-            });
-          }
-
-          return;
-        }
-      }
-
-      deleteBackward(...args);
+    if (unit !== 'character') {
+      return deleteBackward(unit);
     }
+
+    e.deleteByCharacter(NOTE);
   };
 
   return e;
