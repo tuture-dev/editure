@@ -1,4 +1,4 @@
-import { createEditor, Editor, Range } from 'tuture-slate';
+import { createEditor, Transforms, Editor, Range } from 'tuture-slate';
 import * as F from 'editure-constants';
 
 import { withCodeBlock } from '../code-block';
@@ -101,10 +101,28 @@ describe('withCodeBlock', () => {
       expect(editor.children).toStrictEqual(nodes);
       expect(Range.isCollapsed(editor.selection!)).toBe(true);
     });
+
+    test('range not collapsed', () => {
+      inputText(editor, '```');
+
+      const path = [0, 0];
+      Transforms.select(editor, {
+        anchor: { path, offset: 2 },
+        focus: { path, offset: 3 }
+      });
+      editor.insertBreak();
+
+      const nodes = [
+        { type: F.PARAGRAPH, children: [{ text: '``' }] },
+        { type: F.PARAGRAPH, children: [{ text: '' }] }
+      ];
+
+      expect(editor.children).toStrictEqual(nodes);
+    });
   });
 
   describe('deleteBackward', () => {
-    test('delete by character', () => {
+    test('delete by character (single paragraph)', () => {
       inputText(editor, '```js\nfoo bar');
 
       deleteNTimes(editor, 4);
@@ -127,6 +145,48 @@ describe('withCodeBlock', () => {
 
       deleteNTimes(editor, 1);
       expect(editor.children).toStrictEqual([
+        {
+          type: F.PARAGRAPH,
+          children: [{ text: '' }]
+        }
+      ]);
+    });
+
+    test('delete by character (multiple paragraphs)', () => {
+      inputText(editor, 'test\n```js\nfoo bar');
+
+      deleteNTimes(editor, 4);
+      expect(editor.children).toStrictEqual([
+        {
+          type: F.PARAGRAPH,
+          children: [{ text: 'test' }]
+        },
+        {
+          type: F.CODE_BLOCK,
+          lang: 'js',
+          children: [{ type: F.CODE_LINE, children: [{ text: 'foo' }] }]
+        }
+      ]);
+
+      deleteNTimes(editor, 3);
+      expect(editor.children).toStrictEqual([
+        {
+          type: F.PARAGRAPH,
+          children: [{ text: 'test' }]
+        },
+        {
+          type: F.CODE_BLOCK,
+          lang: 'js',
+          children: [{ type: F.CODE_LINE, children: [{ text: '' }] }]
+        }
+      ]);
+
+      deleteNTimes(editor, 1);
+      expect(editor.children).toStrictEqual([
+        {
+          type: F.PARAGRAPH,
+          children: [{ text: 'test' }]
+        },
         {
           type: F.PARAGRAPH,
           children: [{ text: '' }]

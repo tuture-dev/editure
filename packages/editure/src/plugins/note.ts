@@ -1,8 +1,8 @@
-import { Transforms, Editor, Range } from 'tuture-slate';
-import { NOTE } from 'editure-constants';
+import { Transforms, Editor, Range, Point } from 'tuture-slate';
+import { NOTE, PARAGRAPH } from 'editure-constants';
 
 import { withBaseContainer } from './base-container';
-import { getBeforeText } from '../utils';
+import { getBeforeText, getLineText } from '../utils';
 import { detectShortcut } from '../shortcuts';
 
 const shortcutRegexes = [/^\s*:::\s*([a-zA-Z]*)$/];
@@ -46,7 +46,37 @@ export const withNote = (editor: Editor) => {
       return deleteBackward(unit);
     }
 
-    e.deleteByCharacter(NOTE);
+    const match = Editor.above(e, {
+      match: n => n.type === NOTE
+    });
+
+    if (match) {
+      const [block, path] = match;
+      const start = Editor.start(e, path);
+
+      if (
+        block.type !== PARAGRAPH &&
+        Point.equals(selection.anchor, start) &&
+        e.isBlockActive(e.getChildFormat(NOTE))
+      ) {
+        const { wholeLineText } = getLineText(e);
+        const { children = [] } = block;
+
+        Editor.withoutNormalizing(e, () => {
+          if (children.length === 1 && !wholeLineText) {
+            e.toggleBlock(NOTE);
+          } else if (children.length > 1) {
+            Transforms.mergeNodes(e);
+          }
+        });
+
+        return;
+      }
+
+      return deleteBackward(unit);
+    }
+
+    deleteBackward(unit);
   };
 
   return e;

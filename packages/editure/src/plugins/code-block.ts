@@ -1,8 +1,8 @@
-import { Transforms, Editor, Range, Element, Node } from 'tuture-slate';
+import { Transforms, Editor, Range, Element, Node, Point } from 'tuture-slate';
 import { CODE_BLOCK, CODE_LINE, PARAGRAPH } from 'editure-constants';
 
 import { withBaseContainer } from './base-container';
-import { getBeforeText } from '../utils';
+import { getBeforeText, getLineText } from '../utils';
 import { detectShortcut } from '../shortcuts';
 
 const shortcutRegexes = [/^\s*```\s*([a-zA-Z]*)$/];
@@ -63,7 +63,37 @@ export const withCodeBlock = (editor: Editor) => {
       return deleteBackward(unit);
     }
 
-    e.deleteByCharacter(CODE_BLOCK);
+    const match = Editor.above(e, {
+      match: n => n.type === CODE_BLOCK
+    });
+
+    if (match) {
+      const [block, path] = match;
+      const start = Editor.start(e, path);
+
+      if (
+        block.type !== PARAGRAPH &&
+        Point.equals(selection.anchor, start) &&
+        e.isBlockActive(e.getChildFormat(CODE_BLOCK))
+      ) {
+        const { wholeLineText } = getLineText(e);
+        const { children = [] } = block;
+
+        Editor.withoutNormalizing(e, () => {
+          if (children.length === 1 && !wholeLineText) {
+            e.toggleBlock(CODE_BLOCK);
+          } else if (children.length > 1) {
+            Transforms.mergeNodes(e);
+          }
+        });
+
+        return;
+      }
+
+      return deleteBackward(unit);
+    }
+
+    deleteBackward(unit);
   };
 
   e.normalizeNode = entry => {

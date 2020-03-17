@@ -1,4 +1,4 @@
-import { createEditor, Range } from 'tuture-slate';
+import { createEditor, Transforms, Range } from 'tuture-slate';
 import * as F from 'editure-constants';
 
 import { withNote } from '../note';
@@ -84,10 +84,28 @@ describe('withNote', () => {
       expect(editor.children).toStrictEqual(nodes);
       expect(Range.isCollapsed(editor.selection!)).toBe(true);
     });
+
+    test('range not collapsed', () => {
+      inputText(editor, ':::');
+
+      const path = [0, 0];
+      Transforms.select(editor, {
+        anchor: { path, offset: 1 },
+        focus: { path, offset: 3 }
+      });
+      editor.insertBreak();
+
+      const nodes = [
+        { type: F.PARAGRAPH, children: [{ text: ':' }] },
+        { type: F.PARAGRAPH, children: [{ text: '' }] }
+      ];
+
+      expect(editor.children).toStrictEqual(nodes);
+    });
   });
 
   describe('deleteBackward', () => {
-    test('delete by character', () => {
+    test('delete by character (single paragraph)', () => {
       inputText(editor, '::: info\nfoo bar');
 
       deleteNTimes(editor, 4);
@@ -110,6 +128,48 @@ describe('withNote', () => {
 
       deleteNTimes(editor, 1);
       expect(editor.children).toStrictEqual([
+        {
+          type: F.PARAGRAPH,
+          children: [{ text: '' }]
+        }
+      ]);
+    });
+
+    test('delete by character (multiple paragraphs)', () => {
+      inputText(editor, 'test\n:::info\nfoo bar');
+
+      deleteNTimes(editor, 4);
+      expect(editor.children).toStrictEqual([
+        {
+          type: F.PARAGRAPH,
+          children: [{ text: 'test' }]
+        },
+        {
+          type: F.NOTE,
+          level: 'info',
+          children: [{ type: F.PARAGRAPH, children: [{ text: 'foo' }] }]
+        }
+      ]);
+
+      deleteNTimes(editor, 3);
+      expect(editor.children).toStrictEqual([
+        {
+          type: F.PARAGRAPH,
+          children: [{ text: 'test' }]
+        },
+        {
+          type: F.NOTE,
+          level: 'info',
+          children: [{ type: F.PARAGRAPH, children: [{ text: '' }] }]
+        }
+      ]);
+
+      deleteNTimes(editor, 1);
+      expect(editor.children).toStrictEqual([
+        {
+          type: F.PARAGRAPH,
+          children: [{ text: 'test' }]
+        },
         {
           type: F.PARAGRAPH,
           children: [{ text: '' }]
