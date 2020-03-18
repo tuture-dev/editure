@@ -1,12 +1,11 @@
-import { createEditor, Editor, Transforms, Range } from 'tuture-slate';
+import { Editor, Transforms } from 'tuture-slate';
 import * as F from 'editure-constants';
 
-import { withParagraph } from '../paragraph';
 import { withBold } from '../bold';
-import { reset, inputText, deleteNTimes } from './utils';
+import { configureEditor, reset, inputText, deleteNTimes } from './utils';
 
 describe('withParagraph', () => {
-  const editor = withBold(withParagraph(createEditor()));
+  const editor = configureEditor({ marks: [withBold] });
   reset(editor);
 
   afterEach(() => reset(editor));

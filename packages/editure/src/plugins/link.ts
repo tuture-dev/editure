@@ -2,8 +2,7 @@ import { Editor, Transforms, Range } from 'tuture-slate';
 import isUrl from 'is-url';
 import { LINK } from 'editure-constants';
 
-import { withBaseMark } from './base-mark';
-import { EditorWithMark } from '../interfaces';
+import { EditorWithMark } from './base-mark';
 import { detectShortcut, handleMarkShortcut } from '../shortcuts';
 
 const shortcutRegexes = [/\[([^*]+)\]\(([^*]+)\)/];
@@ -21,8 +20,8 @@ interface EditorWithLink extends EditorWithMark {
   removeLink(): void;
 }
 
-export const withLink = (editor: Editor) => {
-  const e = withBaseMark(editor) as EditorWithLink;
+export const withLink = (editor: EditorWithMark) => {
+  const e = editor as EditorWithLink;
   const { insertText } = e;
 
   e.insertText = text => {

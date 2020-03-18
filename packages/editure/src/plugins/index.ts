@@ -4,15 +4,22 @@ import { withInlineCode } from './inline-code';
 import { withStrikethrough } from './strikethrough';
 import { withLink } from './link';
 
+import { withBaseMark } from './base-mark';
+import { withBaseBlock } from './base-block';
+import { withBaseContainer } from './base-container';
+
 import { withParagraph } from './paragraph';
 import { withList } from './list';
 import { withHeading } from './heading';
 import { withCodeBlock } from './code-block';
 import { withBlockquote } from './block-quote';
 import { withNote } from './note';
-import withHr from './hr';
+import { withHr } from './hr';
 
 export {
+  withBaseMark,
+  withBaseBlock,
+  withBaseContainer,
   withBold,
   withItalic,
   withInlineCode,
@@ -28,7 +35,11 @@ export {
 };
 
 export const defaultPlugins = [
+  withParagraph,
+  withHr,
+
   // Mark plugins.
+  withBaseMark,
   withBold,
   withItalic,
   withInlineCode,
@@ -36,11 +47,13 @@ export const defaultPlugins = [
   withLink,
 
   // Block plugins.
-  withParagraph,
+  withBaseBlock,
   withList,
   withHeading,
-  withCodeBlock,
+
+  // Container plugins.
+  withBaseContainer,
   withBlockquote,
   withNote,
-  withHr
+  withCodeBlock
 ];

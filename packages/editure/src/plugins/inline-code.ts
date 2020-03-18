@@ -1,23 +1,22 @@
-import { Editor, Range } from 'tuture-slate';
+import { Range } from 'tuture-slate';
 import { CODE } from 'editure-constants';
 
-import { withBaseMark } from './base-mark';
+import { EditorWithMark } from './base-mark';
 import { detectShortcut, handleMarkShortcut } from '../shortcuts';
 
 const shortcutRegexes = [/`([^`]+)`/];
 
-export const withInlineCode = (editor: Editor) => {
-  const e = withBaseMark(editor);
-  const { insertText } = e;
+export const withInlineCode = (editor: EditorWithMark) => {
+  const { insertText } = editor;
 
-  e.insertText = text => {
-    const { selection } = e;
+  editor.insertText = text => {
+    const { selection } = editor;
 
     if (text === ' ' && selection && Range.isCollapsed(selection)) {
-      const matchArr = detectShortcut(e, shortcutRegexes);
+      const matchArr = detectShortcut(editor, shortcutRegexes);
 
       if (matchArr) {
-        handleMarkShortcut(e, CODE, matchArr);
+        handleMarkShortcut(editor, CODE, matchArr);
       }
 
       return insertText(' ');
@@ -26,5 +25,5 @@ export const withInlineCode = (editor: Editor) => {
     insertText(text);
   };
 
-  return e;
+  return editor;
 };

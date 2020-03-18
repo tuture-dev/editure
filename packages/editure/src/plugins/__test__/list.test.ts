@@ -1,12 +1,11 @@
-import { createEditor, Range, Editor } from 'tuture-slate';
+import { Range, Editor } from 'tuture-slate';
 import * as F from 'editure-constants';
 
 import { withList } from '../list';
-import { withParagraph } from '../paragraph';
-import { reset, inputText, deleteNTimes } from './utils';
+import { configureEditor, reset, inputText, deleteNTimes } from './utils';
 
 describe('withList', () => {
-  const editor = withList(withParagraph(createEditor()));
+  const editor = configureEditor({ blocks: [withList] });
   reset(editor);
 
   afterEach(() => reset(editor));

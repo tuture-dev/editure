@@ -1,23 +1,22 @@
-import { Editor, Range } from 'tuture-slate';
+import { Range } from 'tuture-slate';
 import { ITALIC } from 'editure-constants';
 
-import { withBaseMark } from './base-mark';
+import { EditorWithMark } from './base-mark';
 import { detectShortcut, handleMarkShortcut } from '../shortcuts';
 
 const shortcutRegexes = [/\*([^\*]+)\*/, /_([^_]+)_/];
 
-export const withItalic = (editor: Editor) => {
-  const e = withBaseMark(editor);
-  const { insertText } = e;
+export const withItalic = (editor: EditorWithMark) => {
+  const { insertText } = editor;
 
-  e.insertText = text => {
-    const { selection } = e;
+  editor.insertText = text => {
+    const { selection } = editor;
 
     if (text === ' ' && selection && Range.isCollapsed(selection)) {
-      const matchArr = detectShortcut(e, shortcutRegexes);
+      const matchArr = detectShortcut(editor, shortcutRegexes);
 
       if (matchArr) {
-        handleMarkShortcut(e, ITALIC, matchArr);
+        handleMarkShortcut(editor, ITALIC, matchArr);
       }
 
       return insertText(' ');
@@ -26,5 +25,5 @@ export const withItalic = (editor: Editor) => {
     insertText(text);
   };
 
-  return e;
+  return editor;
 };

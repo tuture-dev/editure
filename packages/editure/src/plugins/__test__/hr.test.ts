@@ -1,7 +1,7 @@
-import { createEditor, Range } from 'tuture-slate';
+import { createEditor, Range, Transforms } from 'tuture-slate';
 import * as F from 'editure-constants';
 
-import withHr from '../hr';
+import { withHr } from '../hr';
 import { reset, inputText } from './utils';
 
 describe('withHr', () => {
@@ -45,6 +45,36 @@ describe('withHr', () => {
 
       expect(editor.children).toStrictEqual(nodes);
       expect(Range.isCollapsed(editor.selection!)).toBe(true);
+    });
+
+    test('insert non-hr', () => {
+      inputText(editor, 'foo\n');
+
+      const nodes = [
+        { type: F.PARAGRAPH, children: [{ text: 'foo' }] },
+        { type: F.PARAGRAPH, children: [{ text: '' }] }
+      ];
+
+      expect(editor.children).toStrictEqual(nodes);
+      expect(Range.isCollapsed(editor.selection!)).toBe(true);
+    });
+
+    test('range not collapsed', () => {
+      inputText(editor, '---');
+
+      const path = [0, 0];
+      Transforms.select(editor, {
+        anchor: { path, offset: 0 },
+        focus: { path, offset: 3 }
+      });
+      editor.insertBreak();
+
+      const nodes = [
+        { type: F.PARAGRAPH, children: [{ text: '' }] },
+        { type: F.PARAGRAPH, children: [{ text: '' }] }
+      ];
+
+      expect(editor.children).toStrictEqual(nodes);
     });
   });
 });

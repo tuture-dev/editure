@@ -1,34 +1,37 @@
 import { Editor, Transforms, Range } from 'tuture-slate';
 import * as F from 'editure-constants';
 
-import { EditorWithMark } from '../interfaces';
+import { Plugin } from '../interfaces';
 
-const isMarkActive = (editor: Editor, format: string) => {
-  try {
-    const marks = Editor.marks(editor);
-    return marks ? marks[format] === true : false;
-  } catch {
-    return false;
-  }
-};
+export interface EditorWithMark extends Editor {
+  isMarkActive(format: string): boolean;
+  toggleMark(format: string): void;
+}
 
-export const withBaseMark = <T extends Editor>(editor: T) => {
-  const e = editor as T & EditorWithMark;
+export type MarkPlugin = Plugin<EditorWithMark, EditorWithMark>;
+
+export const withBaseMark: Plugin<Editor, EditorWithMark> = editor => {
+  const e = editor as EditorWithMark;
 
   e.isMarkActive = (format: string) => {
-    return isMarkActive(e, format);
+    try {
+      const marks = Editor.marks(e);
+      return marks ? marks[format] === true : false;
+    } catch {
+      return false;
+    }
   };
 
   e.toggleMark = (format: string) => {
-    const isActive = isMarkActive(editor, format);
+    const isActive = e.isMarkActive(format);
 
     if (isActive) {
-      Editor.removeMark(editor, format);
+      Editor.removeMark(e, format);
     } else {
-      Editor.addMark(editor, format, true);
+      Editor.addMark(e, format, true);
     }
 
-    const { selection, children } = editor;
+    const { selection, children } = e;
 
     // Fix issue (from slate) of deleting first line.
     if (

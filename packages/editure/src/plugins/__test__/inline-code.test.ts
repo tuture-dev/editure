@@ -1,12 +1,11 @@
-import { createEditor, Editor, Transforms, Range } from 'tuture-slate';
+import { Editor, Transforms, Range } from 'tuture-slate';
 import * as F from 'editure-constants';
 
 import { withInlineCode } from '../inline-code';
-import { withBaseMark } from '../base-mark';
-import { reset, inputText } from './utils';
+import { configureEditor, reset, inputText } from './utils';
 
 describe('withInlineCode', () => {
-  const editor = withInlineCode(withBaseMark(createEditor()));
+  const editor = configureEditor({ marks: [withInlineCode] });
   reset(editor);
 
   afterEach(() => reset(editor));

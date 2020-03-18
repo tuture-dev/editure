@@ -3,10 +3,10 @@ import * as F from 'editure-constants';
 
 import { withHeading } from '../heading';
 import { withBold } from '../bold';
-import { reset, inputText, deleteNTimes } from './utils';
+import { configureEditor, reset, inputText, deleteNTimes } from './utils';
 
 describe('withHeading', () => {
-  const editor = withHeading(withBold(createEditor()));
+  const editor = configureEditor({ marks: [withBold], blocks: [withHeading] });
   reset(editor);
 
   afterEach(() => reset(editor));

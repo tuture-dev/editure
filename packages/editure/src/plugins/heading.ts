@@ -2,7 +2,7 @@ import shortid from 'shortid';
 import { Editor, Transforms, Range, Point } from 'tuture-slate';
 import { H1, H2, H3, H4, H5, H6, PARAGRAPH } from 'editure-constants';
 
-import { withBaseBlock } from './base-block';
+import { EditorWithBlock } from './base-block';
 import { getBeforeText } from '../utils';
 import { detectShortcut } from '../shortcuts';
 
@@ -15,22 +15,21 @@ const shortcutRegexes: [string, RegExp[]][] = [
   [H6, [/^\s*######$/]]
 ];
 
-export const withHeading = (editor: Editor) => {
-  const e = withBaseBlock(editor);
-  const { insertText, insertBreak, deleteBackward } = e;
+export const withHeading = (editor: EditorWithBlock) => {
+  const { insertText, insertBreak, deleteBackward } = editor;
 
-  e.insertText = text => {
-    const { selection } = e;
+  editor.insertText = text => {
+    const { selection } = editor;
 
     if (text === ' ' && selection && Range.isCollapsed(selection)) {
       for (const [format, regexes] of shortcutRegexes) {
-        const matchArr = detectShortcut(e, regexes);
+        const matchArr = detectShortcut(editor, regexes);
 
         if (matchArr) {
-          Transforms.select(e, getBeforeText(e).range!);
-          Transforms.delete(e);
+          Transforms.select(editor, getBeforeText(editor).range!);
+          Transforms.delete(editor);
 
-          return e.toggleBlock(format, { id: shortid.generate() });
+          return editor.toggleBlock(format, { id: shortid.generate() });
         }
       }
 
@@ -40,38 +39,38 @@ export const withHeading = (editor: Editor) => {
     insertText(text);
   };
 
-  e.insertBreak = () => {
+  editor.insertBreak = () => {
     insertBreak();
 
     [H1, H2, H3, H4, H5].forEach(format => {
-      if (e.isBlockActive(format)) {
-        e.toggleBlock(format);
+      if (editor.isBlockActive(format)) {
+        editor.toggleBlock(format);
       }
     });
   };
 
-  e.deleteBackward = (...args) => {
-    const { selection } = e;
+  editor.deleteBackward = (...args) => {
+    const { selection } = editor;
 
-    const match = Editor.above(e, {
-      match: n => Editor.isBlock(e, n)
+    const match = Editor.above(editor, {
+      match: n => Editor.isBlock(editor, n)
     });
 
     if (match) {
       const [block, path] = match;
-      const start = Editor.start(e, path);
+      const start = Editor.start(editor, path);
 
       if (
         block.type !== PARAGRAPH &&
         Point.equals(selection!.anchor, start) &&
-        e.detectBlockFormat([H1, H2, H3, H4, H5, H6])
+        editor.detectBlockFormat([H1, H2, H3, H4, H5, H6])
       ) {
-        return Transforms.setNodes(e, { type: PARAGRAPH });
+        return Transforms.setNodes(editor, { type: PARAGRAPH });
       }
     }
 
     deleteBackward(...args);
   };
 
-  return e;
+  return editor;
 };

@@ -1,27 +1,30 @@
 import { Editor, Transforms, Range, Point } from 'tuture-slate';
 import { BLOCK_QUOTE, PARAGRAPH } from 'editure-constants';
 
-import { withBaseContainer } from './base-container';
+import { EditorWithContainer } from './base-container';
 import { getLineText, getBeforeText } from '../utils';
 import { detectShortcut } from '../shortcuts';
 
 const shortcutRegexes = [/^\s*>$/];
 
-export const withBlockquote = (editor: Editor) => {
-  const e = withBaseContainer(editor);
-  const { insertText, insertBreak, deleteBackward } = e;
+export const withBlockquote = (editor: EditorWithContainer) => {
+  const { getChildFormat, insertText, insertBreak, deleteBackward } = editor;
 
-  e.insertText = text => {
-    const { selection } = e;
+  editor.getChildFormat = format => {
+    return format === BLOCK_QUOTE ? PARAGRAPH : getChildFormat(format);
+  };
+
+  editor.insertText = text => {
+    const { selection } = editor;
 
     if (text === ' ' && selection && Range.isCollapsed(selection)) {
-      const matchArr = detectShortcut(e, shortcutRegexes);
+      const matchArr = detectShortcut(editor, shortcutRegexes);
 
       if (matchArr) {
-        Transforms.select(e, getBeforeText(e).range!);
-        Transforms.delete(e);
+        Transforms.select(editor, getBeforeText(editor).range!);
+        Transforms.delete(editor);
 
-        return e.toggleBlock(BLOCK_QUOTE);
+        return editor.toggleBlock(BLOCK_QUOTE);
       }
 
       return insertText(' ');
@@ -30,13 +33,13 @@ export const withBlockquote = (editor: Editor) => {
     insertText(text);
   };
 
-  e.insertBreak = () => {
-    if (e.isBlockActive(BLOCK_QUOTE)) {
-      const { wholeLineText } = getLineText(e);
+  editor.insertBreak = () => {
+    if (editor.isBlockActive(BLOCK_QUOTE)) {
+      const { wholeLineText } = getLineText(editor);
 
       if (!wholeLineText) {
         // Exit the blockquote if last line is empty.
-        e.exitBlock(BLOCK_QUOTE);
+        editor.exitBlock(BLOCK_QUOTE);
       } else {
         insertBreak();
       }
@@ -47,8 +50,8 @@ export const withBlockquote = (editor: Editor) => {
     insertBreak();
   };
 
-  e.deleteBackward = unit => {
-    const { selection } = e;
+  editor.deleteBackward = unit => {
+    const { selection } = editor;
 
     if (!selection) return;
 
@@ -56,27 +59,27 @@ export const withBlockquote = (editor: Editor) => {
       return deleteBackward(unit);
     }
 
-    const match = Editor.above(e, {
+    const match = Editor.above(editor, {
       match: n => n.type === BLOCK_QUOTE
     });
 
     if (match) {
       const [block, path] = match;
-      const start = Editor.start(e, path);
+      const start = Editor.start(editor, path);
 
       if (
         block.type !== PARAGRAPH &&
         Point.equals(selection.anchor, start) &&
-        e.isBlockActive(e.getChildFormat(BLOCK_QUOTE))
+        editor.isBlockActive(editor.getChildFormat(BLOCK_QUOTE))
       ) {
-        const { wholeLineText } = getLineText(e);
+        const { wholeLineText } = getLineText(editor);
         const { children = [] } = block;
 
-        Editor.withoutNormalizing(e, () => {
+        Editor.withoutNormalizing(editor, () => {
           if (children.length === 1 && !wholeLineText) {
-            e.toggleBlock(BLOCK_QUOTE);
+            editor.toggleBlock(BLOCK_QUOTE);
           } else if (children.length > 1) {
-            Transforms.mergeNodes(e);
+            Transforms.mergeNodes(editor);
           }
         });
 
@@ -89,5 +92,5 @@ export const withBlockquote = (editor: Editor) => {
     deleteBackward(unit);
   };
 
-  return e;
+  return editor;
 };

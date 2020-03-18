@@ -6,7 +6,7 @@ import { detectShortcut } from '../shortcuts';
 
 const shortcutRegexes = [/^\s*---$/, /^\s*\*\*\*$/, /^\s*___$/];
 
-export default function withHr(editor: Editor) {
+export const withHr = (editor: Editor) => {
   const { isVoid, insertBreak } = editor;
 
   editor.isVoid = element => {
@@ -16,7 +16,9 @@ export default function withHr(editor: Editor) {
   editor.insertBreak = () => {
     const { selection } = editor;
 
-    if (selection && Range.isCollapsed(selection)) {
+    if (!selection) return;
+
+    if (Range.isCollapsed(selection)) {
       const matchArr = detectShortcut(editor, shortcutRegexes);
 
       if (matchArr) {
@@ -40,4 +42,4 @@ export default function withHr(editor: Editor) {
   };
 
   return editor;
-}
+};

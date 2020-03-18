@@ -1,12 +1,12 @@
-import { createEditor, Transforms, Editor, Range } from 'tuture-slate';
+import { Transforms, Editor, Range } from 'tuture-slate';
 import * as F from 'editure-constants';
 
 import { withCodeBlock } from '../code-block';
 import { withBold } from '../bold';
-import { reset, inputText, deleteNTimes } from './utils';
+import { configureEditor, reset, inputText, deleteNTimes } from './utils';
 
 describe('withCodeBlock', () => {
-  const editor = withCodeBlock(withBold(createEditor()));
+  const editor = configureEditor({ marks: [withBold], containers: [withCodeBlock] });
   reset(editor);
 
   afterEach(() => reset(editor));

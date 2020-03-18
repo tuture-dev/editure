@@ -1,34 +1,37 @@
 import { Transforms, Editor, Range, Point } from 'tuture-slate';
 import { NOTE, PARAGRAPH } from 'editure-constants';
 
-import { withBaseContainer } from './base-container';
+import { EditorWithContainer } from './base-container';
 import { getBeforeText, getLineText } from '../utils';
 import { detectShortcut } from '../shortcuts';
 
 const shortcutRegexes = [/^\s*:::\s*([a-zA-Z]*)$/];
 
-export const withNote = (editor: Editor) => {
-  const e = withBaseContainer(editor);
-  const { insertBreak, deleteBackward } = e;
+export const withNote = (editor: EditorWithContainer) => {
+  const { getChildFormat, insertBreak, deleteBackward } = editor;
 
-  e.insertBreak = () => {
-    const { selection } = e;
+  editor.getChildFormat = format => {
+    return format === NOTE ? PARAGRAPH : getChildFormat(format);
+  };
+
+  editor.insertBreak = () => {
+    const { selection } = editor;
 
     if (!selection) return;
 
     if (Range.isCollapsed(selection)) {
-      const matchArr = detectShortcut(e, shortcutRegexes);
+      const matchArr = detectShortcut(editor, shortcutRegexes);
 
       if (matchArr) {
-        if (e.isBlockActive(NOTE)) {
+        if (editor.isBlockActive(NOTE)) {
           // Already in a note block.
           return insertBreak();
         }
 
-        Transforms.select(e, getBeforeText(e).range!);
-        Transforms.delete(e);
+        Transforms.select(editor, getBeforeText(editor).range!);
+        Transforms.delete(editor);
 
-        return e.toggleBlock(NOTE, { level: matchArr[1] });
+        return editor.toggleBlock(NOTE, { level: matchArr[1] });
       }
 
       return insertBreak();
@@ -37,8 +40,8 @@ export const withNote = (editor: Editor) => {
     insertBreak();
   };
 
-  e.deleteBackward = unit => {
-    const { selection } = e;
+  editor.deleteBackward = unit => {
+    const { selection } = editor;
 
     if (!selection) return;
 
@@ -46,27 +49,27 @@ export const withNote = (editor: Editor) => {
       return deleteBackward(unit);
     }
 
-    const match = Editor.above(e, {
+    const match = Editor.above(editor, {
       match: n => n.type === NOTE
     });
 
     if (match) {
       const [block, path] = match;
-      const start = Editor.start(e, path);
+      const start = Editor.start(editor, path);
 
       if (
         block.type !== PARAGRAPH &&
         Point.equals(selection.anchor, start) &&
-        e.isBlockActive(e.getChildFormat(NOTE))
+        editor.isBlockActive(editor.getChildFormat(NOTE))
       ) {
-        const { wholeLineText } = getLineText(e);
+        const { wholeLineText } = getLineText(editor);
         const { children = [] } = block;
 
-        Editor.withoutNormalizing(e, () => {
+        Editor.withoutNormalizing(editor, () => {
           if (children.length === 1 && !wholeLineText) {
-            e.toggleBlock(NOTE);
+            editor.toggleBlock(NOTE);
           } else if (children.length > 1) {
-            Transforms.mergeNodes(e);
+            Transforms.mergeNodes(editor);
           }
         });
 
@@ -79,5 +82,5 @@ export const withNote = (editor: Editor) => {
     deleteBackward(unit);
   };
 
-  return e;
+  return editor;
 };
