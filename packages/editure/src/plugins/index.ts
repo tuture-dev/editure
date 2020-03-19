@@ -1,3 +1,5 @@
+import { withHistory } from 'tuture-slate-history';
+
 import { withBold } from './bold';
 import { withItalic } from './italic';
 import { withInlineCode } from './inline-code';
@@ -17,6 +19,7 @@ import { withNote } from './note';
 import { withHr } from './hr';
 
 export {
+  withHistory,
   withBaseMark,
   withBaseBlock,
   withBaseContainer,
