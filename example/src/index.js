@@ -1,10 +1,11 @@
 import React, { useMemo, useCallback, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { Editure, Editable, withReact, withPaste } from 'editure-react';
-import { createEditor, defaultPlugins } from 'editure';
+import { createEditor, defaultPlugins, withHistory } from 'editure';
 
 import Leaf from './leaf';
 import Element from './element';
+import createHotKeysHandler from './hotkeys';
 
 import './index.css';
 
@@ -57,7 +58,7 @@ const withDebug = editor => {
   return editor;
 };
 
-const plugins = [withReact, withDebug, ...defaultPlugins, withPaste];
+const plugins = [withReact, withDebug, ...defaultPlugins, withPaste, withHistory];
 
 function App() {
   const editor = useMemo(
@@ -67,6 +68,8 @@ function App() {
 
   const renderElement = useCallback(Element, []);
   const renderLeaf = useCallback(Leaf, []);
+
+  const hotKeyHandler = createHotKeysHandler(editor);
 
   const style = {
     margin: '8%',
@@ -87,6 +90,10 @@ function App() {
           placeholder="Enter something ..."
           renderElement={renderElement}
           renderLeaf={renderLeaf}
+          onKeyDown={hotKeyHandler}
+          onCopy={e => {
+            e.clipboardData.setData('application/x-editure-fragment', true);
+          }}
         />
       </div>
     </Editure>
