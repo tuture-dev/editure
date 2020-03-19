@@ -1,6 +1,6 @@
 import { Transforms, Node, parseHtml, parseMarkdown, getBeforeText } from 'editure';
 
-import { LINK, IMAGE, CODE_BLOCK, CODE_LINE } from 'editure-constants';
+import { PARAGRAPH, LINK, IMAGE, CODE_BLOCK, CODE_LINE } from 'editure-constants';
 import { ReactEditor } from 'tuture-slate-react';
 
 const containsMarkdownCode = (text: string) => {
@@ -79,7 +79,7 @@ export const withPaste = (editor: ReactEditor) => {
     if (containsMarkdownCode(text)) {
       const parsed = parseMarkdown(text);
       if (parsed) {
-        Transforms.insertNodes(editor, parsed as Node[]);
+        Transforms.insertFragment(editor, parsed as Node[]);
 
         if (!beforeText && selection) {
           Transforms.removeNodes(editor, { at: selection });
@@ -90,7 +90,22 @@ export const withPaste = (editor: ReactEditor) => {
     }
 
     if (dataTypes.length === 1 && dataTypes[0] === 'text/plain') {
-      return insertText(data.getData('text/plain'));
+      return data
+        .getData('text/plain')
+        .trim()
+        .split('\n')
+        .filter(line => line)
+        .forEach((line, index) => {
+          if (index === 0) {
+            // Insert the first line without creating a new paragraph.
+            return insertText(line);
+          }
+
+          Transforms.insertNodes(editor, {
+            type: PARAGRAPH,
+            children: [{ text: line }]
+          });
+        });
     }
 
     const html = data.getData('text/html');
@@ -103,9 +118,7 @@ export const withPaste = (editor: ReactEditor) => {
         return;
       }
 
-      Transforms.insertNodes(editor, fragment);
-
-      return;
+      return Transforms.insertFragment(editor, fragment);
     }
 
     insertData(data);

@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { Editure, Editable, withReact } from 'editure-react';
+import { Editure, Editable, withReact, withPaste } from 'editure-react';
 import { createEditor, defaultPlugins } from 'editure';
 
 import Leaf from './leaf';
@@ -57,7 +57,7 @@ const withDebug = editor => {
   return editor;
 };
 
-const plugins = [withReact, withDebug, ...defaultPlugins];
+const plugins = [withReact, withDebug, ...defaultPlugins, withPaste];
 
 function App() {
   const editor = useMemo(
