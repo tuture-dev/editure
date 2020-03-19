@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { css, cx } from 'emotion';
 import { updateBlock } from 'editure';
 import * as F from 'editure-constants';
-import { useSlate, useSelected, useFocused } from 'tuture-slate-react';
+import { useEditure, useSelected, useFocused } from 'editure-react';
 
 import { languages, enumPrismLangToLanguage } from './utils/code';
 import { palette, icons, levels } from './utils/note';
@@ -40,12 +40,12 @@ const CodeBlockElement = props => {
   const { lang: defaultLang = 'Plain Text' } = element;
 
   const [lang, setLang] = useState(defaultLang);
-  const editor = useSlate();
+  const editor = useEditure();
 
   function handleChange(event) {
     const newLang = event.target.value;
     setLang(newLang);
-    updateBlock(editor, F.CODE_BLOCK, { lang: newLang });
+    editor.updateBlock(F.CODE_BLOCK, { lang: newLang });
   }
 
   const selectValue =
@@ -125,12 +125,12 @@ const NoteElement = props => {
   const realLevel = levels.includes(defaultLevel) ? defaultLevel : 'default';
 
   const [level, setLevel] = useState(realLevel);
-  const editor = useSlate();
+  const editor = useEditure();
 
   function handleChange(event) {
     const newLevel = event.target.value;
     setLevel(newLevel);
-    updateBlock(editor, F.NOTE, { level: newLevel });
+    editor.updateBlock(F.NOTE, { level: newLevel });
   }
 
   const baseStyle = css`

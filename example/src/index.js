@@ -1,8 +1,7 @@
 import React, { useMemo, useCallback, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { createEditor } from 'tuture-slate';
-import { Slate, Editable, withReact } from 'tuture-slate-react';
-import { defaultPlugins } from 'editure';
+import { Editure, Editable, withReact } from 'editure-react';
+import { createEditor, defaultPlugins } from 'editure';
 
 import Leaf from './leaf';
 import Element from './element';
@@ -82,7 +81,7 @@ function App() {
   console.log('nodes', editor.children);
 
   return (
-    <Slate editor={editor} value={value} onChange={newVal => setValue(newVal)}>
+    <Editure editor={editor} value={value} onChange={newVal => setValue(newVal)}>
       <div style={style}>
         <Editable
           placeholder="Enter something ..."
@@ -90,7 +89,7 @@ function App() {
           renderLeaf={renderLeaf}
         />
       </div>
-    </Slate>
+    </Editure>
   );
 }
 
