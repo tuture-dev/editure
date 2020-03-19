@@ -1,6 +1,6 @@
 {
   "name": "editure-react",
-  "description": "The React component for editure.",
+  "description": "React-specific components, plugins and hooks for editure.",
   "version": "0.0.15",
   "license": "MIT",
   "repository": "https://github.com/tuture-dev/editure.git",
@@ -11,17 +11,10 @@
   ],
   "dependencies": {
     "editure": "^0.0.15",
-    "emotion": "^10.0.27",
-    "escape-html": "^1.0.3",
-    "is-hotkey": "^0.1.6",
-    "material-icons": "^0.3.1",
-    "react-modal": "^3.11.1",
-    "tuture-slate-history": "^0.57.3",
     "tuture-slate-react": "^0.57.3"
   },
   "peerDependencies": {
     "react": ">=16.8.0",
-    "react-dom": ">=16.8.0",
-    "tuture-slate": ">=0.55.0"
+    "react-dom": ">=16.8.0"
   }
 }
