@@ -15,7 +15,8 @@ export const withCodeBlock = (editor: EditorWithContainer) => {
     normalizeNode,
     getChildFormat,
     unwrapBlock,
-    exitBlock
+    exitBlock,
+    toggleBlock
   } = editor;
 
   editor.insertText = text => {
@@ -163,6 +164,22 @@ export const withCodeBlock = (editor: EditorWithContainer) => {
     }
 
     exitBlock(format);
+  };
+
+  editor.toggleBlock = (format, props?) => {
+    if (format === CODE_BLOCK) {
+      return Editor.withoutNormalizing(editor, () => {
+        const isActive = editor.isBlockActive(format);
+
+        if (isActive) {
+          editor.unwrapBlock(format);
+        } else {
+          editor.wrapBlock(format, props);
+        }
+      });
+    }
+
+    toggleBlock(format, props);
   };
 
   return editor;

@@ -8,7 +8,7 @@ import { detectShortcut } from '../shortcuts';
 const shortcutRegexes = [/^\s*>$/];
 
 export const withBlockquote = (editor: EditorWithContainer) => {
-  const { getChildFormat, insertText, insertBreak, deleteBackward } = editor;
+  const { getChildFormat, insertText, insertBreak, deleteBackward, toggleBlock } = editor;
 
   editor.getChildFormat = format => {
     return format === BLOCK_QUOTE ? PARAGRAPH : getChildFormat(format);
@@ -90,6 +90,22 @@ export const withBlockquote = (editor: EditorWithContainer) => {
     }
 
     deleteBackward(unit);
+  };
+
+  editor.toggleBlock = (format, props?) => {
+    if (format === BLOCK_QUOTE) {
+      return Editor.withoutNormalizing(editor, () => {
+        const isActive = editor.isBlockActive(format);
+
+        if (isActive) {
+          editor.unwrapBlock(format);
+        } else {
+          editor.wrapBlock(format, props);
+        }
+      });
+    }
+
+    toggleBlock(format, props);
   };
 
   return editor;

@@ -8,7 +8,7 @@ import { detectShortcut } from '../shortcuts';
 const shortcutRegexes = [/^\s*:::\s*([a-zA-Z]*)$/];
 
 export const withNote = (editor: EditorWithContainer) => {
-  const { getChildFormat, insertBreak, deleteBackward } = editor;
+  const { getChildFormat, insertBreak, deleteBackward, toggleBlock } = editor;
 
   editor.getChildFormat = format => {
     return format === NOTE ? PARAGRAPH : getChildFormat(format);
@@ -80,6 +80,22 @@ export const withNote = (editor: EditorWithContainer) => {
     }
 
     deleteBackward(unit);
+  };
+
+  editor.toggleBlock = (format, props?) => {
+    if (format === NOTE) {
+      return Editor.withoutNormalizing(editor, () => {
+        const isActive = editor.isBlockActive(format);
+
+        if (isActive) {
+          editor.unwrapBlock(format);
+        } else {
+          editor.wrapBlock(format, props);
+        }
+      });
+    }
+
+    toggleBlock(format, props);
   };
 
   return editor;

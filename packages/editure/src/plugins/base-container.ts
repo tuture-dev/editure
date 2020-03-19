@@ -34,18 +34,6 @@ export const withBaseContainer = <T extends EditorWithBlock>(editor: T) => {
     });
   };
 
-  e.toggleBlock = (format: string, props?: any) => {
-    Editor.withoutNormalizing(editor, () => {
-      const isActive = e.isBlockActive(format);
-
-      if (isActive) {
-        e.unwrapBlock(format);
-      } else {
-        e.wrapBlock(format, props);
-      }
-    });
-  };
-
   e.exitBlock = (format: string) => {
     const block = Editor.above(editor, {
       match: n => n.type === e.getChildFormat(format)
