@@ -149,18 +149,18 @@ export const withCodeBlock = (editor: EditorWithContainer) => {
 
   editor.exitBlock = format => {
     if (format === CODE_BLOCK) {
-      Transforms.setNodes(
-        editor,
-        { type: PARAGRAPH },
-        { match: n => n.type === CODE_LINE }
-      );
+      return Editor.withoutNormalizing(editor, () => {
+        Transforms.setNodes(
+          editor,
+          { type: PARAGRAPH },
+          { match: n => n.type === CODE_LINE }
+        );
 
-      Transforms.unwrapNodes(editor, {
-        match: n => n.type === CODE_BLOCK,
-        split: true
+        Transforms.unwrapNodes(editor, {
+          match: n => n.type === CODE_BLOCK,
+          split: true
+        });
       });
-
-      return;
     }
 
     exitBlock(format);
