@@ -186,12 +186,12 @@ export const toHtml = (
 export const parseHtml = (text: string) => {
   let parsed;
 
-  if (typeof process === 'object' && typeof require === 'function') {
+  if (typeof DOMParser === 'function') {
+    parsed = new DOMParser().parseFromString(text, 'text/html');
+  } else {
     // Use JSDOM in node environment.
     const { JSDOM } = eval('require')('jsdom');
     parsed = new JSDOM(text).window.document;
-  } else {
-    parsed = new DOMParser().parseFromString(text, 'text/html');
   }
 
   return deserialize(parsed.body);
