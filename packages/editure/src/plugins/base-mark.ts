@@ -1,17 +1,13 @@
 import { Editor, Transforms, Range } from 'tuture-slate';
 import * as F from 'editure-constants';
 
-import { Plugin } from '../interfaces';
-
 export interface EditorWithMark extends Editor {
   isMarkActive(format: string): boolean;
   toggleMark(format: string): void;
 }
 
-export type MarkPlugin = Plugin<EditorWithMark, EditorWithMark>;
-
-export const withBaseMark: Plugin<Editor, EditorWithMark> = editor => {
-  const e = editor as EditorWithMark;
+export const withBaseMark = <T extends Editor>(editor: T) => {
+  const e = editor as T & EditorWithMark;
 
   e.isMarkActive = (format: string) => {
     try {

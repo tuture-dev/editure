@@ -2,10 +2,11 @@ import { Editor, Transforms, Range } from 'tuture-slate';
 import * as F from 'editure-constants';
 
 import { withBold } from '../bold';
+import { EditorWithMark } from '../base-mark';
 import { reset, inputText, configureEditor } from './utils';
 
 describe('withBold', () => {
-  const editor = configureEditor({ marks: [withBold] });
+  const editor = configureEditor({ marks: [withBold] }) as EditorWithMark;
   reset(editor);
 
   afterEach(() => reset(editor));

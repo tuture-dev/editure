@@ -1,12 +1,17 @@
-import { createEditor, Transforms, Range } from 'tuture-slate';
+import { Transforms, Range } from 'tuture-slate';
 import * as F from 'editure-constants';
 
+import { EditorWithContainer } from '../base-container';
+import { EditorWithMark } from '../base-mark';
 import { withHeading } from '../heading';
 import { withBold } from '../bold';
 import { configureEditor, reset, inputText, deleteNTimes } from './utils';
 
 describe('withHeading', () => {
-  const editor = configureEditor({ marks: [withBold], blocks: [withHeading] });
+  const editor = configureEditor({
+    marks: [withBold],
+    blocks: [withHeading]
+  }) as EditorWithMark & EditorWithContainer;
   reset(editor);
 
   afterEach(() => reset(editor));

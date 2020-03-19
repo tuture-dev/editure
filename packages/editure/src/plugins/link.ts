@@ -12,7 +12,7 @@ type Link = {
   url: string;
 };
 
-interface EditorWithLink extends EditorWithMark {
+export interface EditorWithLink extends EditorWithMark {
   insertLink(link: Link): void;
   getLinkData(): Link;
   selectLink(): void;

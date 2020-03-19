@@ -4,9 +4,9 @@ import { withInlineCode } from './inline-code';
 import { withStrikethrough } from './strikethrough';
 import { withLink } from './link';
 
-import { withBaseMark } from './base-mark';
-import { withBaseBlock } from './base-block';
-import { withBaseContainer } from './base-container';
+import { EditorWithMark, withBaseMark } from './base-mark';
+import { EditorWithBlock, withBaseBlock } from './base-block';
+import { EditorWithContainer, withBaseContainer } from './base-container';
 
 import { withParagraph } from './paragraph';
 import { withList } from './list';
@@ -31,7 +31,10 @@ export {
   withCodeBlock,
   withBlockquote,
   withNote,
-  withHr
+  withHr,
+  EditorWithMark,
+  EditorWithBlock,
+  EditorWithContainer
 };
 
 export const defaultPlugins = [

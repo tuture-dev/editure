@@ -1,11 +1,12 @@
 import { Editor, Transforms, Range } from 'tuture-slate';
 import * as F from 'editure-constants';
 
+import { EditorWithMark } from '../base-mark';
 import { withItalic } from '../italic';
 import { configureEditor, reset, inputText } from './utils';
 
 describe('withItalic', () => {
-  const editor = configureEditor({ marks: [withItalic] });
+  const editor = configureEditor({ marks: [withItalic] }) as EditorWithMark;
   reset(editor);
 
   afterEach(() => reset(editor));

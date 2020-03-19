@@ -1,12 +1,12 @@
 import { Range } from 'tuture-slate';
 import { BOLD } from 'editure-constants';
 
-import { MarkPlugin } from './base-mark';
+import { EditorWithMark } from './base-mark';
 import { detectShortcut, handleMarkShortcut } from '../shortcuts';
 
 const shortcutRegexes = [/\*\*([^\*]+)\*\*/, /__([^_]+)__/];
 
-export const withBold: MarkPlugin = editor => {
+export const withBold = (editor: EditorWithMark) => {
   const { insertText } = editor;
 
   editor.insertText = text => {

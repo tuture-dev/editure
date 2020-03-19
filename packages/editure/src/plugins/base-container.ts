@@ -1,7 +1,6 @@
 import { Editor, Transforms } from 'tuture-slate';
 import * as F from 'editure-constants';
 
-import { Plugin } from '../interfaces';
 import { EditorWithBlock } from './base-block';
 
 export interface EditorWithContainer extends EditorWithBlock {
@@ -11,8 +10,8 @@ export interface EditorWithContainer extends EditorWithBlock {
   exitBlock(format: string): void;
 }
 
-export const withBaseContainer: Plugin<EditorWithBlock, EditorWithContainer> = editor => {
-  const e = editor as EditorWithContainer;
+export const withBaseContainer = <T extends EditorWithBlock>(editor: T) => {
+  const e = editor as T & EditorWithContainer;
 
   e.getChildFormat = () => {
     return F.PARAGRAPH;

@@ -30,35 +30,10 @@ export function deleteNTimes(editor: Editor, times: number) {
   });
 }
 
-type IEditor = Editor | EditorWithMark | EditorWithBlock | EditorWithContainer;
-
-// interface Plugin<S, T> {
-//   (editor: S): T
-// }
-
 type Plugin<S, T> = (editor: S) => T;
-type NormalPlugin = Plugin<Editor, Editor>;
 type MarkPlugin = Plugin<EditorWithMark, EditorWithMark>;
 type BlockPlugin = Plugin<EditorWithBlock, EditorWithBlock>;
 type ContainerPlugin = Plugin<EditorWithContainer, EditorWithContainer>;
-
-type AllowedPlugin =
-  | NormalPlugin
-  | MarkPlugin
-  | BlockPlugin
-  | ContainerPlugin
-  | typeof withBaseMark
-  | typeof withBaseBlock
-  | typeof withBaseContainer;
-
-// type MarkPlugin = (editor: EditorWithMark) => EditorWithMark;
-
-// type BlockPlugin = (editor: EditorWithBlock) => EditorWithBlock;
-
-// type ContainerPlugin = (editor: EditorWithContainer) => EditorWithContainer;
-
-// type Plugin = NormalPlugin | MarkPlugin | BlockPlugin | ContainerPlugin;
-// type Plugin = <T extends Editor>(editor: T) => T;
 
 type EditorConfiguration = {
   marks?: MarkPlugin[];
@@ -67,7 +42,7 @@ type EditorConfiguration = {
 };
 
 export function configureEditor(config?: EditorConfiguration) {
-  const plugins: Array<AllowedPlugin> = [withParagraph];
+  const plugins: Function[] = [withParagraph];
 
   if (config) {
     const { marks, blocks, containers } = config;
@@ -90,10 +65,7 @@ export function configureEditor(config?: EditorConfiguration) {
     }
   }
 
-  return plugins.reduce((editor, plugin) => {
-    // TODO: fix the typecheck of plugins
-    return (plugin as any)(editor);
-  }, createEditor());
+  return plugins.reduce((editor, plugin) => plugin(editor), createEditor());
 }
 
 export function createEditorWithMark(editor?: Editor) {

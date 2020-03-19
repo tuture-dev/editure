@@ -1,6 +1,7 @@
-import { createEditor, Editor, Transforms, Range } from 'tuture-slate';
+import { Editor, Transforms, Range } from 'tuture-slate';
 import * as F from 'editure-constants';
 
+import { EditorWithLink } from '../link';
 import { withLink } from '../link';
 import { configureEditor, reset, inputText } from './utils';
 
@@ -15,7 +16,7 @@ describe('withLink', () => {
     }
   ];
 
-  const editor = configureEditor({ marks: [withLink] });
+  const editor = configureEditor({ marks: [withLink] }) as EditorWithLink;
   reset(editor);
 
   afterEach(() => reset(editor));

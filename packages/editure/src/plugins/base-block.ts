@@ -1,8 +1,6 @@
 import { Editor, Transforms } from 'tuture-slate';
 import * as F from 'editure-constants';
 
-import { Plugin } from '../interfaces';
-
 export interface EditorWithBlock extends Editor {
   isBlockActive(format: string): boolean;
   toggleBlock(format: string, props?: any): void;
@@ -10,8 +8,8 @@ export interface EditorWithBlock extends Editor {
   detectBlockFormat(formats: string[]): string | null;
 }
 
-export const withBaseBlock: Plugin<Editor, EditorWithBlock> = editor => {
-  const e = editor as EditorWithBlock;
+export const withBaseBlock = <T extends Editor>(editor: T) => {
+  const e = editor as T & EditorWithBlock;
 
   e.isBlockActive = (format: string) => {
     try {

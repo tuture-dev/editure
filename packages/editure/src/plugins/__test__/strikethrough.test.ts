@@ -1,11 +1,12 @@
 import { Editor, Transforms, Range } from 'tuture-slate';
 import * as F from 'editure-constants';
 
+import { EditorWithMark } from '../base-mark';
 import { withStrikethrough } from '../strikethrough';
 import { configureEditor, reset, inputText } from './utils';
 
 describe('withStrikethrough', () => {
-  const editor = configureEditor({ marks: [withStrikethrough] });
+  const editor = configureEditor({ marks: [withStrikethrough] }) as EditorWithMark;
   reset(editor);
 
   afterEach(() => reset(editor));
