@@ -9,6 +9,7 @@ import { withLink } from './link';
 import { EditorWithMark, withBaseMark } from './base-mark';
 import { EditorWithBlock, withBaseBlock } from './base-block';
 import { EditorWithContainer, withBaseContainer } from './base-container';
+import { EditorWithVoid, withVoid } from './void';
 
 import { withParagraph } from './paragraph';
 import { withList } from './list';
@@ -35,14 +36,17 @@ export {
   withBlockquote,
   withNote,
   withHr,
+  withVoid,
   EditorWithMark,
   EditorWithBlock,
-  EditorWithContainer
+  EditorWithContainer,
+  EditorWithVoid
 };
 
 export const defaultPlugins = [
   withParagraph,
   withHr,
+  withVoid,
 
   // Mark plugins.
   withBaseMark,
