@@ -1,65 +1,154 @@
 import { Transforms, Editor, Point, Range, Element, Node } from 'tuture-slate';
 import { LIST_ITEM, BULLETED_LIST, NUMBERED_LIST, PARAGRAPH } from 'editure-constants';
 
-import { isBlockActive, decreaseItemDepth } from '../helpers';
+import { EditorWithBlock } from './base-block';
+import { getBeforeText } from '../utils';
+import { detectShortcut } from '../shortcuts';
 
-export default function withList(editor: Editor) {
-  const { deleteBackward, normalizeNode } = editor;
+export interface EditorWithList extends EditorWithBlock {
+  increaseItemDepth(): void;
+  decreaseItemDepth(): void;
+}
 
-  editor.deleteBackward = (...args) => {
-    const { selection } = editor;
+const shortcutRegexes: [string, RegExp[]][] = [
+  [BULLETED_LIST, [/^\*$/, /^-$/, /^\+$/]],
+  [NUMBERED_LIST, [/^[0-9]\.$/]]
+];
 
-    if (selection && Range.isCollapsed(selection)) {
-      const match = Editor.above(editor, {
-        match: n => n.type === LIST_ITEM
+const toggleList = (editor: EditorWithBlock, format: string, props?: any) => {
+  if ([BULLETED_LIST, NUMBERED_LIST].includes(format)) {
+    const isActive = !!editor.detectBlockFormat([BULLETED_LIST, NUMBERED_LIST]);
+
+    if (!isActive) {
+      Transforms.setNodes(editor, {
+        ...props,
+        type: LIST_ITEM
       });
 
-      if (match) {
-        const [block, path] = match;
-        const start = Editor.start(editor, path);
+      const block = { type: format, children: [] };
+      Transforms.wrapNodes(editor, block, props);
+    } else {
+      Transforms.unwrapNodes(editor, {
+        match: n => [BULLETED_LIST, NUMBERED_LIST].includes(n.type),
+        split: true
+      });
 
-        const parentAbove = Editor.above(editor, {
-          match: n => n.type === BULLETED_LIST || n.type === NUMBERED_LIST
-        });
+      Transforms.setNodes(editor, {
+        type: PARAGRAPH
+      });
 
-        if (
-          block.type !== PARAGRAPH &&
-          Point.equals(selection.anchor, start) &&
-          parentAbove
-        ) {
-          const type = isBlockActive(editor, BULLETED_LIST)
-            ? BULLETED_LIST
-            : NUMBERED_LIST;
+      Transforms.unsetNodes(editor, ['parent', 'number', 'level']);
+    }
+  }
+};
 
-          const block = Editor.above(editor, {
-            match: n => n.type === type
-          });
+export const withList = (editor: EditorWithBlock) => {
+  const e = editor as EditorWithList;
+  const { insertText, insertBreak, deleteBackward, normalizeNode } = e;
 
-          if (block) {
-            const [node] = block;
-            const { level = 0 } = node;
+  e.insertText = text => {
+    const { selection } = e;
 
-            if (level === 0) {
-              Transforms.liftNodes(editor, {
-                match: n => n.type === LIST_ITEM
-              });
+    if (text === ' ' && selection && Range.isCollapsed(selection)) {
+      for (const [format, regexes] of shortcutRegexes) {
+        const matchArr = detectShortcut(e, regexes);
 
-              Transforms.setNodes(editor, { type: PARAGRAPH });
-            } else {
-              decreaseItemDepth(editor);
-            }
-          }
-          return;
-        } else if (block.type !== PARAGRAPH && Point.equals(selection.anchor, start)) {
-          Transforms.setNodes(editor, { type: PARAGRAPH });
+        if (matchArr) {
+          Transforms.select(e, getBeforeText(e).range!);
+          Transforms.delete(e);
+
+          const nodeProp = { type: LIST_ITEM, level: 0, parent: format };
+          return toggleList(e, format, nodeProp);
         }
       }
 
-      deleteBackward(...args);
+      return insertText(' ');
     }
+
+    insertText(text);
   };
 
-  editor.normalizeNode = entry => {
+  e.insertBreak = () => {
+    for (const format of [BULLETED_LIST, NUMBERED_LIST]) {
+      if (e.isBlockActive(format)) {
+        const { beforeText } = getBeforeText(e);
+
+        // Exit the list if empty.
+        if (!beforeText) {
+          toggleList(e, format);
+          Transforms.unsetNodes(e, ['parent', 'number', 'level']);
+
+          return;
+        }
+
+        return insertBreak();
+      }
+    }
+
+    insertBreak();
+  };
+
+  e.deleteBackward = unit => {
+    const { selection } = e;
+
+    if (!selection) return;
+
+    if (unit !== 'character') {
+      return deleteBackward(unit);
+    }
+
+    const match = Editor.above(e, {
+      match: n => n.type === LIST_ITEM
+    });
+
+    if (match) {
+      const [block, path] = match;
+      const start = Editor.start(e, path);
+
+      const parentAbove = Editor.above(e, {
+        match: n => n.type === BULLETED_LIST || n.type === NUMBERED_LIST
+      });
+
+      if (
+        block.type !== PARAGRAPH &&
+        Point.equals(selection.anchor, start) &&
+        parentAbove
+      ) {
+        const type = e.isBlockActive(BULLETED_LIST) ? BULLETED_LIST : NUMBERED_LIST;
+
+        const block = Editor.above(e, {
+          match: n => n.type === type
+        });
+
+        if (block) {
+          const [node] = block;
+          const { level = 0 } = node;
+
+          if (level === 0) {
+            Transforms.liftNodes(e, {
+              match: n => n.type === LIST_ITEM
+            });
+
+            Transforms.setNodes(e, { type: PARAGRAPH });
+            Transforms.unsetNodes(e, ['level', 'parent', 'number']);
+          } else {
+            e.decreaseItemDepth();
+          }
+
+          return;
+        }
+      } else if (block.type !== PARAGRAPH && Point.equals(selection.anchor, start)) {
+        Transforms.setNodes(e, { type: PARAGRAPH });
+        Transforms.unsetNodes(e, ['level', 'parent', 'number']);
+
+        return;
+      }
+    }
+
+    deleteBackward(unit);
+  };
+
+  e.normalizeNode = entry => {
     const [node, path] = entry;
 
     if (!Element.isElement(node)) {
@@ -67,13 +156,13 @@ export default function withList(editor: Editor) {
     }
 
     if (node.type === BULLETED_LIST) {
-      for (const [child, childPath] of Node.children(editor, path)) {
+      for (const [child, childPath] of Node.children(e, path)) {
         const { level = 0, children } = child;
-        Transforms.setNodes(editor, { level, parent: node.type }, { at: childPath });
+        Transforms.setNodes(e, { level, parent: node.type }, { at: childPath });
 
         // List item should not have any block child.
         if (children.length === 1 && Element.isElement(children[0])) {
-          Transforms.unwrapNodes(editor, { at: [...childPath, 0] });
+          Transforms.unwrapNodes(e, { at: [...childPath, 0] });
         }
       }
       return;
@@ -85,7 +174,7 @@ export default function withList(editor: Editor) {
       let counter = 0;
       let lastLevel = 0;
 
-      for (const [child, childPath] of Node.children(editor, path)) {
+      for (const [child, childPath] of Node.children(e, path)) {
         const { level = 0, children } = child;
         if (level > lastLevel) {
           counterStack.push(counter);
@@ -100,7 +189,7 @@ export default function withList(editor: Editor) {
         }
 
         Transforms.setNodes(
-          editor,
+          e,
           { level, parent: node.type, number: counter },
           { at: childPath }
         );
@@ -109,7 +198,7 @@ export default function withList(editor: Editor) {
 
         // List item should not have any block child.
         if (children.length === 1 && Element.isElement(children[0])) {
-          Transforms.unwrapNodes(editor, { at: [...childPath, 0] });
+          Transforms.unwrapNodes(e, { at: [...childPath, 0] });
         }
       }
       return;
@@ -119,5 +208,39 @@ export default function withList(editor: Editor) {
     normalizeNode(entry);
   };
 
-  return editor;
-}
+  e.increaseItemDepth = () => {
+    const block = Editor.above(e, {
+      match: n => n.type === LIST_ITEM
+    });
+
+    if (block) {
+      const [node] = block;
+      const { level = 0, parent } = node;
+
+      Transforms.setNodes(
+        e,
+        { parent, level: Math.min(level + 1, 8) },
+        { match: n => n.type === LIST_ITEM }
+      );
+    }
+
+    e.decreaseItemDepth = () => {
+      const block = Editor.above(editor, {
+        match: n => n.type === LIST_ITEM
+      });
+
+      if (block) {
+        const [node] = block;
+        const { level = 0, parent } = node;
+
+        Transforms.setNodes(
+          editor,
+          { parent, level: Math.max(level - 1, 0) },
+          { match: n => n.type === LIST_ITEM }
+        );
+      }
+    };
+  };
+
+  return e;
+};

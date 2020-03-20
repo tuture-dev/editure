@@ -52,7 +52,7 @@ export default [
     external: id => !id.startsWith('.') && !id.startsWith('/')
   },
   {
-    input: 'packages/editure-react/src/index.js',
+    input: 'packages/editure-react/src/index.ts',
     output: [
       {
         file: 'packages/editure-react/dist/index.esm.js',
@@ -67,22 +67,10 @@ export default [
       }
     ],
     plugins: [
-      css({ output: 'packages/editure-react/dist/index.css' }),
       resolve({ browser: true }),
-      commonjs({
-        exclude: ['packages/editure-react/src/**'],
-        namedExports: {
-          esrever: ['reverse'],
-          'react-dom': ['findDOMNode'],
-          'react-dom/server': ['renderToStaticMarkup']
-        }
-      }),
       json(),
-      babel({
-        include: ['packages/editure-react/src/**'],
-        extensions: ['.js'],
-        presets: ['@babel/preset-react'],
-        plugins: ['@babel/plugin-proposal-class-properties']
+      typescript({
+        tsconfig: 'packages/editure-react/tsconfig.json'
       })
     ],
     external: id => !id.startsWith('.') && !id.startsWith('/')
