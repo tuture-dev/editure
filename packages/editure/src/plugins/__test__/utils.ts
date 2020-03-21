@@ -31,11 +31,13 @@ export function deleteNTimes(editor: Editor, times: number) {
 }
 
 type Plugin<S, T> = (editor: S) => T;
+type CommonPlugin = Plugin<Editor, Editor>;
 type MarkPlugin = Plugin<EditorWithMark, EditorWithMark>;
 type BlockPlugin = Plugin<EditorWithBlock, EditorWithBlock>;
 type ContainerPlugin = Plugin<EditorWithContainer, EditorWithContainer>;
 
 type EditorConfiguration = {
+  commons?: CommonPlugin[];
   marks?: MarkPlugin[];
   blocks?: BlockPlugin[];
   containers?: ContainerPlugin[];
@@ -45,7 +47,11 @@ export function configureEditor(config?: EditorConfiguration) {
   const plugins: Function[] = [withParagraph];
 
   if (config) {
-    const { marks, blocks, containers } = config;
+    const { commons, marks, blocks, containers } = config;
+
+    if (commons && commons.length > 0) {
+      plugins.push(withBaseMark, ...commons);
+    }
 
     if (marks && marks.length > 0) {
       plugins.push(withBaseMark, ...marks);
