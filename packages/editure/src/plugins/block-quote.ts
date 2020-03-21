@@ -1,4 +1,4 @@
-import { Editor, Transforms, Range, Point } from 'tuture-slate';
+import { Editor, Transforms, Range } from 'tuture-slate';
 import { BLOCK_QUOTE, PARAGRAPH } from 'editure-constants';
 
 import { EditorWithContainer } from './base-container';
@@ -64,29 +64,22 @@ export const withBlockquote = (editor: EditorWithContainer) => {
     });
 
     if (match) {
-      const [block, path] = match;
-      const start = Editor.start(editor, path);
+      const { beforeText } = getBeforeText(editor);
 
-      if (
-        block.type !== PARAGRAPH &&
-        Point.equals(selection.anchor, start) &&
-        editor.isBlockActive(editor.getChildFormat(BLOCK_QUOTE))
-      ) {
-        const { wholeLineText } = getLineText(editor);
-        const { children = [] } = block;
-
-        Editor.withoutNormalizing(editor, () => {
-          if (children.length === 1 && !wholeLineText) {
-            editor.toggleBlock(BLOCK_QUOTE);
-          } else if (children.length > 1) {
-            Transforms.mergeNodes(editor);
-          }
-        });
-
-        return;
+      if (beforeText) {
+        return deleteBackward('character');
       }
 
-      return deleteBackward(unit);
+      const [block] = match;
+      const { children = [] } = block;
+
+      if (children.length === 1 && !beforeText) {
+        editor.toggleBlock(BLOCK_QUOTE);
+      } else if (children.length > 1) {
+        Transforms.mergeNodes(editor);
+      }
+
+      return;
     }
 
     deleteBackward(unit);

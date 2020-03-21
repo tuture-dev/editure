@@ -1,9 +1,15 @@
-import { Range } from 'tuture-slate';
+import { Transforms, Range } from 'tuture-slate';
 import * as F from 'editure-constants';
 
 import { EditorWithContainer } from '../base-container';
 import { withBlockquote } from '../block-quote';
-import { configureEditor, reset, inputText, deleteNTimes } from './utils';
+import {
+  configureEditor,
+  createEditorWithContainer,
+  reset,
+  inputText,
+  deleteNTimes
+} from './utils';
 
 describe('withBlockquote', () => {
   const editor = configureEditor({ containers: [withBlockquote] }) as EditorWithContainer;
@@ -25,23 +31,32 @@ describe('withBlockquote', () => {
       expect(editor.children).toStrictEqual(nodes);
       expect(Range.isCollapsed(editor.selection!)).toBe(true);
     });
-  });
 
-  test('block quote with multiple paragraphs', () => {
-    inputText(editor, '> foo\nbar');
+    test('block quote with multiple paragraphs', () => {
+      inputText(editor, '> foo\nbar');
 
-    const nodes = [
-      {
-        type: F.BLOCK_QUOTE,
-        children: [
-          { type: F.PARAGRAPH, children: [{ text: 'foo' }] },
-          { type: F.PARAGRAPH, children: [{ text: 'bar' }] }
-        ]
-      }
-    ];
+      const nodes = [
+        {
+          type: F.BLOCK_QUOTE,
+          children: [
+            { type: F.PARAGRAPH, children: [{ text: 'foo' }] },
+            { type: F.PARAGRAPH, children: [{ text: 'bar' }] }
+          ]
+        }
+      ];
 
-    expect(editor.children).toStrictEqual(nodes);
-    expect(Range.isCollapsed(editor.selection!)).toBe(true);
+      expect(editor.children).toStrictEqual(nodes);
+      expect(Range.isCollapsed(editor.selection!)).toBe(true);
+    });
+
+    test('should not interfere with regular space inserting', () => {
+      inputText(editor, '*test* ');
+
+      const nodes = [{ type: F.PARAGRAPH, children: [{ text: '*test* ' }] }];
+
+      expect(editor.children).toStrictEqual(nodes);
+      expect(Range.isCollapsed(editor.selection!)).toBe(true);
+    });
   });
 
   describe('insertBreak', () => {
@@ -67,6 +82,24 @@ describe('withBlockquote', () => {
         },
         { type: F.PARAGRAPH, children: [{ text: '' }] }
       ]);
+    });
+
+    test('should not interfere with regular break', () => {
+      inputText(editor, 'foo\nbar');
+
+      const nodes = [
+        {
+          type: F.PARAGRAPH,
+          children: [{ text: 'foo' }]
+        },
+        {
+          type: F.PARAGRAPH,
+          children: [{ text: 'bar' }]
+        }
+      ];
+
+      expect(editor.children).toStrictEqual(nodes);
+      expect(Range.isCollapsed(editor.selection!)).toBe(true);
     });
   });
 
@@ -99,6 +132,52 @@ describe('withBlockquote', () => {
       ]);
     });
 
+    test('delete by character from middle', () => {
+      inputText(editor, '> foo');
+      Transforms.select(editor, { path: [0, 0, 0], offset: 1 });
+
+      deleteNTimes(editor, 1);
+      expect(editor.children).toStrictEqual([
+        {
+          type: F.BLOCK_QUOTE,
+          children: [{ type: F.PARAGRAPH, children: [{ text: 'oo' }] }]
+        }
+      ]);
+
+      deleteNTimes(editor, 1);
+      expect(editor.children).toStrictEqual([
+        { type: F.PARAGRAPH, children: [{ text: 'oo' }] }
+      ]);
+    });
+
+    test('delete by character within multiple paragraphs', () => {
+      inputText(editor, '> foo\nbar\nbaz');
+      Transforms.select(editor, { path: [0, 1, 0], offset: 1 });
+
+      deleteNTimes(editor, 1);
+      expect(editor.children).toStrictEqual([
+        {
+          type: F.BLOCK_QUOTE,
+          children: [
+            { type: F.PARAGRAPH, children: [{ text: 'foo' }] },
+            { type: F.PARAGRAPH, children: [{ text: 'ar' }] },
+            { type: F.PARAGRAPH, children: [{ text: 'baz' }] }
+          ]
+        }
+      ]);
+
+      deleteNTimes(editor, 1);
+      expect(editor.children).toStrictEqual([
+        {
+          type: F.BLOCK_QUOTE,
+          children: [
+            { type: F.PARAGRAPH, children: [{ text: 'fooar' }] },
+            { type: F.PARAGRAPH, children: [{ text: 'baz' }] }
+          ]
+        }
+      ]);
+    });
+
     test('delete by line', () => {
       inputText(editor, '> foo');
       editor.deleteBackward('line');
@@ -110,6 +189,56 @@ describe('withBlockquote', () => {
         }
       ]);
       expect(Range.isCollapsed(editor.selection!)).toBe(true);
+    });
+
+    test('should not interfere with regular delete', () => {
+      inputText(editor, 'foo');
+      deleteNTimes(editor, 1);
+
+      const nodes = [{ type: F.PARAGRAPH, children: [{ text: 'fo' }] }];
+
+      expect(editor.children).toStrictEqual(nodes);
+    });
+  });
+
+  describe('toggleBlock', () => {
+    test('toggle empty paragraph', () => {
+      inputText(editor, 'foo\n');
+      editor.toggleBlock(F.BLOCK_QUOTE);
+
+      const nodes = [
+        { type: F.PARAGRAPH, children: [{ text: 'foo' }] },
+        {
+          type: F.BLOCK_QUOTE,
+          children: [{ type: F.PARAGRAPH, children: [{ text: '' }] }]
+        }
+      ];
+
+      expect(editor.children).toStrictEqual(nodes);
+    });
+
+    test('toggle non-empty paragraph', () => {
+      inputText(editor, 'foo\nbar');
+      editor.toggleBlock(F.BLOCK_QUOTE);
+
+      const nodes = [
+        { type: F.PARAGRAPH, children: [{ text: 'foo' }] },
+        {
+          type: F.BLOCK_QUOTE,
+          children: [{ type: F.PARAGRAPH, children: [{ text: 'bar' }] }]
+        }
+      ];
+
+      expect(editor.children).toStrictEqual(nodes);
+    });
+
+    test('should be able delegate to downstream toggleBlock ', () => {
+      const baseEditor = createEditorWithContainer();
+      const toggleBlock = jest.spyOn(baseEditor, 'toggleBlock');
+
+      withBlockquote(baseEditor).toggleBlock('some-other-block');
+
+      expect(toggleBlock).toBeCalled();
     });
   });
 });
