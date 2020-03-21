@@ -97,52 +97,31 @@ export const withList = (editor: EditorWithBlock) => {
       return deleteBackward(unit);
     }
 
-    const match = Editor.above(e, {
+    const [match] = Editor.nodes(e, {
       match: n => n.type === LIST_ITEM
     });
 
     if (match) {
-      const [block, path] = match;
-      const start = Editor.start(e, path);
+      const [node] = match;
+      const { level = 0 } = node;
+      const { beforeText } = getBeforeText(e);
 
-      const parentAbove = Editor.above(e, {
-        match: n => n.type === BULLETED_LIST || n.type === NUMBERED_LIST
-      });
+      if (beforeText) {
+        return deleteBackward('character');
+      }
 
-      if (
-        block.type !== PARAGRAPH &&
-        Point.equals(selection.anchor, start) &&
-        parentAbove
-      ) {
-        const type = e.isBlockActive(BULLETED_LIST) ? BULLETED_LIST : NUMBERED_LIST;
-
-        const block = Editor.above(e, {
-          match: n => n.type === type
+      if (level === 0) {
+        Transforms.liftNodes(e, {
+          match: n => n.type === LIST_ITEM
         });
 
-        if (block) {
-          const [node] = block;
-          const { level = 0 } = node;
-
-          if (level === 0) {
-            Transforms.liftNodes(e, {
-              match: n => n.type === LIST_ITEM
-            });
-
-            Transforms.setNodes(e, { type: PARAGRAPH });
-            Transforms.unsetNodes(e, ['level', 'parent', 'number']);
-          } else {
-            e.decreaseItemDepth();
-          }
-
-          return;
-        }
-      } else if (block.type !== PARAGRAPH && Point.equals(selection.anchor, start)) {
         Transforms.setNodes(e, { type: PARAGRAPH });
         Transforms.unsetNodes(e, ['level', 'parent', 'number']);
-
-        return;
+      } else {
+        e.decreaseItemDepth();
       }
+
+      return;
     }
 
     deleteBackward(unit);
@@ -223,23 +202,23 @@ export const withList = (editor: EditorWithBlock) => {
         { match: n => n.type === LIST_ITEM }
       );
     }
+  };
 
-    e.decreaseItemDepth = () => {
-      const block = Editor.above(editor, {
-        match: n => n.type === LIST_ITEM
-      });
+  e.decreaseItemDepth = () => {
+    const block = Editor.above(editor, {
+      match: n => n.type === LIST_ITEM
+    });
 
-      if (block) {
-        const [node] = block;
-        const { level = 0, parent } = node;
+    if (block) {
+      const [node] = block;
+      const { level = 0, parent } = node;
 
-        Transforms.setNodes(
-          editor,
-          { parent, level: Math.max(level - 1, 0) },
-          { match: n => n.type === LIST_ITEM }
-        );
-      }
-    };
+      Transforms.setNodes(
+        editor,
+        { parent, level: Math.max(level - 1, 0) },
+        { match: n => n.type === LIST_ITEM }
+      );
+    }
   };
 
   return e;
