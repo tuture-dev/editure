@@ -110,6 +110,19 @@ describe('withLink', () => {
       expect(Range.isCollapsed(editor.selection!)).toBe(true);
       expect(Editor.marks(editor)).toStrictEqual({});
     });
+
+    test('linkify', () => {
+      editor.insertText(link.url);
+
+      const nodes = [
+        {
+          type: F.PARAGRAPH,
+          children: [{ text: link.url, url: link.url, link: true }]
+        }
+      ];
+
+      expect(editor.children).toStrictEqual(nodes);
+    });
   });
 
   describe('insertLink', () => {
@@ -162,6 +175,40 @@ describe('withLink', () => {
 
       Transforms.select(editor, { path: [0, 1], offset: 0 });
       expect(editor.getLinkData()).toStrictEqual(emptyLink);
+    });
+  });
+
+  describe('selectLink', () => {
+    test('regular', () => {
+      inputText(editor, 'foo [bar](https://test.com) baz');
+
+      Transforms.select(editor, { path: [0, 1], offset: 1 });
+      editor.selectLink();
+
+      expect(editor.selection).toStrictEqual({
+        anchor: { path: [0, 1], offset: 0 },
+        focus: { path: [0, 1], offset: 3 }
+      });
+    });
+
+    test('link not active', () => {
+      inputText(editor, 'foo [bar](https://test.com) baz');
+
+      Transforms.select(editor, { path: [0, 0], offset: 1 });
+      const selection = editor.selection;
+
+      editor.selectLink();
+
+      expect(editor.selection).toStrictEqual(selection);
+    });
+
+    test('no selection', () => {
+      inputText(editor, 'foo [bar](https://test.com) baz');
+
+      editor.selection = null;
+      editor.selectLink();
+
+      expect(editor.selection).toStrictEqual(null);
     });
   });
 
