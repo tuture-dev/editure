@@ -41,17 +41,3 @@ export const getChildrenText = (children: Node[], path: Location): string => {
 
   return childrenItem[path[i]].text;
 };
-
-export const compareNode = (nodeOnePath: Location, nodeTwoPath: Location) => {
-  if (nodeOnePath.length !== nodeTwoPath.length) {
-    return false;
-  }
-
-  for (let i = 0; i < nodeOnePath.length; i++) {
-    if (nodeOnePath[i] !== nodeTwoPath[i]) {
-      return false;
-    }
-  }
-
-  return true;
-};
