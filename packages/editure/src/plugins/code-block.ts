@@ -33,15 +33,15 @@ export const withCodeBlock = (editor: EditorWithContainer) => {
 
     if (!selection) return;
 
+    if (editor.isBlockActive(CODE_BLOCK)) {
+      // Disable any shortcuts in a code block.
+      return Transforms.splitNodes(editor, { always: true });
+    }
+
     if (Range.isCollapsed(selection)) {
       const matchArr = detectShortcut(editor, shortcutRegexes);
 
       if (matchArr) {
-        if (editor.isBlockActive(CODE_BLOCK)) {
-          // Already in a code block.
-          return insertBreak();
-        }
-
         Transforms.select(editor, getBeforeText(editor).range!);
         Transforms.delete(editor);
 
@@ -68,29 +68,23 @@ export const withCodeBlock = (editor: EditorWithContainer) => {
     });
 
     if (match) {
-      const [block, path] = match;
-      const start = Editor.start(editor, path);
+      const { beforeText } = getBeforeText(editor);
 
-      if (
-        block.type !== PARAGRAPH &&
-        Point.equals(selection.anchor, start) &&
-        editor.isBlockActive(editor.getChildFormat(CODE_BLOCK))
-      ) {
-        const { wholeLineText } = getLineText(editor);
-        const { children = [] } = block;
-
-        Editor.withoutNormalizing(editor, () => {
-          if (children.length === 1 && !wholeLineText) {
-            editor.toggleBlock(CODE_BLOCK);
-          } else if (children.length > 1) {
-            Transforms.mergeNodes(editor);
-          }
-        });
-
-        return;
+      if (beforeText) {
+        return deleteBackward('character');
       }
 
-      return deleteBackward(unit);
+      const [block] = match;
+      const { wholeLineText } = getLineText(editor);
+      const { children = [] } = block;
+
+      if (children.length === 1 && !wholeLineText) {
+        editor.toggleBlock(CODE_BLOCK);
+      } else if (children.length > 1) {
+        Transforms.mergeNodes(editor);
+      }
+
+      return;
     }
 
     deleteBackward(unit);
@@ -116,17 +110,21 @@ export const withCodeBlock = (editor: EditorWithContainer) => {
   };
 
   editor.unwrapBlock = format => {
-    if (format === CODE_BLOCK) {
-      const block = Editor.above(editor, {
-        match: n => n.type === CODE_BLOCK
-      });
+    if (format !== CODE_BLOCK) {
+      return unwrapBlock(format);
+    }
 
-      if (block) {
-        const [, path] = block;
-        const anchor = Editor.start(editor, path);
-        const focus = Editor.end(editor, path);
-        const range = { anchor, focus };
+    const block = Editor.above(editor, {
+      match: n => n.type === CODE_BLOCK
+    });
 
+    if (block) {
+      const [, path] = block;
+      const anchor = Editor.start(editor, path);
+      const focus = Editor.end(editor, path);
+      const range = { anchor, focus };
+
+      Editor.withoutNormalizing(editor, () => {
         Transforms.setNodes(
           editor,
           { type: PARAGRAPH },
@@ -135,51 +133,44 @@ export const withCodeBlock = (editor: EditorWithContainer) => {
             match: n => n.type === CODE_LINE
           }
         );
+
         Transforms.unwrapNodes(editor, {
           at: range,
           match: n => n.type === CODE_BLOCK
         });
-      }
-
-      return;
+      });
     }
-
-    unwrapBlock(format);
   };
 
   editor.exitBlock = format => {
-    if (format === CODE_BLOCK) {
-      return Editor.withoutNormalizing(editor, () => {
-        Transforms.setNodes(
-          editor,
-          { type: PARAGRAPH },
-          { match: n => n.type === CODE_LINE }
-        );
-
-        Transforms.unwrapNodes(editor, {
-          match: n => n.type === CODE_BLOCK,
-          split: true
-        });
-      });
+    if (format !== CODE_BLOCK) {
+      return exitBlock(format);
     }
 
-    exitBlock(format);
+    Editor.withoutNormalizing(editor, () => {
+      Transforms.setNodes(
+        editor,
+        { type: PARAGRAPH },
+        { match: n => n.type === CODE_LINE }
+      );
+
+      Transforms.unwrapNodes(editor, {
+        match: n => n.type === CODE_BLOCK,
+        split: true
+      });
+    });
   };
 
   editor.toggleBlock = (format, props?) => {
-    if (format === CODE_BLOCK) {
-      return Editor.withoutNormalizing(editor, () => {
-        const isActive = editor.isBlockActive(format);
-
-        if (isActive) {
-          editor.unwrapBlock(format);
-        } else {
-          editor.wrapBlock(format, props);
-        }
-      });
+    if (format !== CODE_BLOCK) {
+      return toggleBlock(format, props);
     }
 
-    toggleBlock(format, props);
+    if (editor.isBlockActive(format)) {
+      editor.unwrapBlock(format);
+    } else {
+      editor.wrapBlock(format, props);
+    }
   };
 
   return editor;
