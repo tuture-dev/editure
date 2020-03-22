@@ -21,7 +21,7 @@ const containsMarkdownCode = (text: string) => {
     /^\s*>/,
     /^\s*#/,
     /^\s*```\s*([a-zA-Z]*)/,
-    /^\s*---/
+    /^\s*---/,
   ];
 
   for (const regex of testRegexes) {
@@ -33,15 +33,15 @@ const containsMarkdownCode = (text: string) => {
 export const withPaste = (editor: ReactEditor) => {
   const { insertData, insertText, isInline, isVoid } = editor;
 
-  editor.isInline = element => {
+  editor.isInline = (element) => {
     return element.type === LINK ? true : isInline(element);
   };
 
-  editor.isVoid = element => {
+  editor.isVoid = (element) => {
     return element.type === IMAGE ? true : isVoid(element);
   };
 
-  editor.insertData = data => {
+  editor.insertData = (data) => {
     const dataTypes = Array.from(data.types);
     if (!dataTypes.includes('text/plain')) {
       return insertData(data);
@@ -55,10 +55,10 @@ export const withPaste = (editor: ReactEditor) => {
         .getData('text/plain')
         .trim()
         .split('\n')
-        .forEach(line => {
+        .forEach((line) => {
           Transforms.insertNodes(editor, {
             type: CODE_LINE,
-            children: [{ text: line.trimRight() }]
+            children: [{ text: line.trimRight() }],
           });
         });
 
@@ -94,7 +94,7 @@ export const withPaste = (editor: ReactEditor) => {
         .getData('text/plain')
         .trim()
         .split('\n')
-        .filter(line => line)
+        .filter((line) => line)
         .forEach((line, index) => {
           if (index === 0) {
             // Insert the first line without creating a new paragraph.
@@ -103,7 +103,7 @@ export const withPaste = (editor: ReactEditor) => {
 
           Transforms.insertNodes(editor, {
             type: PARAGRAPH,
-            children: [{ text: line }]
+            children: [{ text: line }],
           });
         });
     }

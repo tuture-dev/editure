@@ -24,7 +24,7 @@ export const withLink = (editor: EditorWithMark) => {
   const e = editor as EditorWithLink;
   const { insertText } = e;
 
-  e.insertText = text => {
+  e.insertText = (text) => {
     if (text && isUrl(text)) {
       return e.insertLink({ text, url: text });
     }
@@ -36,7 +36,7 @@ export const withLink = (editor: EditorWithMark) => {
 
       if (matchArr) {
         handleMarkShortcut(e, LINK, matchArr);
-        Transforms.setNodes(e, { url: matchArr[2] }, { match: n => n.link });
+        Transforms.setNodes(e, { url: matchArr[2] }, { match: (n) => n.link });
       }
 
       return insertText(' ');
@@ -63,11 +63,11 @@ export const withLink = (editor: EditorWithMark) => {
     Transforms.collapse(e, { edge: 'end' });
     e.toggleMark(LINK);
 
-    Transforms.setNodes(e, { url }, { match: n => n.link });
+    Transforms.setNodes(e, { url }, { match: (n) => n.link });
   };
 
   e.getLinkData = () => {
-    const [match] = Editor.nodes(e, { match: n => n.link });
+    const [match] = Editor.nodes(e, { match: (n) => n.link });
     if (match) {
       const { text, url } = match[0];
       return { text, url };

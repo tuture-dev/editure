@@ -13,7 +13,7 @@ import {
   PARAGRAPH,
   CODE_BLOCK,
   CODE_LINE,
-  LIST_ITEM
+  LIST_ITEM,
 } from 'editure-constants';
 import { toHtml, parseHtml } from '../html';
 
@@ -71,8 +71,8 @@ describe('html serialization', () => {
           { italic: true, text: 'italic' },
           { text: ' and ' },
           { code: true, text: 'code' },
-          { text: '.' }
-        ]
+          { text: '.' },
+        ],
       };
       const output =
         '<p>This is <strong>bold</strong> and <em>italic</em> and <code>code</code>.</p>';
@@ -101,8 +101,7 @@ describe('html serialization', () => {
 
     test('bold + strikethrough', () => {
       const node = { bold: true, strikethrough: true, text: 'test' };
-      const output =
-        '<span style="text-decoration: line-through"><strong>test</strong></span>';
+      const output = '<span style="text-decoration: line-through"><strong>test</strong></span>';
       expect(toHtml(node)).toBe(output);
     });
 
@@ -121,7 +120,7 @@ describe('html serialization', () => {
         link: true,
         strikethrough: true,
         url: 'https://test.com',
-        text: 'test'
+        text: 'test',
       };
       const output = `<a href="${node.url}"><u><span style=\"text-decoration: line-through\"><em><strong><code>test</code></strong></em></span></u></a>`;
       expect(toHtml(node)).toBe(output);
@@ -137,8 +136,8 @@ describe('html serialization', () => {
           { underline: true, strikethrough: true, text: 'mixed' },
           { text: ' and ' },
           { code: true, link: true, url: 'https://test.com', text: 'code' },
-          { text: '.' }
-        ]
+          { text: '.' },
+        ],
       };
       const output =
         '<p>This is <em><strong>mixed</strong></em> and <u><span style="text-decoration: line-through">mixed</span></u> and <a href="https://test.com"><code>code</code></a>.</p>';
@@ -193,7 +192,7 @@ describe('html serialization', () => {
       const node = {
         type: IMAGE,
         url: 'https://test.com/image.png',
-        children: [{ text: '' }]
+        children: [{ text: '' }],
       };
       const output = `<img src="${node.url}" alt="" />`;
       expect(toHtml(node)).toBe(output);
@@ -202,7 +201,7 @@ describe('html serialization', () => {
     test('blockquote (single line)', () => {
       const node = {
         type: BLOCK_QUOTE,
-        children: [{ type: PARAGRAPH, children: [{ text: 'test' }] }]
+        children: [{ type: PARAGRAPH, children: [{ text: 'test' }] }],
       };
       const output = '<blockquote><p>test</p></blockquote>';
       expect(toHtml(node)).toBe(output);
@@ -213,8 +212,8 @@ describe('html serialization', () => {
         type: BLOCK_QUOTE,
         children: [
           { type: PARAGRAPH, children: [{ text: 'foo' }] },
-          { type: PARAGRAPH, children: [{ text: 'bar' }] }
-        ]
+          { type: PARAGRAPH, children: [{ text: 'bar' }] },
+        ],
       };
       const output = '<blockquote><p>foo</p><p>bar</p></blockquote>';
       expect(toHtml(node)).toBe(output);
@@ -224,7 +223,7 @@ describe('html serialization', () => {
       const node = {
         type: NOTE,
         level: 'info',
-        children: [{ type: PARAGRAPH, children: [{ text: 'test' }] }]
+        children: [{ type: PARAGRAPH, children: [{ text: 'test' }] }],
       };
 
       // Should degrade to blockquote.
@@ -238,8 +237,8 @@ describe('html serialization', () => {
         level: 'warning',
         children: [
           { type: PARAGRAPH, children: [{ text: 'foo' }] },
-          { type: PARAGRAPH, children: [{ text: 'bar' }] }
-        ]
+          { type: PARAGRAPH, children: [{ text: 'bar' }] },
+        ],
       };
 
       // Should degrade to blockquote.
@@ -251,7 +250,7 @@ describe('html serialization', () => {
       const node = {
         type: CODE_BLOCK,
         lang: '',
-        children: [{ type: CODE_LINE, children: [{ text: 'test' }] }]
+        children: [{ type: CODE_LINE, children: [{ text: 'test' }] }],
       };
       const output = '<pre><code>test</code></pre>';
       expect(toHtml(node)).toBe(output);
@@ -263,8 +262,8 @@ describe('html serialization', () => {
         lang: '',
         children: [
           { type: CODE_LINE, children: [{ text: 'foo' }] },
-          { type: CODE_LINE, children: [{ text: 'bar' }] }
-        ]
+          { type: CODE_LINE, children: [{ text: 'bar' }] },
+        ],
       };
       const output = '<pre><code>foo</code><code>bar</code></pre>';
       expect(toHtml(node)).toBe(output);
@@ -275,8 +274,8 @@ describe('html serialization', () => {
         type: BULLETED_LIST,
         children: [
           { type: LIST_ITEM, children: [{ text: 'foo' }] },
-          { type: LIST_ITEM, children: [{ text: 'bar ' }, { text: 'baz', bold: true }] }
-        ]
+          { type: LIST_ITEM, children: [{ text: 'bar ' }, { text: 'baz', bold: true }] },
+        ],
       };
       const output = '<ul><li>foo</li><li>bar <strong>baz</strong></li></ul>';
       expect(toHtml(node)).toBe(output);
@@ -287,8 +286,8 @@ describe('html serialization', () => {
         type: NUMBERED_LIST,
         children: [
           { type: LIST_ITEM, children: [{ text: 'foo' }] },
-          { type: LIST_ITEM, children: [{ text: 'bar' }] }
-        ]
+          { type: LIST_ITEM, children: [{ text: 'bar' }] },
+        ],
       };
       const output = '<ol><li>foo</li><li>bar</li></ol>';
       expect(toHtml(node)).toBe(output);
@@ -301,17 +300,17 @@ describe('html serialization', () => {
           { type: PARAGRAPH, children: [{ text: 'paragraph1' }] },
           {
             type: BLOCK_QUOTE,
-            children: [{ type: PARAGRAPH, children: [{ text: 'blockquote' }] }]
+            children: [{ type: PARAGRAPH, children: [{ text: 'blockquote' }] }],
           },
           {
             type: CODE_BLOCK,
             lang: 'javascript',
             children: [
               { type: CODE_LINE, children: [{ text: 'const a = 1;' }] },
-              { type: CODE_LINE, children: [{ text: "console.log('hello');" }] }
-            ]
-          }
-        ]
+              { type: CODE_LINE, children: [{ text: "console.log('hello');" }] },
+            ],
+          },
+        ],
       };
       const output =
         "<h1>title</h1><p>paragraph1</p><blockquote><p>blockquote</p></blockquote><pre><code>const a = 1;</code><code>console.log('hello');</code></pre>";
@@ -331,11 +330,11 @@ describe('html serialization', () => {
             lang: 'typescript',
             children: [
               { type: CODE_LINE, children: [{ text: 'const a = 1;' }] },
-              { type: CODE_LINE, children: [{ text: "console.log('hello');" }] }
-            ]
+              { type: CODE_LINE, children: [{ text: "console.log('hello');" }] },
+            ],
           },
-          { type: PARAGRAPH, children: [{ text: 'Bye.' }] }
-        ]
+          { type: PARAGRAPH, children: [{ text: 'Bye.' }] },
+        ],
       };
       const output =
         "<blockquote><p>This is some code:</p><pre><code>const a = 1;</code><code>console.log('hello');</code></pre><p>Bye.</p></blockquote>";
@@ -351,10 +350,10 @@ describe('html serialization', () => {
           { type: PARAGRAPH, children: [{ bold: true, text: 'Danger!' }] },
           {
             type: BLOCK_QUOTE,
-            children: [{ type: PARAGRAPH, children: [{ text: 'A really wise quote.' }] }]
+            children: [{ type: PARAGRAPH, children: [{ text: 'A really wise quote.' }] }],
           },
-          { type: PARAGRAPH, children: [{ text: 'Bye.' }] }
-        ]
+          { type: PARAGRAPH, children: [{ text: 'Bye.' }] },
+        ],
       };
       const output =
         '<blockquote><p><strong>Danger!</strong></p><blockquote><p>A really wise quote.</p></blockquote><p>Bye.</p></blockquote>';
@@ -415,9 +414,9 @@ describe('html deserialization', () => {
             { italic: true, text: 'italic' },
             { text: ' and ' },
             { code: true, text: 'code' },
-            { text: '.' }
-          ]
-        }
+            { text: '.' },
+          ],
+        },
       ];
       expect(parseHtml(html)).toStrictEqual(fragment);
     });
@@ -444,9 +443,7 @@ describe('html deserialization', () => {
 
     test('bold + link', () => {
       const html = '<a href="https://test.com"><strong>test</strong></a>';
-      const fragment = [
-        { bold: true, link: true, url: 'https://test.com', text: 'test' }
-      ];
+      const fragment = [{ bold: true, link: true, url: 'https://test.com', text: 'test' }];
       expect(parseHtml(html)).toStrictEqual(fragment);
     });
 
@@ -461,8 +458,8 @@ describe('html deserialization', () => {
           underline: true,
           link: true,
           url: 'https://test.com',
-          text: 'test'
-        }
+          text: 'test',
+        },
       ];
       expect(parseHtml(html)).toStrictEqual(fragment);
     });
@@ -480,9 +477,9 @@ describe('html deserialization', () => {
             { underline: true, text: 'underlined' },
             { text: ' and ' },
             { code: true, link: true, url: 'https://test.com', text: 'code' },
-            { text: '.' }
-          ]
-        }
+            { text: '.' },
+          ],
+        },
       ];
 
       expect(parseHtml(html)).toStrictEqual(fragment);
@@ -550,8 +547,8 @@ describe('html deserialization', () => {
         {
           type: IMAGE,
           url: 'https://test.com/image.png',
-          children: [{ text: '' }]
-        }
+          children: [{ text: '' }],
+        },
       ];
       expect(parseHtml(html)).toStrictEqual(fragment);
     });
@@ -561,8 +558,8 @@ describe('html deserialization', () => {
       const fragment = [
         {
           type: BLOCK_QUOTE,
-          children: [{ type: PARAGRAPH, children: [{ text: 'test' }] }]
-        }
+          children: [{ type: PARAGRAPH, children: [{ text: 'test' }] }],
+        },
       ];
       expect(parseHtml(html)).toStrictEqual(fragment);
     });
@@ -574,9 +571,9 @@ describe('html deserialization', () => {
           type: BLOCK_QUOTE,
           children: [
             { type: PARAGRAPH, children: [{ text: 'foo' }] },
-            { type: PARAGRAPH, children: [{ text: 'bar' }] }
-          ]
-        }
+            { type: PARAGRAPH, children: [{ text: 'bar' }] },
+          ],
+        },
       ];
       expect(parseHtml(html)).toStrictEqual(fragment);
     });
@@ -586,8 +583,8 @@ describe('html deserialization', () => {
       const fragment = [
         {
           type: CODE_BLOCK,
-          children: [{ type: CODE_LINE, children: [{ text: 'test' }] }]
-        }
+          children: [{ type: CODE_LINE, children: [{ text: 'test' }] }],
+        },
       ];
       expect(parseHtml(html)).toMatchObject(fragment);
     });
@@ -599,9 +596,9 @@ describe('html deserialization', () => {
           type: CODE_BLOCK,
           children: [
             { type: CODE_LINE, children: [{ text: 'foo' }] },
-            { type: CODE_LINE, children: [{ text: 'bar' }] }
-          ]
-        }
+            { type: CODE_LINE, children: [{ text: 'bar' }] },
+          ],
+        },
       ];
       expect(parseHtml(html)).toMatchObject(fragment);
     });
@@ -616,10 +613,10 @@ describe('html deserialization', () => {
             {
               type: LIST_ITEM,
               parent: 'bulleted-list',
-              children: [{ text: 'bar ' }, { text: 'baz', bold: true }]
-            }
-          ]
-        }
+              children: [{ text: 'bar ' }, { text: 'baz', bold: true }],
+            },
+          ],
+        },
       ];
       expect(parseHtml(html)).toStrictEqual(fragment);
     });
@@ -634,10 +631,10 @@ describe('html deserialization', () => {
             {
               type: LIST_ITEM,
               parent: 'numbered-list',
-              children: [{ text: 'bar ' }, { text: 'baz', italic: true }]
-            }
-          ]
-        }
+              children: [{ text: 'bar ' }, { text: 'baz', italic: true }],
+            },
+          ],
+        },
       ];
       expect(parseHtml(html)).toStrictEqual(fragment);
     });
@@ -650,16 +647,16 @@ describe('html deserialization', () => {
         { type: PARAGRAPH, children: [{ text: 'paragraph1' }] },
         {
           type: BLOCK_QUOTE,
-          children: [{ type: PARAGRAPH, children: [{ text: 'blockquote' }] }]
+          children: [{ type: PARAGRAPH, children: [{ text: 'blockquote' }] }],
         },
         { type: PARAGRAPH, children: [{ text: 'paragraph2' }] },
         {
           type: CODE_BLOCK,
           children: [
             { type: CODE_LINE, children: [{ text: 'const a = 1;' }] },
-            { type: CODE_LINE, children: [{ text: "console.log('hello');" }] }
-          ]
-        }
+            { type: CODE_LINE, children: [{ text: "console.log('hello');" }] },
+          ],
+        },
       ];
 
       expect(parseHtml(html)).toStrictEqual(fragment);
@@ -673,8 +670,8 @@ describe('html deserialization', () => {
         {
           type: IMAGE,
           url: 'https://test.com/image.png',
-          children: [{ text: '' }]
-        }
+          children: [{ text: '' }],
+        },
       ];
       expect(parseHtml(html)).toStrictEqual(fragment);
     });
@@ -684,8 +681,8 @@ describe('html deserialization', () => {
       const fragment = [
         {
           type: PARAGRAPH,
-          children: [{ text: 'test' }]
-        }
+          children: [{ text: 'test' }],
+        },
       ];
       expect(parseHtml(html)).toStrictEqual(fragment);
     });
@@ -704,12 +701,12 @@ describe('html deserialization', () => {
               type: CODE_BLOCK,
               children: [
                 { type: CODE_LINE, children: [{ text: 'const a = 1;' }] },
-                { type: CODE_LINE, children: [{ text: "console.log('hello');" }] }
-              ]
+                { type: CODE_LINE, children: [{ text: "console.log('hello');" }] },
+              ],
             },
-            { type: PARAGRAPH, children: [{ text: 'Bye.' }] }
-          ]
-        }
+            { type: PARAGRAPH, children: [{ text: 'Bye.' }] },
+          ],
+        },
       ];
 
       expect(parseHtml(html)).toStrictEqual(fragment);

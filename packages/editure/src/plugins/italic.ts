@@ -9,7 +9,7 @@ const shortcutRegexes = [/\*([^\*]+)\*/, /_([^_]+)_/];
 export const withItalic = (editor: EditorWithMark) => {
   const { insertText } = editor;
 
-  editor.insertText = text => {
+  editor.insertText = (text) => {
     const { selection } = editor;
 
     if (text === ' ' && selection && Range.isCollapsed(selection)) {

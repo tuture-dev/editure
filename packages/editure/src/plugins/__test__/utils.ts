@@ -12,7 +12,7 @@ export function reset(editor: Editor) {
 }
 
 export function inputText(editor: Editor, text: string) {
-  text.split('').forEach(c => {
+  text.split('').forEach((c) => {
     if (c === '\n') {
       editor.insertBreak();
     } else {

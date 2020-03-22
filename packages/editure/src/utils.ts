@@ -3,7 +3,7 @@ import { Editor, Node, Location } from 'tuture-slate';
 export const getBeforeText = (editor: Editor) => {
   const { anchor } = editor.selection!;
   const match = Editor.above(editor, {
-    match: n => Editor.isBlock(editor, n)
+    match: (n) => Editor.isBlock(editor, n),
   });
 
   const path = match ? match[1] : [];
@@ -16,7 +16,7 @@ export const getBeforeText = (editor: Editor) => {
 
 export const getLineText = (editor: Editor) => {
   const match = Editor.above(editor, {
-    match: n => Editor.isBlock(editor, n)
+    match: (n) => Editor.isBlock(editor, n),
   });
 
   const path = match ? match[1] : [];

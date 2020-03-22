@@ -16,7 +16,7 @@ describe('withInlineCode', () => {
       inputText(editor, '`code` ');
 
       const nodes = [
-        { type: F.PARAGRAPH, children: [{ text: 'code', code: true }, { text: ' ' }] }
+        { type: F.PARAGRAPH, children: [{ text: 'code', code: true }, { text: ' ' }] },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -30,8 +30,8 @@ describe('withInlineCode', () => {
       const nodes = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'foo ' }, { text: 'bar', code: true }, { text: ' ' }]
-        }
+          children: [{ text: 'foo ' }, { text: 'bar', code: true }, { text: ' ' }],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -43,8 +43,8 @@ describe('withInlineCode', () => {
       editor.children = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'foo' }]
-        }
+          children: [{ text: 'foo' }],
+        },
       ];
 
       const point = { path: [0, 0], offset: 0 };
@@ -54,8 +54,8 @@ describe('withInlineCode', () => {
       const nodes = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'bar', code: true }, { text: ' foo' }]
-        }
+          children: [{ text: 'bar', code: true }, { text: ' foo' }],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -67,8 +67,8 @@ describe('withInlineCode', () => {
       editor.children = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'foo bar' }]
-        }
+          children: [{ text: 'foo bar' }],
+        },
       ];
 
       const point = { path: [0, 0], offset: 4 };
@@ -78,8 +78,8 @@ describe('withInlineCode', () => {
       const nodes = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'foo ' }, { text: 'baz', code: true }, { text: ' bar' }]
-        }
+          children: [{ text: 'foo ' }, { text: 'baz', code: true }, { text: ' bar' }],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);

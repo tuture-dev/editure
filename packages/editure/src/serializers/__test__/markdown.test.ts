@@ -13,7 +13,7 @@ import {
   PARAGRAPH,
   CODE_BLOCK,
   CODE_LINE,
-  LIST_ITEM
+  LIST_ITEM,
 } from 'editure-constants';
 import { toMarkdown, parseMarkdown } from '../markdown';
 
@@ -73,8 +73,8 @@ describe('markdown serialization', () => {
           { italic: true, text: 'italic' },
           { text: ' and ' },
           { code: true, text: 'code' },
-          { text: '.' }
-        ]
+          { text: '.' },
+        ],
       };
       const output = 'This is **bold** and *italic* and `code`.';
       expect(toMarkdown(node)).toBe(output);
@@ -121,7 +121,7 @@ describe('markdown serialization', () => {
         link: true,
         strikethrough: true,
         url: 'https://test.com',
-        text: 'test'
+        text: 'test',
       };
       const output = `[~~***\`test\`***~~](${node.url})`;
       expect(toMarkdown(node)).toBe(output);
@@ -137,8 +137,8 @@ describe('markdown serialization', () => {
           { underline: true, strikethrough: true, text: 'mixed' },
           { text: ' and ' },
           { code: true, link: true, url: 'https://test.com', text: 'code' },
-          { text: '.' }
-        ]
+          { text: '.' },
+        ],
       };
       const output = `This is ***mixed*** and ~~mixed~~ and [\`code\`](https://test.com).`;
       expect(toMarkdown(node)).toBe(output);
@@ -198,7 +198,7 @@ describe('markdown serialization', () => {
       const node = {
         type: IMAGE,
         url: 'https://test.com/image.png',
-        children: [{ text: '' }]
+        children: [{ text: '' }],
       };
       const output = `![](${node.url})`;
       expect(toMarkdown(node)).toBe(output);
@@ -207,7 +207,7 @@ describe('markdown serialization', () => {
     test('blockquote (single line)', () => {
       const node = {
         type: BLOCK_QUOTE,
-        children: [{ type: PARAGRAPH, children: [{ text: 'test' }] }]
+        children: [{ type: PARAGRAPH, children: [{ text: 'test' }] }],
       };
       const output = '> test';
       expect(toMarkdown(node)).toBe(output);
@@ -218,8 +218,8 @@ describe('markdown serialization', () => {
         type: BLOCK_QUOTE,
         children: [
           { type: PARAGRAPH, children: [{ text: 'foo' }] },
-          { type: PARAGRAPH, children: [{ text: 'bar' }] }
-        ]
+          { type: PARAGRAPH, children: [{ text: 'bar' }] },
+        ],
       };
       const output = '> foo\n>\n> bar';
       expect(toMarkdown(node)).toBe(output);
@@ -229,7 +229,7 @@ describe('markdown serialization', () => {
       const node = {
         type: NOTE,
         level: 'info',
-        children: [{ type: PARAGRAPH, children: [{ text: 'test' }] }]
+        children: [{ type: PARAGRAPH, children: [{ text: 'test' }] }],
       };
 
       // Should degrade to blockquote.
@@ -243,8 +243,8 @@ describe('markdown serialization', () => {
         level: 'warning',
         children: [
           { type: PARAGRAPH, children: [{ text: 'foo' }] },
-          { type: PARAGRAPH, children: [{ text: 'bar' }] }
-        ]
+          { type: PARAGRAPH, children: [{ text: 'bar' }] },
+        ],
       };
 
       // Should degrade to blockquote.
@@ -256,7 +256,7 @@ describe('markdown serialization', () => {
       const node = {
         type: CODE_BLOCK,
         lang: '',
-        children: [{ type: CODE_LINE, children: [{ text: 'test' }] }]
+        children: [{ type: CODE_LINE, children: [{ text: 'test' }] }],
       };
       const output = '```\ntest\n```';
       expect(toMarkdown(node)).toBe(output);
@@ -268,8 +268,8 @@ describe('markdown serialization', () => {
         lang: '',
         children: [
           { type: CODE_LINE, children: [{ text: 'foo' }] },
-          { type: CODE_LINE, children: [{ text: 'bar' }] }
-        ]
+          { type: CODE_LINE, children: [{ text: 'bar' }] },
+        ],
       };
       const output = '```\nfoo\nbar\n```';
       expect(toMarkdown(node)).toBe(output);
@@ -281,8 +281,8 @@ describe('markdown serialization', () => {
         lang: 'javascript',
         children: [
           { type: CODE_LINE, children: [{ text: 'foo' }] },
-          { type: CODE_LINE, children: [{ text: 'bar' }] }
-        ]
+          { type: CODE_LINE, children: [{ text: 'bar' }] },
+        ],
       };
       const output = '```javascript\nfoo\nbar\n```';
       expect(toMarkdown(node)).toBe(output);
@@ -293,8 +293,8 @@ describe('markdown serialization', () => {
         type: BULLETED_LIST,
         children: [
           { type: LIST_ITEM, children: [{ text: 'foo' }] },
-          { type: LIST_ITEM, children: [{ text: 'bar ' }, { text: 'baz', bold: true }] }
-        ]
+          { type: LIST_ITEM, children: [{ text: 'bar ' }, { text: 'baz', bold: true }] },
+        ],
       };
       const output = '- foo\n- bar **baz**';
       expect(toMarkdown(node)).toBe(output);
@@ -306,8 +306,8 @@ describe('markdown serialization', () => {
         level: 1,
         children: [
           { type: LIST_ITEM, children: [{ text: 'foo' }] },
-          { type: LIST_ITEM, children: [{ text: 'bar ' }, { text: 'baz', code: true }] }
-        ]
+          { type: LIST_ITEM, children: [{ text: 'bar ' }, { text: 'baz', code: true }] },
+        ],
       };
       const output = '  - foo\n  - bar `baz`';
       expect(toMarkdown(node)).toBe(output);
@@ -320,23 +320,23 @@ describe('markdown serialization', () => {
             type: BULLETED_LIST,
             children: [
               { type: LIST_ITEM, children: [{ text: 'foo' }] },
-              { type: LIST_ITEM, children: [{ text: 'bar' }] }
-            ]
+              { type: LIST_ITEM, children: [{ text: 'bar' }] },
+            ],
           },
           {
             type: BULLETED_LIST,
             level: 1,
             children: [
               { type: LIST_ITEM, children: [{ text: 'hello' }] },
-              { type: LIST_ITEM, children: [{ text: 'world' }] }
-            ]
+              { type: LIST_ITEM, children: [{ text: 'world' }] },
+            ],
           },
           {
             type: BULLETED_LIST,
             level: 0,
-            children: [{ type: LIST_ITEM, children: [{ text: 'test' }] }]
-          }
-        ]
+            children: [{ type: LIST_ITEM, children: [{ text: 'test' }] }],
+          },
+        ],
       };
       const output = `- foo
 - bar
@@ -354,8 +354,8 @@ describe('markdown serialization', () => {
         type: NUMBERED_LIST,
         children: [
           { type: LIST_ITEM, children: [{ text: 'foo' }] },
-          { type: LIST_ITEM, children: [{ text: 'bar' }] }
-        ]
+          { type: LIST_ITEM, children: [{ text: 'bar' }] },
+        ],
       };
       const output = '1. foo\n2. bar';
       expect(toMarkdown(node)).toBe(output);
@@ -367,8 +367,8 @@ describe('markdown serialization', () => {
         level: 1,
         children: [
           { type: LIST_ITEM, children: [{ text: 'foo' }] },
-          { type: LIST_ITEM, children: [{ text: 'bar' }] }
-        ]
+          { type: LIST_ITEM, children: [{ text: 'bar' }] },
+        ],
       };
       const output = '  1. foo\n  2. bar';
       expect(toMarkdown(node)).toBe(output);
@@ -385,23 +385,23 @@ describe('markdown serialization', () => {
             type: BULLETED_LIST,
             children: [
               { type: LIST_ITEM, children: [{ text: 'foo' }] },
-              { type: LIST_ITEM, children: [{ text: 'bar' }] }
-            ]
+              { type: LIST_ITEM, children: [{ text: 'bar' }] },
+            ],
           },
           {
             type: NUMBERED_LIST,
             level: 1,
             children: [
               { type: LIST_ITEM, children: [{ text: 'hello' }] },
-              { type: LIST_ITEM, children: [{ text: 'world' }] }
-            ]
+              { type: LIST_ITEM, children: [{ text: 'world' }] },
+            ],
           },
           {
             type: BULLETED_LIST,
             level: 0,
-            children: [{ type: LIST_ITEM, children: [{ text: 'test' }] }]
-          }
-        ]
+            children: [{ type: LIST_ITEM, children: [{ text: 'test' }] }],
+          },
+        ],
       };
       const output = `- foo
 - bar
@@ -420,17 +420,17 @@ describe('markdown serialization', () => {
           { type: PARAGRAPH, children: [{ text: 'paragraph1' }] },
           {
             type: BLOCK_QUOTE,
-            children: [{ type: PARAGRAPH, children: [{ text: 'blockquote' }] }]
+            children: [{ type: PARAGRAPH, children: [{ text: 'blockquote' }] }],
           },
           {
             type: CODE_BLOCK,
             lang: 'javascript',
             children: [
               { type: CODE_LINE, children: [{ text: 'const a = 1;' }] },
-              { type: CODE_LINE, children: [{ text: "console.log('hello');" }] }
-            ]
-          }
-        ]
+              { type: CODE_LINE, children: [{ text: "console.log('hello');" }] },
+            ],
+          },
+        ],
       };
       const output = `# title
 
@@ -458,11 +458,11 @@ console.log('hello');
             lang: 'typescript',
             children: [
               { type: CODE_LINE, children: [{ text: 'const a = 1;' }] },
-              { type: CODE_LINE, children: [{ text: "console.log('hello');" }] }
-            ]
+              { type: CODE_LINE, children: [{ text: "console.log('hello');" }] },
+            ],
           },
-          { type: PARAGRAPH, children: [{ text: 'Bye.' }] }
-        ]
+          { type: PARAGRAPH, children: [{ text: 'Bye.' }] },
+        ],
       };
       const output = `> This is some code:
 >
@@ -484,10 +484,10 @@ console.log('hello');
           { type: PARAGRAPH, children: [{ bold: true, text: 'Danger!' }] },
           {
             type: BLOCK_QUOTE,
-            children: [{ type: PARAGRAPH, children: [{ text: 'A really wise quote.' }] }]
+            children: [{ type: PARAGRAPH, children: [{ text: 'A really wise quote.' }] }],
           },
-          { type: PARAGRAPH, children: [{ text: 'Bye.' }] }
-        ]
+          { type: PARAGRAPH, children: [{ text: 'Bye.' }] },
+        ],
       };
       const output = `> **Danger!**
 >
@@ -531,8 +531,8 @@ describe('markdown deserialization', () => {
       const fragment = [
         {
           type: PARAGRAPH,
-          children: [{ link: true, text: 'test', url: 'https://test.com' }]
-        }
+          children: [{ link: true, text: 'test', url: 'https://test.com' }],
+        },
       ];
       expect(parseMarkdown(markdown)).toStrictEqual(fragment);
     });
@@ -549,9 +549,9 @@ describe('markdown deserialization', () => {
             { italic: true, text: 'italic' },
             { text: ' and ' },
             { code: true, text: 'code' },
-            { text: '.' }
-          ]
-        }
+            { text: '.' },
+          ],
+        },
       ];
       expect(parseMarkdown(markdown)).toStrictEqual(fragment);
     });
@@ -561,16 +561,14 @@ describe('markdown deserialization', () => {
     test('bold + italic', () => {
       const markdown = '***test***';
       const fragment = [
-        { type: PARAGRAPH, children: [{ bold: true, italic: true, text: 'test' }] }
+        { type: PARAGRAPH, children: [{ bold: true, italic: true, text: 'test' }] },
       ];
       expect(parseMarkdown(markdown)).toStrictEqual(fragment);
     });
 
     test('bold + code', () => {
       const markdown = '**`test`**';
-      const fragment = [
-        { type: PARAGRAPH, children: [{ bold: true, code: true, text: 'test' }] }
-      ];
+      const fragment = [{ type: PARAGRAPH, children: [{ bold: true, code: true, text: 'test' }] }];
       expect(parseMarkdown(markdown)).toStrictEqual(fragment);
     });
 
@@ -579,8 +577,8 @@ describe('markdown deserialization', () => {
       const fragment = [
         {
           type: PARAGRAPH,
-          children: [{ bold: true, link: true, url: 'https://test.com', text: 'test' }]
-        }
+          children: [{ bold: true, link: true, url: 'https://test.com', text: 'test' }],
+        },
       ];
       expect(parseMarkdown(markdown)).toStrictEqual(fragment);
     });
@@ -597,10 +595,10 @@ describe('markdown deserialization', () => {
               code: true,
               link: true,
               url: 'https://test.com',
-              text: 'test'
-            }
-          ]
-        }
+              text: 'test',
+            },
+          ],
+        },
       ];
 
       expect(parseMarkdown(markdown)).toStrictEqual(fragment);
@@ -616,9 +614,9 @@ describe('markdown deserialization', () => {
             { bold: true, italic: true, text: 'mixed' },
             { text: ' and ' },
             { code: true, link: true, url: 'https://test.com', text: 'code' },
-            { text: '.' }
-          ]
-        }
+            { text: '.' },
+          ],
+        },
       ];
 
       expect(parseMarkdown(markdown)).toStrictEqual(fragment);
@@ -671,10 +669,10 @@ describe('markdown deserialization', () => {
             {
               type: IMAGE,
               url: 'https://test.com/image.png',
-              children: [{ text: '' }]
-            }
-          ]
-        }
+              children: [{ text: '' }],
+            },
+          ],
+        },
       ];
       expect(parseMarkdown(markdown)).toStrictEqual(fragment);
     });
@@ -684,8 +682,8 @@ describe('markdown deserialization', () => {
       const fragment = [
         {
           type: BLOCK_QUOTE,
-          children: [{ type: PARAGRAPH, children: [{ text: 'test' }] }]
-        }
+          children: [{ type: PARAGRAPH, children: [{ text: 'test' }] }],
+        },
       ];
       expect(parseMarkdown(markdown)).toStrictEqual(fragment);
     });
@@ -697,9 +695,9 @@ describe('markdown deserialization', () => {
           type: BLOCK_QUOTE,
           children: [
             { type: PARAGRAPH, children: [{ text: 'foo' }] },
-            { type: PARAGRAPH, children: [{ text: 'bar' }] }
-          ]
-        }
+            { type: PARAGRAPH, children: [{ text: 'bar' }] },
+          ],
+        },
       ];
       expect(parseMarkdown(markdown)).toStrictEqual(fragment);
     });
@@ -710,8 +708,8 @@ describe('markdown deserialization', () => {
         {
           type: CODE_BLOCK,
           lang: '',
-          children: [{ type: CODE_LINE, children: [{ text: 'test' }] }]
-        }
+          children: [{ type: CODE_LINE, children: [{ text: 'test' }] }],
+        },
       ];
       expect(parseMarkdown(markdown)).toMatchObject(fragment);
     });
@@ -724,9 +722,9 @@ describe('markdown deserialization', () => {
           lang: 'js',
           children: [
             { type: CODE_LINE, children: [{ text: 'foo' }] },
-            { type: CODE_LINE, children: [{ text: 'bar' }] }
-          ]
-        }
+            { type: CODE_LINE, children: [{ text: 'bar' }] },
+          ],
+        },
       ];
       expect(parseMarkdown(markdown)).toMatchObject(fragment);
     });
@@ -741,16 +739,16 @@ describe('markdown deserialization', () => {
               type: LIST_ITEM,
               parent: BULLETED_LIST,
               level: 0,
-              children: [{ text: 'foo' }]
+              children: [{ text: 'foo' }],
             },
             {
               type: LIST_ITEM,
               parent: BULLETED_LIST,
               level: 0,
-              children: [{ text: 'bar ' }, { text: 'baz', bold: true }]
-            }
-          ]
-        }
+              children: [{ text: 'bar ' }, { text: 'baz', bold: true }],
+            },
+          ],
+        },
       ];
       expect(parseMarkdown(markdown)).toStrictEqual(fragment);
     });
@@ -766,17 +764,17 @@ describe('markdown deserialization', () => {
               parent: NUMBERED_LIST,
               level: 0,
               number: 1,
-              children: [{ text: 'foo' }]
+              children: [{ text: 'foo' }],
             },
             {
               type: LIST_ITEM,
               parent: NUMBERED_LIST,
               level: 0,
               number: 2,
-              children: [{ text: 'bar ' }, { text: 'baz', italic: true }]
-            }
-          ]
-        }
+              children: [{ text: 'bar ' }, { text: 'baz', italic: true }],
+            },
+          ],
+        },
       ];
       expect(parseMarkdown(markdown)).toStrictEqual(fragment);
     });
@@ -800,7 +798,7 @@ console.log('hello');
         { type: PARAGRAPH, children: [{ text: 'paragraph1' }] },
         {
           type: BLOCK_QUOTE,
-          children: [{ type: PARAGRAPH, children: [{ text: 'blockquote' }] }]
+          children: [{ type: PARAGRAPH, children: [{ text: 'blockquote' }] }],
         },
         { type: PARAGRAPH, children: [{ text: 'paragraph2' }] },
         {
@@ -808,9 +806,9 @@ console.log('hello');
           lang: '',
           children: [
             { type: CODE_LINE, children: [{ text: 'const a = 1;' }] },
-            { type: CODE_LINE, children: [{ text: "console.log('hello');" }] }
-          ]
-        }
+            { type: CODE_LINE, children: [{ text: "console.log('hello');" }] },
+          ],
+        },
       ];
 
       expect(parseMarkdown(markdown)).toStrictEqual(fragment);

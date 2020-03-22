@@ -12,13 +12,13 @@ const shortcutRegexes: [string, RegExp[]][] = [
   [H3, [/^\s*###$/]],
   [H4, [/^\s*####$/]],
   [H5, [/^\s*#####$/]],
-  [H6, [/^\s*######$/]]
+  [H6, [/^\s*######$/]],
 ];
 
 export const withHeading = (editor: EditorWithBlock) => {
   const { insertText, insertBreak, deleteBackward } = editor;
 
-  editor.insertText = text => {
+  editor.insertText = (text) => {
     if (text === ' ' && Range.isCollapsed(editor.selection!)) {
       for (const [format, regexes] of shortcutRegexes) {
         const matchArr = detectShortcut(editor, regexes);
@@ -40,7 +40,7 @@ export const withHeading = (editor: EditorWithBlock) => {
   editor.insertBreak = () => {
     insertBreak();
 
-    [H1, H2, H3, H4, H5].forEach(format => {
+    [H1, H2, H3, H4, H5].forEach((format) => {
       if (editor.isBlockActive(format)) {
         editor.toggleBlock(format);
       }
@@ -51,7 +51,7 @@ export const withHeading = (editor: EditorWithBlock) => {
     const { selection } = editor;
 
     const match = Editor.above(editor, {
-      match: n => Editor.isBlock(editor, n)
+      match: (n) => Editor.isBlock(editor, n),
     });
 
     if (match) {

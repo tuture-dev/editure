@@ -12,8 +12,8 @@ describe('withLink', () => {
   const getChildren = () => [
     {
       type: F.PARAGRAPH,
-      children: [{ text: 'foo' }, { ...link, link: true }, { text: 'baz', bold: true }]
-    }
+      children: [{ text: 'foo' }, { ...link, link: true }, { text: 'baz', bold: true }],
+    },
   ];
 
   const editor = configureEditor({ marks: [withLink] }) as EditorWithLink;
@@ -28,8 +28,8 @@ describe('withLink', () => {
       const nodes = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'foo', link: true, url: 'https://test.com' }, { text: ' ' }]
-        }
+          children: [{ text: 'foo', link: true, url: 'https://test.com' }, { text: ' ' }],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -46,9 +46,9 @@ describe('withLink', () => {
           children: [
             { text: 'foo ' },
             { text: 'bar', link: true, url: 'https://test.com' },
-            { text: ' ' }
-          ]
-        }
+            { text: ' ' },
+          ],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -60,8 +60,8 @@ describe('withLink', () => {
       editor.children = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'foo' }]
-        }
+          children: [{ text: 'foo' }],
+        },
       ];
 
       const point = { path: [0, 0], offset: 0 };
@@ -71,11 +71,8 @@ describe('withLink', () => {
       const nodes = [
         {
           type: F.PARAGRAPH,
-          children: [
-            { text: 'bar', link: true, url: 'https://test.com' },
-            { text: ' foo' }
-          ]
-        }
+          children: [{ text: 'bar', link: true, url: 'https://test.com' }, { text: ' foo' }],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -87,8 +84,8 @@ describe('withLink', () => {
       editor.children = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'foo bar' }]
-        }
+          children: [{ text: 'foo bar' }],
+        },
       ];
 
       const point = { path: [0, 0], offset: 4 };
@@ -101,9 +98,9 @@ describe('withLink', () => {
           children: [
             { text: 'foo ' },
             { text: 'baz', link: true, url: 'https://test.com' },
-            { text: ' bar' }
-          ]
-        }
+            { text: ' bar' },
+          ],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -117,8 +114,8 @@ describe('withLink', () => {
       const nodes = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: link.url, url: link.url, link: true }]
-        }
+          children: [{ text: link.url, url: link.url, link: true }],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -166,8 +163,8 @@ describe('withLink', () => {
       editor.children = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'foo' }, { text: 'baz', bold: true }]
-        }
+          children: [{ text: 'foo' }, { text: 'baz', bold: true }],
+        },
       ];
 
       Transforms.select(editor, { path: [0, 0], offset: 1 });
@@ -187,7 +184,7 @@ describe('withLink', () => {
 
       expect(editor.selection).toStrictEqual({
         anchor: { path: [0, 1], offset: 0 },
-        focus: { path: [0, 1], offset: 3 }
+        focus: { path: [0, 1], offset: 3 },
       });
     });
 
@@ -217,12 +214,8 @@ describe('withLink', () => {
     const newChildren = [
       {
         type: F.PARAGRAPH,
-        children: [
-          { text: 'foo' },
-          { ...newLink, link: true },
-          { text: 'baz', bold: true }
-        ]
-      }
+        children: [{ text: 'foo' }, { ...newLink, link: true }, { text: 'baz', bold: true }],
+      },
     ];
 
     test('update link from middle', () => {
@@ -262,8 +255,8 @@ describe('withLink', () => {
     const childrenWithRemovedLink = [
       {
         type: F.PARAGRAPH,
-        children: [{ text: 'foobar' }, { text: 'baz', bold: true }]
-      }
+        children: [{ text: 'foobar' }, { text: 'baz', bold: true }],
+      },
     ];
 
     test('remove link from middle', () => {

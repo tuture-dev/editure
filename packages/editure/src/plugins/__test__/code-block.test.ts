@@ -11,13 +11,13 @@ import {
   inputText,
   deleteNTimes,
   configureEditor,
-  createEditorWithContainer
+  createEditorWithContainer,
 } from './utils';
 
 describe('withCodeBlock', () => {
   const editor = configureEditor({
     marks: [withBold],
-    containers: [withCodeBlock]
+    containers: [withCodeBlock],
   }) as EditorWithMark & EditorWithContainer;
   reset(editor);
 
@@ -31,8 +31,8 @@ describe('withCodeBlock', () => {
         {
           type: F.CODE_BLOCK,
           lang: '',
-          children: [{ type: F.CODE_LINE, children: [{ text: 'foo **bar** ' }] }]
-        }
+          children: [{ type: F.CODE_LINE, children: [{ text: 'foo **bar** ' }] }],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -45,8 +45,8 @@ describe('withCodeBlock', () => {
       const nodes = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'foo' }]
-        }
+          children: [{ text: 'foo' }],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -63,9 +63,9 @@ describe('withCodeBlock', () => {
           lang: '',
           children: [
             { type: F.CODE_LINE, children: [{ text: 'const a = 1;' }] },
-            { type: F.CODE_LINE, children: [{ text: 'console.log("hello");' }] }
-          ]
-        }
+            { type: F.CODE_LINE, children: [{ text: 'console.log("hello");' }] },
+          ],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -81,9 +81,9 @@ describe('withCodeBlock', () => {
           lang: 'js',
           children: [
             { type: F.CODE_LINE, children: [{ text: 'const a = 1;' }] },
-            { type: F.CODE_LINE, children: [{ text: 'console.log("hello");' }] }
-          ]
-        }
+            { type: F.CODE_LINE, children: [{ text: 'console.log("hello");' }] },
+          ],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -99,9 +99,9 @@ describe('withCodeBlock', () => {
           lang: 'js',
           children: [
             { type: F.CODE_LINE, children: [{ text: 'const a = 1;' }] },
-            { type: F.CODE_LINE, children: [{ text: 'console.log("hello");' }] }
-          ]
-        }
+            { type: F.CODE_LINE, children: [{ text: 'console.log("hello");' }] },
+          ],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -118,9 +118,9 @@ describe('withCodeBlock', () => {
           children: [
             { type: F.CODE_LINE, children: [{ text: 'foo bar' }] },
             { type: F.CODE_LINE, children: [{ text: '```' }] },
-            { type: F.CODE_LINE, children: [{ text: 'baz' }] }
-          ]
-        }
+            { type: F.CODE_LINE, children: [{ text: 'baz' }] },
+          ],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -130,7 +130,7 @@ describe('withCodeBlock', () => {
     test('disable any shortcuts in a code block', () => {
       const newEditor = configureEditor({
         commons: [withHr],
-        containers: [withCodeBlock]
+        containers: [withCodeBlock],
       });
       reset(newEditor);
       inputText(newEditor, '```\n---\n');
@@ -141,9 +141,9 @@ describe('withCodeBlock', () => {
           lang: '',
           children: [
             { type: F.CODE_LINE, children: [{ text: '---' }] },
-            { type: F.CODE_LINE, children: [{ text: '' }] }
-          ]
-        }
+            { type: F.CODE_LINE, children: [{ text: '' }] },
+          ],
+        },
       ];
 
       expect(newEditor.children).toStrictEqual(nodes);
@@ -155,13 +155,13 @@ describe('withCodeBlock', () => {
       const path = [0, 0];
       Transforms.select(editor, {
         anchor: { path, offset: 2 },
-        focus: { path, offset: 3 }
+        focus: { path, offset: 3 },
       });
       editor.insertBreak();
 
       const nodes = [
         { type: F.PARAGRAPH, children: [{ text: '``' }] },
-        { type: F.PARAGRAPH, children: [{ text: '' }] }
+        { type: F.PARAGRAPH, children: [{ text: '' }] },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -173,12 +173,12 @@ describe('withCodeBlock', () => {
       const nodes = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'foo' }]
+          children: [{ text: 'foo' }],
         },
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'bar' }]
-        }
+          children: [{ text: 'bar' }],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -195,8 +195,8 @@ describe('withCodeBlock', () => {
         {
           type: F.CODE_BLOCK,
           lang: 'js',
-          children: [{ type: F.CODE_LINE, children: [{ text: 'foo' }] }]
-        }
+          children: [{ type: F.CODE_LINE, children: [{ text: 'foo' }] }],
+        },
       ]);
 
       deleteNTimes(editor, 3);
@@ -204,16 +204,16 @@ describe('withCodeBlock', () => {
         {
           type: F.CODE_BLOCK,
           lang: 'js',
-          children: [{ type: F.CODE_LINE, children: [{ text: '' }] }]
-        }
+          children: [{ type: F.CODE_LINE, children: [{ text: '' }] }],
+        },
       ]);
 
       deleteNTimes(editor, 1);
       expect(editor.children).toStrictEqual([
         {
           type: F.PARAGRAPH,
-          children: [{ text: '' }]
-        }
+          children: [{ text: '' }],
+        },
       ]);
     });
 
@@ -224,38 +224,38 @@ describe('withCodeBlock', () => {
       expect(editor.children).toStrictEqual([
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'test' }]
+          children: [{ text: 'test' }],
         },
         {
           type: F.CODE_BLOCK,
           lang: 'js',
-          children: [{ type: F.CODE_LINE, children: [{ text: 'foo' }] }]
-        }
+          children: [{ type: F.CODE_LINE, children: [{ text: 'foo' }] }],
+        },
       ]);
 
       deleteNTimes(editor, 3);
       expect(editor.children).toStrictEqual([
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'test' }]
+          children: [{ text: 'test' }],
         },
         {
           type: F.CODE_BLOCK,
           lang: 'js',
-          children: [{ type: F.CODE_LINE, children: [{ text: '' }] }]
-        }
+          children: [{ type: F.CODE_LINE, children: [{ text: '' }] }],
+        },
       ]);
 
       deleteNTimes(editor, 1);
       expect(editor.children).toStrictEqual([
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'test' }]
+          children: [{ text: 'test' }],
         },
         {
           type: F.PARAGRAPH,
-          children: [{ text: '' }]
-        }
+          children: [{ text: '' }],
+        },
       ]);
     });
 
@@ -271,9 +271,9 @@ describe('withCodeBlock', () => {
           children: [
             { type: F.CODE_LINE, children: [{ text: 'foo' }] },
             { type: F.CODE_LINE, children: [{ text: 'ar' }] },
-            { type: F.CODE_LINE, children: [{ text: 'baz' }] }
-          ]
-        }
+            { type: F.CODE_LINE, children: [{ text: 'baz' }] },
+          ],
+        },
       ]);
 
       deleteNTimes(editor, 1);
@@ -283,9 +283,9 @@ describe('withCodeBlock', () => {
           lang: 'js',
           children: [
             { type: F.CODE_LINE, children: [{ text: 'fooar' }] },
-            { type: F.CODE_LINE, children: [{ text: 'baz' }] }
-          ]
-        }
+            { type: F.CODE_LINE, children: [{ text: 'baz' }] },
+          ],
+        },
       ]);
     });
 
@@ -297,8 +297,8 @@ describe('withCodeBlock', () => {
         {
           type: F.CODE_BLOCK,
           lang: 'js',
-          children: [{ type: F.CODE_LINE, children: [{ text: '' }] }]
-        }
+          children: [{ type: F.CODE_LINE, children: [{ text: '' }] }],
+        },
       ]);
       expect(Range.isCollapsed(editor.selection!)).toBe(true);
     });
@@ -319,8 +319,8 @@ describe('withCodeBlock', () => {
         {
           type: F.CODE_BLOCK,
           lang: 'js',
-          children: [{ children: [{ text: 'foo' }] }, { children: [{ text: 'bar' }] }]
-        }
+          children: [{ children: [{ text: 'foo' }] }, { children: [{ text: 'bar' }] }],
+        },
       ];
 
       Editor.normalize(editor, { force: true });
@@ -331,9 +331,9 @@ describe('withCodeBlock', () => {
           lang: 'js',
           children: [
             { type: F.CODE_LINE, children: [{ text: 'foo' }] },
-            { type: F.CODE_LINE, children: [{ text: 'bar' }] }
-          ]
-        }
+            { type: F.CODE_LINE, children: [{ text: 'bar' }] },
+          ],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -362,8 +362,8 @@ describe('withCodeBlock', () => {
       const nodes = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'test' }]
-        }
+          children: [{ text: 'test' }],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -387,12 +387,12 @@ describe('withCodeBlock', () => {
         {
           type: F.CODE_BLOCK,
           lang: 'ts',
-          children: [{ type: F.CODE_LINE, children: [{ text: 'foo' }] }]
+          children: [{ type: F.CODE_LINE, children: [{ text: 'foo' }] }],
         },
         {
           type: F.PARAGRAPH,
-          children: [{ text: '' }]
-        }
+          children: [{ text: '' }],
+        },
       ];
 
       const point = { path: [1, 0], offset: 0 };

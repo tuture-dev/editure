@@ -29,8 +29,8 @@ describe('withParagraph', () => {
       const nodes = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'foo ' }, { text: 'btestar', bold: true }, { text: ' baz' }]
-        }
+          children: [{ text: 'foo ' }, { text: 'btestar', bold: true }, { text: ' baz' }],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -44,19 +44,13 @@ describe('withParagraph', () => {
         inputText(editor, 'foo bar');
 
         deleteNTimes(editor, 4);
-        expect(editor.children).toStrictEqual([
-          { type: F.PARAGRAPH, children: [{ text: 'foo' }] }
-        ]);
+        expect(editor.children).toStrictEqual([{ type: F.PARAGRAPH, children: [{ text: 'foo' }] }]);
 
         deleteNTimes(editor, 3);
-        expect(editor.children).toStrictEqual([
-          { type: F.PARAGRAPH, children: [{ text: '' }] }
-        ]);
+        expect(editor.children).toStrictEqual([{ type: F.PARAGRAPH, children: [{ text: '' }] }]);
 
         deleteNTimes(editor, 1);
-        expect(editor.children).toStrictEqual([
-          { type: F.PARAGRAPH, children: [{ text: '' }] }
-        ]);
+        expect(editor.children).toStrictEqual([{ type: F.PARAGRAPH, children: [{ text: '' }] }]);
       });
 
       test('from the end of single paragraph with marks', () => {
@@ -64,14 +58,12 @@ describe('withParagraph', () => {
 
         deleteNTimes(editor, 5);
         expect(editor.children).toStrictEqual([
-          { type: F.PARAGRAPH, children: [{ text: 'foo ' }, { text: 'ba', bold: true }] }
+          { type: F.PARAGRAPH, children: [{ text: 'foo ' }, { text: 'ba', bold: true }] },
         ]);
         expect(Editor.marks(editor)).toStrictEqual({ bold: true });
 
         deleteNTimes(editor, 3);
-        expect(editor.children).toStrictEqual([
-          { type: F.PARAGRAPH, children: [{ text: 'foo' }] }
-        ]);
+        expect(editor.children).toStrictEqual([{ type: F.PARAGRAPH, children: [{ text: 'foo' }] }]);
         expect(Editor.marks(editor)).toStrictEqual({});
       });
     });
@@ -82,9 +74,7 @@ describe('withParagraph', () => {
           inputText(editor, 'foo bar');
 
           editor.deleteBackward('line');
-          expect(editor.children).toStrictEqual([
-            { type: F.PARAGRAPH, children: [{ text: '' }] }
-          ]);
+          expect(editor.children).toStrictEqual([{ type: F.PARAGRAPH, children: [{ text: '' }] }]);
         });
 
         test('from the middle', () => {
@@ -93,7 +83,7 @@ describe('withParagraph', () => {
           Transforms.select(editor, { path: [0, 0], offset: 4 });
           editor.deleteBackward('line');
           expect(editor.children).toStrictEqual([
-            { type: F.PARAGRAPH, children: [{ text: 'bar' }] }
+            { type: F.PARAGRAPH, children: [{ text: 'bar' }] },
           ]);
         });
       });
@@ -103,9 +93,7 @@ describe('withParagraph', () => {
           inputText(editor, 'foo **bar** baz');
 
           editor.deleteBackward('line');
-          expect(editor.children).toStrictEqual([
-            { type: F.PARAGRAPH, children: [{ text: '' }] }
-          ]);
+          expect(editor.children).toStrictEqual([{ type: F.PARAGRAPH, children: [{ text: '' }] }]);
         });
 
         test('from the middle', () => {
@@ -114,7 +102,7 @@ describe('withParagraph', () => {
           Transforms.select(editor, { path: [0, 1], offset: 2 });
           editor.deleteBackward('line');
           expect(editor.children).toStrictEqual([
-            { type: F.PARAGRAPH, children: [{ text: 'r', bold: true }, { text: ' baz' }] }
+            { type: F.PARAGRAPH, children: [{ text: 'r', bold: true }, { text: ' baz' }] },
           ]);
           expect(Editor.marks(editor)).toStrictEqual({ bold: true });
         });
@@ -129,7 +117,7 @@ describe('withParagraph', () => {
           expect(editor.children).toStrictEqual([
             { type: F.PARAGRAPH, children: [{ text: 'First line' }] },
             { type: F.PARAGRAPH, children: [{ text: '' }] },
-            { type: F.PARAGRAPH, children: [{ text: 'Third line' }] }
+            { type: F.PARAGRAPH, children: [{ text: 'Third line' }] },
           ]);
         });
 
@@ -141,7 +129,7 @@ describe('withParagraph', () => {
           expect(editor.children).toStrictEqual([
             { type: F.PARAGRAPH, children: [{ text: 'First line' }] },
             { type: F.PARAGRAPH, children: [{ text: 'line' }] },
-            { type: F.PARAGRAPH, children: [{ text: 'Third line' }] }
+            { type: F.PARAGRAPH, children: [{ text: 'Third line' }] },
           ]);
         });
       });
@@ -155,13 +143,13 @@ describe('withParagraph', () => {
           expect(editor.children).toStrictEqual([
             {
               type: F.PARAGRAPH,
-              children: [{ text: 'First', bold: true }, { text: ' line' }]
+              children: [{ text: 'First', bold: true }, { text: ' line' }],
             },
             { type: F.PARAGRAPH, children: [{ text: '' }] },
             {
               type: F.PARAGRAPH,
-              children: [{ text: 'Third', bold: true }, { text: ' line' }]
-            }
+              children: [{ text: 'Third', bold: true }, { text: ' line' }],
+            },
           ]);
         });
 
@@ -173,16 +161,16 @@ describe('withParagraph', () => {
           expect(editor.children).toStrictEqual([
             {
               type: F.PARAGRAPH,
-              children: [{ text: 'First', bold: true }, { text: ' line' }]
+              children: [{ text: 'First', bold: true }, { text: ' line' }],
             },
             {
               type: F.PARAGRAPH,
-              children: [{ text: 'ond', bold: true }, { text: ' line' }]
+              children: [{ text: 'ond', bold: true }, { text: ' line' }],
             },
             {
               type: F.PARAGRAPH,
-              children: [{ text: 'Third', bold: true }, { text: ' line' }]
-            }
+              children: [{ text: 'Third', bold: true }, { text: ' line' }],
+            },
           ]);
         });
       });
@@ -203,8 +191,8 @@ describe('withParagraph', () => {
       editor.children = [
         {
           type: F.PARAGRAPH,
-          children: [{ type: F.PARAGRAPH, children: [{ text: 'foo ' }] }]
-        }
+          children: [{ type: F.PARAGRAPH, children: [{ text: 'foo ' }] }],
+        },
       ];
       Editor.normalize(editor, { force: true });
 

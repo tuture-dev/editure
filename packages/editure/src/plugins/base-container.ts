@@ -24,19 +24,19 @@ export const withBaseContainer = <T extends EditorWithBlock>(editor: T) => {
 
     Transforms.setNodes(editor, { type: childFormat, children: [text] });
     Transforms.wrapNodes(editor, node, {
-      match: n => n.type === childFormat
+      match: (n) => n.type === childFormat,
     });
   };
 
   e.unwrapBlock = (format: string) => {
     Transforms.unwrapNodes(editor, {
-      match: n => n.type === format
+      match: (n) => n.type === format,
     });
   };
 
   e.exitBlock = (format: string) => {
     const block = Editor.above(editor, {
-      match: n => n.type === e.getChildFormat(format)
+      match: (n) => n.type === e.getChildFormat(format),
     });
 
     if (block) {
@@ -44,10 +44,10 @@ export const withBaseContainer = <T extends EditorWithBlock>(editor: T) => {
       Transforms.unwrapNodes(editor, {
         at: {
           anchor: Editor.start(editor, path),
-          focus: Editor.end(editor, path)
+          focus: Editor.end(editor, path),
         },
-        match: n => n.type === format,
-        split: true
+        match: (n) => n.type === format,
+        split: true,
       });
     }
   };

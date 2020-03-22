@@ -5,51 +5,50 @@ import * as F from 'editure-constants';
 
 import { MarkDecoratorGroup, BlockConverterGroup } from './types';
 
-const joinChildren = (node: Element): string =>
-  node.children.map(n => serialize(n)).join('');
+const joinChildren = (node: Element): string => node.children.map((n) => serialize(n)).join('');
 
 let markDecorators: MarkDecoratorGroup = {
-  [F.CODE]: node => ({ ...node, text: `<code>${node.text}</code>` }),
-  [F.BOLD]: node => ({ ...node, text: `<strong>${node.text}</strong>` }),
-  [F.ITALIC]: node => ({ ...node, text: `<em>${node.text}</em>` }),
-  [F.STRIKETHROUGH]: node => ({
+  [F.CODE]: (node) => ({ ...node, text: `<code>${node.text}</code>` }),
+  [F.BOLD]: (node) => ({ ...node, text: `<strong>${node.text}</strong>` }),
+  [F.ITALIC]: (node) => ({ ...node, text: `<em>${node.text}</em>` }),
+  [F.STRIKETHROUGH]: (node) => ({
     ...node,
-    text: `<span style="text-decoration: line-through">${node.text}</span>`
+    text: `<span style="text-decoration: line-through">${node.text}</span>`,
   }),
-  [F.UNDERLINE]: node => ({ ...node, text: `<u>${node.text}</u>` }),
-  [F.LINK]: node => ({
+  [F.UNDERLINE]: (node) => ({ ...node, text: `<u>${node.text}</u>` }),
+  [F.LINK]: (node) => ({
     ...node,
-    text: `<a href="${escapeHtml(node.url)}">${node.text}</a>`
-  })
+    text: `<a href="${escapeHtml(node.url)}">${node.text}</a>`,
+  }),
 };
 
 let blockConverters: BlockConverterGroup = {
-  [F.H1]: node => `<h1>${joinChildren(node)}</h1>`,
-  [F.H2]: node => `<h2>${joinChildren(node)}</h2>`,
-  [F.H3]: node => `<h3>${joinChildren(node)}</h3>`,
-  [F.H4]: node => `<h4>${joinChildren(node)}</h4>`,
-  [F.H5]: node => `<h5>${joinChildren(node)}</h5>`,
-  [F.PARAGRAPH]: node => `<p>${joinChildren(node)}</p>`,
-  [F.IMAGE]: node => `<img src="${escapeHtml(node.url)}" alt="" />`,
+  [F.H1]: (node) => `<h1>${joinChildren(node)}</h1>`,
+  [F.H2]: (node) => `<h2>${joinChildren(node)}</h2>`,
+  [F.H3]: (node) => `<h3>${joinChildren(node)}</h3>`,
+  [F.H4]: (node) => `<h4>${joinChildren(node)}</h4>`,
+  [F.H5]: (node) => `<h5>${joinChildren(node)}</h5>`,
+  [F.PARAGRAPH]: (node) => `<p>${joinChildren(node)}</p>`,
+  [F.IMAGE]: (node) => `<img src="${escapeHtml(node.url)}" alt="" />`,
   [F.HR]: () => '<hr />',
-  [F.BLOCK_QUOTE]: node => `<blockquote>${joinChildren(node)}</blockquote>`,
-  [F.NOTE]: node => `<blockquote>${joinChildren(node)}</blockquote>`,
-  [F.LIST_ITEM]: node => joinChildren(node),
-  [F.BULLETED_LIST]: node => {
+  [F.BLOCK_QUOTE]: (node) => `<blockquote>${joinChildren(node)}</blockquote>`,
+  [F.NOTE]: (node) => `<blockquote>${joinChildren(node)}</blockquote>`,
+  [F.LIST_ITEM]: (node) => joinChildren(node),
+  [F.BULLETED_LIST]: (node) => {
     const { children } = node;
-    const items = children.map(item => `<li>${serialize(item)}</li>`);
+    const items = children.map((item) => `<li>${serialize(item)}</li>`);
     return `<ul>${items.join('')}</ul>`;
   },
-  [F.NUMBERED_LIST]: node => {
+  [F.NUMBERED_LIST]: (node) => {
     const { children } = node;
-    const items = children.map(item => `<li>${serialize(item)}</li>`);
+    const items = children.map((item) => `<li>${serialize(item)}</li>`);
     return `<ol>${items.join('')}</ol>`;
   },
-  [F.CODE_BLOCK]: node => {
+  [F.CODE_BLOCK]: (node) => {
     const { children } = node;
-    const codeLines = children.map(line => `<code>${line.children[0].text}</code>`);
+    const codeLines = children.map((line) => `<code>${line.children[0].text}</code>`);
     return `<pre>${codeLines.join('')}</pre>`;
-  }
+  },
 };
 
 const ELEMENT_TAGS: {} = {
@@ -64,14 +63,13 @@ const ELEMENT_TAGS: {} = {
   IMG: (el: HTMLElement) => ({ type: F.IMAGE, url: el.getAttribute('src') }),
   LI: (el: HTMLElement) => ({
     type: F.LIST_ITEM,
-    parent:
-      el.parentNode && el.parentNode.nodeName === 'UL' ? F.BULLETED_LIST : F.NUMBERED_LIST
+    parent: el.parentNode && el.parentNode.nodeName === 'UL' ? F.BULLETED_LIST : F.NUMBERED_LIST,
   }),
   OL: () => ({ type: F.NUMBERED_LIST }),
   P: () => ({ type: F.PARAGRAPH }),
   DIV: () => ({ type: F.PARAGRAPH }),
   PRE: () => ({ type: F.CODE_BLOCK }),
-  UL: () => ({ type: F.BULLETED_LIST })
+  UL: () => ({ type: F.BULLETED_LIST }),
 };
 
 // COMPAT: `B` is omitted here because Google Docs uses `<b>` in weird ways.
@@ -83,18 +81,16 @@ const TEXT_TAGS = {
   I: () => ({ italic: true }),
   S: () => ({ strikethrough: true }),
   STRONG: () => ({ bold: true }),
-  U: () => ({ underline: true })
+  U: () => ({ underline: true }),
 };
 
 const serialize = (node: Node) => {
   if (Text.isText(node)) {
     const markedNode = Object.keys(markDecorators).reduce(
       (decoratedNode, currentMark) => {
-        return node[currentMark]
-          ? markDecorators[currentMark](decoratedNode)
-          : decoratedNode;
+        return node[currentMark] ? markDecorators[currentMark](decoratedNode) : decoratedNode;
       },
-      { ...node, text: escapeHtml(node.text) }
+      { ...node, text: escapeHtml(node.text) },
     );
 
     return markedNode.text;
@@ -126,19 +122,17 @@ const deserialize = (el: HTMLElement): Descendant[] | Element | string | null =>
       return jsx(
         'element',
         attrs,
-        Array.from(el.childNodes).map(child =>
-          jsx('element', { type: F.CODE_LINE }, [{ text: child.textContent }])
-        )
+        Array.from(el.childNodes).map((child) =>
+          jsx('element', { type: F.CODE_LINE }, [{ text: child.textContent }]),
+        ),
       );
     } catch {
-      return jsx('element', attrs, [
-        jsx('element', F.CODE_LINE, [{ text: el.textContent }])
-      ]);
+      return jsx('element', attrs, [jsx('element', F.CODE_LINE, [{ text: el.textContent }])]);
     }
   }
 
   const children = Array.from(el.childNodes)
-    .map(el => deserialize(el as HTMLElement))
+    .map((el) => deserialize(el as HTMLElement))
     .flat();
 
   // Ensure that children is not empty.
@@ -175,7 +169,7 @@ const deserialize = (el: HTMLElement): Descendant[] | Element | string | null =>
 export const toHtml = (
   node: Node,
   customMarkDecorators?: MarkDecoratorGroup,
-  customBlockConverters?: BlockConverterGroup
+  customBlockConverters?: BlockConverterGroup,
 ) => {
   markDecorators = { ...markDecorators, ...customMarkDecorators };
   blockConverters = { ...blockConverters, ...customBlockConverters };

@@ -9,7 +9,7 @@ const shortcutRegexes = [/`([^`]+)`/];
 export const withInlineCode = (editor: EditorWithMark) => {
   const { insertText } = editor;
 
-  editor.insertText = text => {
+  editor.insertText = (text) => {
     const { selection } = editor;
 
     if (text === ' ' && selection && Range.isCollapsed(selection)) {

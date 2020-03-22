@@ -10,7 +10,7 @@ describe('withBaseBlock', () => {
   const blockNode = {
     type: BLOCK_TYPE,
     attr: 'test',
-    children: [{ text: 'bar' }]
+    children: [{ text: 'bar' }],
   };
 
   const editor = withBaseBlock(createEditor());
@@ -23,9 +23,9 @@ describe('withBaseBlock', () => {
       editor.children = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'foo' }]
+          children: [{ text: 'foo' }],
         },
-        blockNode
+        blockNode,
       ];
 
       Transforms.select(editor, { path: [1, 0], offset: 1 });
@@ -50,8 +50,8 @@ describe('withBaseBlock', () => {
       editor.children = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'foo' }]
-        }
+          children: [{ text: 'foo' }],
+        },
       ];
 
       Transforms.select(editor, { path: [0, 0], offset: 1 });
@@ -61,8 +61,8 @@ describe('withBaseBlock', () => {
         {
           type: BLOCK_TYPE,
           children: [{ text: 'foo' }],
-          ...blockProps
-        }
+          ...blockProps,
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -73,8 +73,8 @@ describe('withBaseBlock', () => {
         {
           type: BLOCK_TYPE,
           children: [{ text: 'foo' }],
-          ...blockProps
-        }
+          ...blockProps,
+        },
       ];
 
       Transforms.select(editor, { path: [0, 0], offset: 1 });
@@ -83,8 +83,8 @@ describe('withBaseBlock', () => {
       const nodes = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'foo' }]
-        }
+          children: [{ text: 'foo' }],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);

@@ -10,11 +10,11 @@ const shortcutRegexes = [/^\s*>$/];
 export const withBlockquote = (editor: EditorWithContainer) => {
   const { getChildFormat, insertText, insertBreak, deleteBackward, toggleBlock } = editor;
 
-  editor.getChildFormat = format => {
+  editor.getChildFormat = (format) => {
     return format === BLOCK_QUOTE ? PARAGRAPH : getChildFormat(format);
   };
 
-  editor.insertText = text => {
+  editor.insertText = (text) => {
     const { selection } = editor;
 
     if (text === ' ' && selection && Range.isCollapsed(selection)) {
@@ -50,13 +50,13 @@ export const withBlockquote = (editor: EditorWithContainer) => {
     insertBreak();
   };
 
-  editor.deleteBackward = unit => {
+  editor.deleteBackward = (unit) => {
     if (unit !== 'character') {
       return deleteBackward(unit);
     }
 
     const match = Editor.above(editor, {
-      match: n => n.type === BLOCK_QUOTE
+      match: (n) => n.type === BLOCK_QUOTE,
     });
 
     if (match) {

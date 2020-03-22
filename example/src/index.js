@@ -9,7 +9,7 @@ import createHotKeysHandler from './hotkeys';
 
 import './index.css';
 
-const withDebug = editor => {
+const withDebug = (editor) => {
   const {
     insertText,
     insertData,
@@ -17,15 +17,15 @@ const withDebug = editor => {
     deleteForward,
     deleteBackward,
     deleteFragment,
-    normalizeNode
+    normalizeNode,
   } = editor;
 
-  editor.insertText = text => {
+  editor.insertText = (text) => {
     console.log('insertText', text);
     insertText(text);
   };
 
-  editor.insertData = data => {
+  editor.insertData = (data) => {
     console.log('insertData', data);
     insertData(data);
   };
@@ -63,7 +63,7 @@ const plugins = [withReact, withDebug, ...defaultPlugins, withPaste, withHistory
 function App() {
   const editor = useMemo(
     () => plugins.reduce((editor, plugin) => plugin(editor), createEditor()),
-    []
+    [],
   );
 
   const renderElement = useCallback(Element, []);
@@ -75,23 +75,21 @@ function App() {
     margin: '8%',
     width: '700px',
     padding: '1%',
-    border: '1px solid grey'
+    border: '1px solid grey',
   };
 
-  const [value, setValue] = useState([
-    { type: 'paragraph', children: [{ text: 'editor 1' }] }
-  ]);
+  const [value, setValue] = useState([{ type: 'paragraph', children: [{ text: 'editor 1' }] }]);
   console.log('nodes', editor.children);
 
   return (
-    <Editure editor={editor} value={value} onChange={newVal => setValue(newVal)}>
+    <Editure editor={editor} value={value} onChange={(newVal) => setValue(newVal)}>
       <div style={style}>
         <Editable
           placeholder="Enter something ..."
           renderElement={renderElement}
           renderLeaf={renderLeaf}
           onKeyDown={hotKeyHandler}
-          onCopy={e => {
+          onCopy={(e) => {
             e.clipboardData.setData('application/x-editure-fragment', true);
           }}
         />

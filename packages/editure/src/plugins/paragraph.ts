@@ -6,7 +6,7 @@ import { getBeforeText } from '../utils';
 export const withParagraph = (editor: Editor) => {
   const { deleteBackward, normalizeNode } = editor;
 
-  editor.deleteBackward = unit => {
+  editor.deleteBackward = (unit) => {
     if (unit === 'line') {
       Transforms.select(editor, getBeforeText(editor).range!);
       Transforms.delete(editor);
@@ -17,7 +17,7 @@ export const withParagraph = (editor: Editor) => {
     deleteBackward(unit);
   };
 
-  editor.normalizeNode = entry => {
+  editor.normalizeNode = (entry) => {
     const [node, path] = entry;
 
     if (!Element.isElement(node)) {

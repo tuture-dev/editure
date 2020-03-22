@@ -8,7 +8,7 @@ const MARK_HOTKEYS = {
   'mod+u': F.UNDERLINE,
   'ctrl+`': F.CODE,
   'mod+k': F.LINK,
-  'mod+shift+`': F.STRIKETHROUGH
+  'mod+shift+`': F.STRIKETHROUGH,
 };
 
 const BLOCK_HOTKEYS = {
@@ -22,7 +22,7 @@ const BLOCK_HOTKEYS = {
   'mod+shift+u': F.BLOCK_QUOTE,
   'mod+alt+u': F.BULLETED_LIST,
   'mod+alt+o': F.NUMBERED_LIST,
-  'mod+alt+-': F.HR
+  'mod+alt+-': F.HR,
 };
 
 const containerBlocks = [F.BLOCK_QUOTE, F.CODE_BLOCK, F.NOTE];
@@ -91,7 +91,7 @@ function handleExitBlock(editor, event) {
 export default function createHotKeysHandler(editor, buttonRefs) {
   // const { imageBtnRef, linkBtnRef } = buttonRefs;
 
-  return event => {
+  return (event) => {
     for (const hotkey in MARK_HOTKEYS) {
       if (isHotkey(hotkey, event)) {
         event.preventDefault();

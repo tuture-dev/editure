@@ -18,8 +18,8 @@ describe('withStrikethrough', () => {
       const nodes = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'strikethrough', strikethrough: true }, { text: ' ' }]
-        }
+          children: [{ text: 'strikethrough', strikethrough: true }, { text: ' ' }],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -33,12 +33,8 @@ describe('withStrikethrough', () => {
       const nodes = [
         {
           type: F.PARAGRAPH,
-          children: [
-            { text: 'foo ' },
-            { text: 'bar', strikethrough: true },
-            { text: ' ' }
-          ]
-        }
+          children: [{ text: 'foo ' }, { text: 'bar', strikethrough: true }, { text: ' ' }],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -50,8 +46,8 @@ describe('withStrikethrough', () => {
       editor.children = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'foo' }]
-        }
+          children: [{ text: 'foo' }],
+        },
       ];
 
       const point = { path: [0, 0], offset: 0 };
@@ -61,8 +57,8 @@ describe('withStrikethrough', () => {
       const nodes = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'bar', strikethrough: true }, { text: ' foo' }]
-        }
+          children: [{ text: 'bar', strikethrough: true }, { text: ' foo' }],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -74,8 +70,8 @@ describe('withStrikethrough', () => {
       editor.children = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'foo bar' }]
-        }
+          children: [{ text: 'foo bar' }],
+        },
       ];
 
       const point = { path: [0, 0], offset: 4 };
@@ -85,12 +81,8 @@ describe('withStrikethrough', () => {
       const nodes = [
         {
           type: F.PARAGRAPH,
-          children: [
-            { text: 'foo ' },
-            { text: 'baz', strikethrough: true },
-            { text: ' bar' }
-          ]
-        }
+          children: [{ text: 'foo ' }, { text: 'baz', strikethrough: true }, { text: ' bar' }],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
