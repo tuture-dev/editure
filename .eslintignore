@@ -1,0 +1,10 @@
+*.md
+*.html
+*.json
+.github
+build
+dist
+node_modules
+tmp
+yarn.lock
+package.json
