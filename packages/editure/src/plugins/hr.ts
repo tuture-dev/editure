@@ -21,12 +21,8 @@ export const withHr = (editor: Editor) => {
         Transforms.select(editor, getBeforeText(editor).range!);
         Transforms.delete(editor);
 
-        const text = { text: '' };
-        Transforms.removeNodes(editor, {
-          match: n => n.children && !n.children[0].text
-        });
-        Transforms.insertNodes(editor, { type: HR, children: [text] });
-        Transforms.insertNodes(editor, { type: PARAGRAPH, children: [text] });
+        Transforms.setNodes(editor, { type: HR });
+        Transforms.insertNodes(editor, { type: PARAGRAPH, children: [{ text: '' }] });
 
         return;
       }
