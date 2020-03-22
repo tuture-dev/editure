@@ -22,6 +22,20 @@ describe('withNote', () => {
 
   afterEach(() => reset(editor));
 
+  describe('getChildFormat', () => {
+    test('get child format of note', () => {
+      expect(editor.getChildFormat(F.NOTE)).toStrictEqual(F.PARAGRAPH);
+    });
+
+    test('get child format of non-note', () => {
+      const baseEditor = createEditorWithContainer();
+      const getChildFormatSpy = jest.spyOn(baseEditor, 'getChildFormat');
+
+      withNote(baseEditor).getChildFormat('other-container');
+      expect(getChildFormatSpy).toBeCalled();
+    });
+  });
+
   describe('insertBreak', () => {
     test('regular note', () => {
       inputText(editor, ':::\nfoo\nbar');

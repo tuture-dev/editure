@@ -14,11 +14,7 @@ export const withHr = (editor: Editor) => {
   };
 
   editor.insertBreak = () => {
-    const { selection } = editor;
-
-    if (!selection) return;
-
-    if (Range.isCollapsed(selection)) {
+    if (Range.isCollapsed(editor.selection!)) {
       const matchArr = detectShortcut(editor, shortcutRegexes);
 
       if (matchArr) {

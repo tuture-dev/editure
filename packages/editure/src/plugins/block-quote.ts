@@ -51,10 +51,6 @@ export const withBlockquote = (editor: EditorWithContainer) => {
   };
 
   editor.deleteBackward = unit => {
-    const { selection } = editor;
-
-    if (!selection) return;
-
     if (unit !== 'character') {
       return deleteBackward(unit);
     }

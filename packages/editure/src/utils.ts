@@ -1,11 +1,7 @@
 import { Editor, Node, Location } from 'tuture-slate';
 
 export const getBeforeText = (editor: Editor) => {
-  if (!editor.selection) {
-    return {};
-  }
-
-  const { anchor } = editor.selection;
+  const { anchor } = editor.selection!;
   const match = Editor.above(editor, {
     match: n => Editor.isBlock(editor, n)
   });

@@ -340,6 +340,20 @@ describe('withCodeBlock', () => {
     });
   });
 
+  describe('getChildFormat', () => {
+    test('get child format of code block', () => {
+      expect(editor.getChildFormat(F.CODE_BLOCK)).toStrictEqual(F.CODE_LINE);
+    });
+
+    test('get child format of non-note', () => {
+      const baseEditor = createEditorWithContainer();
+      const getChildFormatSpy = jest.spyOn(baseEditor, 'getChildFormat');
+
+      withCodeBlock(baseEditor).getChildFormat('other-container');
+      expect(getChildFormatSpy).toBeCalled();
+    });
+  });
+
   describe('unwrapBlock', () => {
     test('unwrap a code block', () => {
       inputText(editor, '```\ntest');

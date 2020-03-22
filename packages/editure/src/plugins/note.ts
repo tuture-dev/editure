@@ -15,11 +15,7 @@ export const withNote = (editor: EditorWithContainer) => {
   };
 
   editor.insertBreak = () => {
-    const { selection } = editor;
-
-    if (!selection) return;
-
-    if (Range.isCollapsed(selection)) {
+    if (Range.isCollapsed(editor.selection!)) {
       const matchArr = detectShortcut(editor, shortcutRegexes);
 
       if (matchArr) {
@@ -41,10 +37,6 @@ export const withNote = (editor: EditorWithContainer) => {
   };
 
   editor.deleteBackward = unit => {
-    const { selection } = editor;
-
-    if (!selection) return;
-
     if (unit !== 'character') {
       return deleteBackward(unit);
     }
@@ -62,11 +54,11 @@ export const withNote = (editor: EditorWithContainer) => {
 
       const [block] = match;
       const { wholeLineText } = getLineText(editor);
-      const { children = [] } = block;
+      const { children } = block;
 
       if (children.length === 1 && !wholeLineText) {
         editor.toggleBlock(NOTE);
-      } else if (children.length > 1) {
+      } else {
         Transforms.mergeNodes(editor);
       }
 

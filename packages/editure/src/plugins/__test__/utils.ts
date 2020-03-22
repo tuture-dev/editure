@@ -74,10 +74,6 @@ export function configureEditor(config?: EditorConfiguration) {
   return plugins.reduce((editor, plugin) => plugin(editor), createEditor());
 }
 
-export function createEditorWithMark(editor?: Editor) {
-  return withBaseMark(editor || createEditor());
-}
-
 export function createEditorWithBlock(editor?: Editor) {
   return withBaseBlock(editor || createEditor());
 }

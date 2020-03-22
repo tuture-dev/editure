@@ -47,9 +47,7 @@ export const withList = (editor: EditorWithBlock) => {
   const { insertText, insertBreak, deleteBackward, normalizeNode } = e;
 
   e.insertText = text => {
-    const { selection } = e;
-
-    if (text === ' ' && selection && Range.isCollapsed(selection)) {
+    if (text === ' ' && Range.isCollapsed(editor.selection!)) {
       for (const [format, regexes] of shortcutRegexes) {
         const matchArr = detectShortcut(e, regexes);
 
@@ -75,10 +73,7 @@ export const withList = (editor: EditorWithBlock) => {
 
         // Exit the list if empty.
         if (!beforeText) {
-          toggleList(e, format);
-          Transforms.unsetNodes(e, ['parent', 'number', 'level']);
-
-          return;
+          return toggleList(e, format);
         }
 
         return insertBreak();
@@ -89,10 +84,6 @@ export const withList = (editor: EditorWithBlock) => {
   };
 
   e.deleteBackward = unit => {
-    const { selection } = e;
-
-    if (!selection) return;
-
     if (unit !== 'character') {
       return deleteBackward(unit);
     }
