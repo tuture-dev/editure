@@ -1,5 +1,7 @@
 # Editure
 
+[![Build Status](https://travis-ci.com/tuture-dev/editure.svg?branch=master)](https://travis-ci.com/tuture-dev/editure)
+
 Editure is a richtext markdown editor built on top of [Slate](https://www.slatejs.org/), with out-of-the-box support for markdown **shortcuts**, **hotkeys**, **serialization**. It aims to provide editing experience on par with [Typora](https://typora.io/) or [Yuque](https://www.yuque.com/).
 
 > Warning: Editure is currently experimental. DO NOT USE IT IN PRODUCTION!
@@ -12,7 +14,7 @@ Editure is a richtext markdown editor built on top of [Slate](https://www.slatej
 
 ## Supported Formats
 
-Marks: **bold**, *italic*, <span style="text-decoration: underline; ">underline</span>, ~~strikethrough~~ and [link](https://tuture.co).
+Marks: **bold**, _italic_, <span style="text-decoration: underline; ">underline</span>, ~~strikethrough~~ and [link](https://tuture.co).
 
 Blocks: paragraphs, headings, blockquotes, code blocks, note blocks, bulleted lists, numbered lists, images, and horizontal lines.
 
@@ -39,7 +41,7 @@ class MyComponent extends React.Component {
     this.state = { value: [] };
   }
 
-  handleChange = value => {
+  handleChange = (value) => {
     this.setState({ value });
   };
 
