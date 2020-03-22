@@ -15,7 +15,7 @@ import {
   CODE_LINE,
   LIST_ITEM
 } from 'editure-constants';
-import { toMarkdown } from '../markdown';
+import { toMarkdown, parseMarkdown } from '../markdown';
 
 describe('markdown serialization', () => {
   describe('pure mark', () => {
@@ -496,6 +496,324 @@ console.log('hello');
 > Bye.`;
 
       expect(toMarkdown(node)).toBe(output);
+    });
+  });
+});
+
+describe('markdown deserialization', () => {
+  describe('pure mark', () => {
+    test('bare text', () => {
+      const markdown = 'test';
+      const fragment = [{ type: PARAGRAPH, children: [{ text: 'test' }] }];
+      expect(parseMarkdown(markdown)).toStrictEqual(fragment);
+    });
+
+    test('bold', () => {
+      const markdown = '**test**';
+      const fragment = [{ type: PARAGRAPH, children: [{ text: 'test', bold: true }] }];
+      expect(parseMarkdown(markdown)).toStrictEqual(fragment);
+    });
+
+    test('italic', () => {
+      const markdown = '*test*';
+      const fragment = [{ type: PARAGRAPH, children: [{ text: 'test', italic: true }] }];
+      expect(parseMarkdown(markdown)).toStrictEqual(fragment);
+    });
+
+    test('code', () => {
+      const markdown = '`test`';
+      const fragment = [{ type: PARAGRAPH, children: [{ text: 'test', code: true }] }];
+      expect(parseMarkdown(markdown)).toStrictEqual(fragment);
+    });
+
+    test('link', () => {
+      const markdown = `[test](https://test.com)`;
+      const fragment = [
+        {
+          type: PARAGRAPH,
+          children: [{ link: true, text: 'test', url: 'https://test.com' }]
+        }
+      ];
+      expect(parseMarkdown(markdown)).toStrictEqual(fragment);
+    });
+
+    test('sequential marks in a paragraph', () => {
+      const markdown = 'This is **bold** and *italic* and `code`.';
+      const fragment = [
+        {
+          type: PARAGRAPH,
+          children: [
+            { text: 'This is ' },
+            { bold: true, text: 'bold' },
+            { text: ' and ' },
+            { italic: true, text: 'italic' },
+            { text: ' and ' },
+            { code: true, text: 'code' },
+            { text: '.' }
+          ]
+        }
+      ];
+      expect(parseMarkdown(markdown)).toStrictEqual(fragment);
+    });
+  });
+
+  describe('mixed marks', () => {
+    test('bold + italic', () => {
+      const markdown = '***test***';
+      const fragment = [
+        { type: PARAGRAPH, children: [{ bold: true, italic: true, text: 'test' }] }
+      ];
+      expect(parseMarkdown(markdown)).toStrictEqual(fragment);
+    });
+
+    test('bold + code', () => {
+      const markdown = '**`test`**';
+      const fragment = [
+        { type: PARAGRAPH, children: [{ bold: true, code: true, text: 'test' }] }
+      ];
+      expect(parseMarkdown(markdown)).toStrictEqual(fragment);
+    });
+
+    test('bold + link', () => {
+      const markdown = '[**test**](https://test.com)';
+      const fragment = [
+        {
+          type: PARAGRAPH,
+          children: [{ bold: true, link: true, url: 'https://test.com', text: 'test' }]
+        }
+      ];
+      expect(parseMarkdown(markdown)).toStrictEqual(fragment);
+    });
+
+    test('bold + italic + code + strikethrough + link', () => {
+      const markdown = '[***`test`***](https://test.com)';
+      const fragment = [
+        {
+          type: PARAGRAPH,
+          children: [
+            {
+              bold: true,
+              italic: true,
+              code: true,
+              link: true,
+              url: 'https://test.com',
+              text: 'test'
+            }
+          ]
+        }
+      ];
+
+      expect(parseMarkdown(markdown)).toStrictEqual(fragment);
+    });
+
+    test('sequential mixed marks', () => {
+      const markdown = 'This is ***mixed*** and [`code`](https://test.com).';
+      const fragment = [
+        {
+          type: PARAGRAPH,
+          children: [
+            { text: 'This is ' },
+            { bold: true, italic: true, text: 'mixed' },
+            { text: ' and ' },
+            { code: true, link: true, url: 'https://test.com', text: 'code' },
+            { text: '.' }
+          ]
+        }
+      ];
+
+      expect(parseMarkdown(markdown)).toStrictEqual(fragment);
+    });
+  });
+
+  describe('pure block', () => {
+    test('h1', () => {
+      const markdown = '# test';
+      const fragment = [{ type: H1, children: [{ text: 'test' }] }];
+      expect(parseMarkdown(markdown)).toStrictEqual(fragment);
+    });
+
+    test('h2', () => {
+      const markdown = '## test';
+      const fragment = [{ type: H2, children: [{ text: 'test' }] }];
+      expect(parseMarkdown(markdown)).toStrictEqual(fragment);
+    });
+
+    test('h3', () => {
+      const markdown = '### test';
+      const fragment = [{ type: H3, children: [{ text: 'test' }] }];
+      expect(parseMarkdown(markdown)).toStrictEqual(fragment);
+    });
+
+    test('h4', () => {
+      const markdown = '#### test';
+      const fragment = [{ type: H4, children: [{ text: 'test' }] }];
+      expect(parseMarkdown(markdown)).toStrictEqual(fragment);
+    });
+
+    test('h5', () => {
+      const markdown = '##### test';
+      const fragment = [{ type: H5, children: [{ text: 'test' }] }];
+      expect(parseMarkdown(markdown)).toStrictEqual(fragment);
+    });
+
+    test('hr', () => {
+      const markdown = '---';
+      const fragment = [{ type: HR, children: [{ text: '' }] }];
+      expect(parseMarkdown(markdown)).toStrictEqual(fragment);
+    });
+
+    test('image', () => {
+      const markdown = '![](https://test.com/image.png)';
+      const fragment = [
+        {
+          type: PARAGRAPH,
+          children: [
+            {
+              type: IMAGE,
+              url: 'https://test.com/image.png',
+              children: [{ text: '' }]
+            }
+          ]
+        }
+      ];
+      expect(parseMarkdown(markdown)).toStrictEqual(fragment);
+    });
+
+    test('blockquote (single line)', () => {
+      const markdown = '> test';
+      const fragment = [
+        {
+          type: BLOCK_QUOTE,
+          children: [{ type: PARAGRAPH, children: [{ text: 'test' }] }]
+        }
+      ];
+      expect(parseMarkdown(markdown)).toStrictEqual(fragment);
+    });
+
+    test('blockquote (multiple lines)', () => {
+      const markdown = '> foo\n>\n> bar';
+      const fragment = [
+        {
+          type: BLOCK_QUOTE,
+          children: [
+            { type: PARAGRAPH, children: [{ text: 'foo' }] },
+            { type: PARAGRAPH, children: [{ text: 'bar' }] }
+          ]
+        }
+      ];
+      expect(parseMarkdown(markdown)).toStrictEqual(fragment);
+    });
+
+    test('code-block (single line)', () => {
+      const markdown = '```\ntest\n```';
+      const fragment = [
+        {
+          type: CODE_BLOCK,
+          lang: '',
+          children: [{ type: CODE_LINE, children: [{ text: 'test' }] }]
+        }
+      ];
+      expect(parseMarkdown(markdown)).toMatchObject(fragment);
+    });
+
+    test('code-block (multiple lines)', () => {
+      const markdown = '```js\nfoo\nbar\n```';
+      const fragment = [
+        {
+          type: CODE_BLOCK,
+          lang: 'js',
+          children: [
+            { type: CODE_LINE, children: [{ text: 'foo' }] },
+            { type: CODE_LINE, children: [{ text: 'bar' }] }
+          ]
+        }
+      ];
+      expect(parseMarkdown(markdown)).toMatchObject(fragment);
+    });
+
+    test('bulleted-list', () => {
+      const markdown = '- foo\n- bar **baz**';
+      const fragment = [
+        {
+          type: BULLETED_LIST,
+          children: [
+            {
+              type: LIST_ITEM,
+              parent: BULLETED_LIST,
+              level: 0,
+              children: [{ text: 'foo' }]
+            },
+            {
+              type: LIST_ITEM,
+              parent: BULLETED_LIST,
+              level: 0,
+              children: [{ text: 'bar ' }, { text: 'baz', bold: true }]
+            }
+          ]
+        }
+      ];
+      expect(parseMarkdown(markdown)).toStrictEqual(fragment);
+    });
+
+    test('numbered-list', () => {
+      const markdown = '1. foo\n2. bar *baz*';
+      const fragment = [
+        {
+          type: NUMBERED_LIST,
+          children: [
+            {
+              type: LIST_ITEM,
+              parent: NUMBERED_LIST,
+              level: 0,
+              number: 1,
+              children: [{ text: 'foo' }]
+            },
+            {
+              type: LIST_ITEM,
+              parent: NUMBERED_LIST,
+              level: 0,
+              number: 2,
+              children: [{ text: 'bar ' }, { text: 'baz', italic: true }]
+            }
+          ]
+        }
+      ];
+      expect(parseMarkdown(markdown)).toStrictEqual(fragment);
+    });
+
+    test('sequential blocks', () => {
+      const markdown = `# title
+
+paragraph1
+
+> blockquote
+
+paragraph2
+
+\`\`\`
+const a = 1;
+console.log('hello');
+\`\`\``;
+
+      const fragment = [
+        { type: H1, children: [{ text: 'title' }] },
+        { type: PARAGRAPH, children: [{ text: 'paragraph1' }] },
+        {
+          type: BLOCK_QUOTE,
+          children: [{ type: PARAGRAPH, children: [{ text: 'blockquote' }] }]
+        },
+        { type: PARAGRAPH, children: [{ text: 'paragraph2' }] },
+        {
+          type: CODE_BLOCK,
+          lang: '',
+          children: [
+            { type: CODE_LINE, children: [{ text: 'const a = 1;' }] },
+            { type: CODE_LINE, children: [{ text: "console.log('hello');" }] }
+          ]
+        }
+      ];
+
+      expect(parseMarkdown(markdown)).toStrictEqual(fragment);
     });
   });
 });
