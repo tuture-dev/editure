@@ -14,23 +14,15 @@ export const withHr = (editor: Editor) => {
   };
 
   editor.insertBreak = () => {
-    const { selection } = editor;
-
-    if (!selection) return;
-
-    if (Range.isCollapsed(selection)) {
+    if (Range.isCollapsed(editor.selection!)) {
       const matchArr = detectShortcut(editor, shortcutRegexes);
 
       if (matchArr) {
         Transforms.select(editor, getBeforeText(editor).range!);
         Transforms.delete(editor);
 
-        const text = { text: '' };
-        Transforms.removeNodes(editor, {
-          match: n => n.children && !n.children[0].text
-        });
-        Transforms.insertNodes(editor, { type: HR, children: [text] });
-        Transforms.insertNodes(editor, { type: PARAGRAPH, children: [text] });
+        Transforms.setNodes(editor, { type: HR });
+        Transforms.insertNodes(editor, { type: PARAGRAPH, children: [{ text: '' }] });
 
         return;
       }

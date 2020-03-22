@@ -25,17 +25,13 @@ export function handleMarkShortcut(
   format: string,
   matchArr: RegExpExecArray
 ) {
-  if (!editor.selection) {
-    return;
-  }
-
   const { insertText, children } = editor;
-  const { anchor } = editor.selection;
+  const { anchor } = editor.selection!;
 
   // Delete previous content with markdown syntax.
   const targetTextWithMdTag = matchArr[0];
   const childrenText = getChildrenText(children, anchor.path);
-  const beforeText = childrenText.slice(0, editor.selection.focus.offset);
+  const beforeText = childrenText.slice(0, editor.selection!.focus.offset);
   const deleteRangeStartOffset = beforeText.length - targetTextWithMdTag.length;
   const deleteRangeEndOffset = beforeText.length;
 

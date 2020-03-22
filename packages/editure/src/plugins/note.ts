@@ -15,11 +15,7 @@ export const withNote = (editor: EditorWithContainer) => {
   };
 
   editor.insertBreak = () => {
-    const { selection } = editor;
-
-    if (!selection) return;
-
-    if (Range.isCollapsed(selection)) {
+    if (Range.isCollapsed(editor.selection!)) {
       const matchArr = detectShortcut(editor, shortcutRegexes);
 
       if (matchArr) {
@@ -41,10 +37,6 @@ export const withNote = (editor: EditorWithContainer) => {
   };
 
   editor.deleteBackward = unit => {
-    const { selection } = editor;
-
-    if (!selection) return;
-
     if (unit !== 'character') {
       return deleteBackward(unit);
     }
@@ -54,48 +46,38 @@ export const withNote = (editor: EditorWithContainer) => {
     });
 
     if (match) {
-      const [block, path] = match;
-      const start = Editor.start(editor, path);
+      const { beforeText } = getBeforeText(editor);
 
-      if (
-        block.type !== PARAGRAPH &&
-        Point.equals(selection.anchor, start) &&
-        editor.isBlockActive(editor.getChildFormat(NOTE))
-      ) {
-        const { wholeLineText } = getLineText(editor);
-        const { children = [] } = block;
-
-        Editor.withoutNormalizing(editor, () => {
-          if (children.length === 1 && !wholeLineText) {
-            editor.toggleBlock(NOTE);
-          } else if (children.length > 1) {
-            Transforms.mergeNodes(editor);
-          }
-        });
-
-        return;
+      if (beforeText) {
+        return deleteBackward('character');
       }
 
-      return deleteBackward(unit);
+      const [block] = match;
+      const { wholeLineText } = getLineText(editor);
+      const { children } = block;
+
+      if (children.length === 1 && !wholeLineText) {
+        editor.toggleBlock(NOTE);
+      } else {
+        Transforms.mergeNodes(editor);
+      }
+
+      return;
     }
 
     deleteBackward(unit);
   };
 
   editor.toggleBlock = (format, props?) => {
-    if (format === NOTE) {
-      return Editor.withoutNormalizing(editor, () => {
-        const isActive = editor.isBlockActive(format);
-
-        if (isActive) {
-          editor.unwrapBlock(format);
-        } else {
-          editor.wrapBlock(format, props);
-        }
-      });
+    if (format !== NOTE) {
+      return toggleBlock(format, props);
     }
 
-    toggleBlock(format, props);
+    if (editor.isBlockActive(format)) {
+      editor.unwrapBlock(format);
+    } else {
+      editor.wrapBlock(format, props);
+    }
   };
 
   return editor;

@@ -19,9 +19,7 @@ export const withHeading = (editor: EditorWithBlock) => {
   const { insertText, insertBreak, deleteBackward } = editor;
 
   editor.insertText = text => {
-    const { selection } = editor;
-
-    if (text === ' ' && selection && Range.isCollapsed(selection)) {
+    if (text === ' ' && Range.isCollapsed(editor.selection!)) {
       for (const [format, regexes] of shortcutRegexes) {
         const matchArr = detectShortcut(editor, regexes);
 

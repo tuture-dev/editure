@@ -59,6 +59,20 @@ describe('withList', () => {
         expect(editor.children).toStrictEqual(nodes);
         expect(Range.isCollapsed(editor.selection!)).toBe(true);
       });
+
+      test('insert space but not to trigger anything', () => {
+        inputText(editor, '*foo* ');
+
+        const nodes = [
+          {
+            type: F.PARAGRAPH,
+            children: [{ text: '*foo* ' }]
+          }
+        ];
+
+        expect(editor.children).toStrictEqual(nodes);
+        expect(Range.isCollapsed(editor.selection!)).toBe(true);
+      });
     });
 
     describe('insertBreak', () => {
@@ -84,6 +98,24 @@ describe('withList', () => {
             ]
           },
           { type: F.PARAGRAPH, children: [{ text: '' }] }
+        ];
+
+        expect(editor.children).toStrictEqual(nodes);
+        expect(Range.isCollapsed(editor.selection!)).toBe(true);
+      });
+
+      test('should not interfere with regular break', () => {
+        inputText(editor, 'foo\nbar');
+
+        const nodes = [
+          {
+            type: F.PARAGRAPH,
+            children: [{ text: 'foo' }]
+          },
+          {
+            type: F.PARAGRAPH,
+            children: [{ text: 'bar' }]
+          }
         ];
 
         expect(editor.children).toStrictEqual(nodes);
@@ -151,6 +183,47 @@ describe('withList', () => {
             ]
           }
         ]);
+        expect(Range.isCollapsed(editor.selection!)).toBe(true);
+      });
+
+      test('delete on item with depth > 1', () => {
+        const listItem = {
+          type: F.LIST_ITEM,
+          level: 1,
+          parent: F.BULLETED_LIST,
+          children: [{ text: '' }]
+        };
+
+        editor.children = [
+          {
+            type: F.BULLETED_LIST,
+            children: [listItem]
+          }
+        ];
+
+        Transforms.select(editor, { path: [0, 0, 0], offset: 0 });
+        editor.deleteBackward('character');
+
+        expect(editor.children).toStrictEqual([
+          {
+            type: F.BULLETED_LIST,
+            children: [{ ...listItem, level: 0 }]
+          }
+        ]);
+      });
+
+      test('should not interfere with regular deleteBackward', () => {
+        inputText(editor, 'foo');
+        editor.deleteBackward('character');
+
+        const nodes = [
+          {
+            type: F.PARAGRAPH,
+            children: [{ text: 'fo' }]
+          }
+        ];
+
+        expect(editor.children).toStrictEqual(nodes);
         expect(Range.isCollapsed(editor.selection!)).toBe(true);
       });
     });
@@ -605,6 +678,153 @@ describe('withList', () => {
                 children: [{ text: 'foo' }]
               }
             ]
+          }
+        ]);
+      });
+    });
+
+    describe('increaseItemDepth', () => {
+      test('should work for empty list item', () => {
+        inputText(editor, '1. ');
+        editor.increaseItemDepth();
+
+        const nodes = [
+          {
+            type: F.NUMBERED_LIST,
+            children: [
+              {
+                type: F.LIST_ITEM,
+                parent: F.NUMBERED_LIST,
+                number: 1,
+                level: 1,
+                children: [{ text: '' }]
+              }
+            ]
+          }
+        ];
+
+        expect(editor.children).toStrictEqual(nodes);
+      });
+
+      test('should work for non-empty list item', () => {
+        inputText(editor, '1. test');
+        editor.increaseItemDepth();
+
+        const nodes = [
+          {
+            type: F.NUMBERED_LIST,
+            children: [
+              {
+                type: F.LIST_ITEM,
+                parent: F.NUMBERED_LIST,
+                number: 1,
+                level: 1,
+                children: [{ text: 'test' }]
+              }
+            ]
+          }
+        ];
+
+        expect(editor.children).toStrictEqual(nodes);
+      });
+
+      test('should work with multiple items', () => {
+        inputText(editor, '1. foo\nbar\nbaz');
+
+        Transforms.select(editor, { path: [0, 1, 0], offset: 0 });
+        editor.increaseItemDepth();
+
+        Transforms.select(editor, { path: [0, 2, 0], offset: 1 });
+        editor.increaseItemDepth();
+        editor.increaseItemDepth();
+
+        const nodes = [
+          {
+            type: F.NUMBERED_LIST,
+            children: [
+              {
+                type: F.LIST_ITEM,
+                parent: F.NUMBERED_LIST,
+                number: 1,
+                level: 0,
+                children: [{ text: 'foo' }]
+              },
+              {
+                type: F.LIST_ITEM,
+                parent: F.NUMBERED_LIST,
+                number: 1,
+                level: 1,
+                children: [{ text: 'bar' }]
+              },
+              {
+                type: F.LIST_ITEM,
+                parent: F.NUMBERED_LIST,
+                number: 1,
+                level: 2,
+                children: [{ text: 'baz' }]
+              }
+            ]
+          }
+        ];
+
+        expect(editor.children).toStrictEqual(nodes);
+      });
+    });
+
+    describe('decreaseItemDepth', () => {
+      test('should do nothing with level 0 item', () => {
+        inputText(editor, '1. test');
+        editor.decreaseItemDepth();
+
+        const nodes = [
+          {
+            type: F.NUMBERED_LIST,
+            children: [
+              {
+                type: F.LIST_ITEM,
+                parent: F.NUMBERED_LIST,
+                number: 1,
+                level: 0,
+                children: [{ text: 'test' }]
+              }
+            ]
+          }
+        ];
+
+        expect(editor.children).toStrictEqual(nodes);
+      });
+
+      test('should correctly decrease depth', () => {
+        const listItem = {
+          type: F.LIST_ITEM,
+          parent: F.NUMBERED_LIST,
+          number: 1,
+          level: 2,
+          children: [{ text: 'test' }]
+        };
+
+        editor.children = [
+          {
+            type: F.NUMBERED_LIST,
+            children: [listItem]
+          }
+        ];
+
+        Transforms.select(editor, { path: [0, 0, 0], offset: 2 });
+
+        editor.decreaseItemDepth();
+        expect(editor.children).toStrictEqual([
+          {
+            type: F.NUMBERED_LIST,
+            children: [{ ...listItem, level: 1 }]
+          }
+        ]);
+
+        editor.decreaseItemDepth();
+        expect(editor.children).toStrictEqual([
+          {
+            type: F.NUMBERED_LIST,
+            children: [{ ...listItem, level: 0 }]
           }
         ]);
       });

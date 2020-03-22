@@ -1,11 +1,7 @@
 import { Editor, Node, Location } from 'tuture-slate';
 
 export const getBeforeText = (editor: Editor) => {
-  if (!editor.selection) {
-    return {};
-  }
-
-  const { anchor } = editor.selection;
+  const { anchor } = editor.selection!;
   const match = Editor.above(editor, {
     match: n => Editor.isBlock(editor, n)
   });
@@ -40,18 +36,4 @@ export const getChildrenText = (children: Node[], path: Location): string => {
   }
 
   return childrenItem[path[i]].text;
-};
-
-export const compareNode = (nodeOnePath: Location, nodeTwoPath: Location) => {
-  if (nodeOnePath.length !== nodeTwoPath.length) {
-    return false;
-  }
-
-  for (let i = 0; i < nodeOnePath.length; i++) {
-    if (nodeOnePath[i] !== nodeTwoPath[i]) {
-      return false;
-    }
-  }
-
-  return true;
 };
