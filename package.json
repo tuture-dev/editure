@@ -14,6 +14,17 @@
     "build:watch": "rollup -c --watch",
     "release": "rollup -c && lerna publish"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*": [
+      "pretty-quick --staged",
+      "eslint . --fix"
+    ]
+  },
   "devDependencies": {
     "@babel/core": "7.7.4",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
@@ -31,11 +42,13 @@
     "editure-constants": "*",
     "editure-react": "*",
     "eslint": "^6.8.0",
+    "husky": "^4.2.3",
     "jest": "^24",
     "jest-environment-jsdom-fourteen": "0.1.0",
     "jest-resolve": "24.9.0",
     "jest-watch-typeahead": "0.4.2",
     "lerna": "^3.20.2",
+    "lint-staged": "^10.0.7",
     "prettier": "^1.19.1",
     "pretty-quick": "^2.0.1",
     "react": "^16.12.0",
