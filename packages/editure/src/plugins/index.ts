@@ -40,7 +40,7 @@ export {
   EditorWithMark,
   EditorWithBlock,
   EditorWithContainer,
-  EditorWithVoid
+  EditorWithVoid,
 };
 
 export const defaultPlugins = [
@@ -65,5 +65,5 @@ export const defaultPlugins = [
   withBaseContainer,
   withBlockquote,
   withNote,
-  withCodeBlock
+  withCodeBlock,
 ];

@@ -3,5 +3,5 @@ export {
   RenderLeafProps,
   Editable,
   DefaultElement,
-  Slate as Editure
+  Slate as Editure,
 } from 'tuture-slate-react';

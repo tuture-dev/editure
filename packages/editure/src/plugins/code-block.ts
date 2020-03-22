@@ -16,10 +16,10 @@ export const withCodeBlock = (editor: EditorWithContainer) => {
     getChildFormat,
     unwrapBlock,
     exitBlock,
-    toggleBlock
+    toggleBlock,
   } = editor;
 
-  editor.insertText = text => {
+  editor.insertText = (text) => {
     // Disable any shortcuts in code blocks.
     if (text === ' ' && editor.isBlockActive(CODE_BLOCK)) {
       return Transforms.insertText(editor, ' ');
@@ -50,13 +50,13 @@ export const withCodeBlock = (editor: EditorWithContainer) => {
     insertBreak();
   };
 
-  editor.deleteBackward = unit => {
+  editor.deleteBackward = (unit) => {
     if (unit !== 'character') {
       return deleteBackward(unit);
     }
 
     const match = Editor.above(editor, {
-      match: n => n.type === CODE_BLOCK
+      match: (n) => n.type === CODE_BLOCK,
     });
 
     if (match) {
@@ -82,7 +82,7 @@ export const withCodeBlock = (editor: EditorWithContainer) => {
     deleteBackward(unit);
   };
 
-  editor.normalizeNode = entry => {
+  editor.normalizeNode = (entry) => {
     const [node, path] = entry;
 
     if (Element.isElement(node) && node.type === CODE_BLOCK) {
@@ -97,17 +97,17 @@ export const withCodeBlock = (editor: EditorWithContainer) => {
     normalizeNode(entry);
   };
 
-  editor.getChildFormat = format => {
+  editor.getChildFormat = (format) => {
     return format === CODE_BLOCK ? CODE_LINE : getChildFormat(format);
   };
 
-  editor.unwrapBlock = format => {
+  editor.unwrapBlock = (format) => {
     if (format !== CODE_BLOCK) {
       return unwrapBlock(format);
     }
 
     const block = Editor.above(editor, {
-      match: n => n.type === CODE_BLOCK
+      match: (n) => n.type === CODE_BLOCK,
     });
 
     if (block) {
@@ -122,33 +122,29 @@ export const withCodeBlock = (editor: EditorWithContainer) => {
           { type: PARAGRAPH },
           {
             at: range,
-            match: n => n.type === CODE_LINE
-          }
+            match: (n) => n.type === CODE_LINE,
+          },
         );
 
         Transforms.unwrapNodes(editor, {
           at: range,
-          match: n => n.type === CODE_BLOCK
+          match: (n) => n.type === CODE_BLOCK,
         });
       });
     }
   };
 
-  editor.exitBlock = format => {
+  editor.exitBlock = (format) => {
     if (format !== CODE_BLOCK) {
       return exitBlock(format);
     }
 
     Editor.withoutNormalizing(editor, () => {
-      Transforms.setNodes(
-        editor,
-        { type: PARAGRAPH },
-        { match: n => n.type === CODE_LINE }
-      );
+      Transforms.setNodes(editor, { type: PARAGRAPH }, { match: (n) => n.type === CODE_LINE });
 
       Transforms.unwrapNodes(editor, {
-        match: n => n.type === CODE_BLOCK,
-        split: true
+        match: (n) => n.type === CODE_BLOCK,
+        split: true,
       });
     });
   };

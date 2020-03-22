@@ -12,7 +12,7 @@ export interface EditorWithList extends EditorWithBlock {
 
 const shortcutRegexes: [string, RegExp[]][] = [
   [BULLETED_LIST, [/^\*$/, /^-$/, /^\+$/]],
-  [NUMBERED_LIST, [/^[0-9]\.$/]]
+  [NUMBERED_LIST, [/^[0-9]\.$/]],
 ];
 
 const toggleList = (editor: EditorWithBlock, format: string, props?: any) => {
@@ -22,19 +22,19 @@ const toggleList = (editor: EditorWithBlock, format: string, props?: any) => {
     if (!isActive) {
       Transforms.setNodes(editor, {
         ...props,
-        type: LIST_ITEM
+        type: LIST_ITEM,
       });
 
       const block = { type: format, children: [] };
       Transforms.wrapNodes(editor, block, props);
     } else {
       Transforms.unwrapNodes(editor, {
-        match: n => [BULLETED_LIST, NUMBERED_LIST].includes(n.type),
-        split: true
+        match: (n) => [BULLETED_LIST, NUMBERED_LIST].includes(n.type),
+        split: true,
       });
 
       Transforms.setNodes(editor, {
-        type: PARAGRAPH
+        type: PARAGRAPH,
       });
 
       Transforms.unsetNodes(editor, ['parent', 'number', 'level']);
@@ -46,7 +46,7 @@ export const withList = (editor: EditorWithBlock) => {
   const e = editor as EditorWithList;
   const { insertText, insertBreak, deleteBackward, normalizeNode } = e;
 
-  e.insertText = text => {
+  e.insertText = (text) => {
     if (text === ' ' && Range.isCollapsed(editor.selection!)) {
       for (const [format, regexes] of shortcutRegexes) {
         const matchArr = detectShortcut(e, regexes);
@@ -83,13 +83,13 @@ export const withList = (editor: EditorWithBlock) => {
     insertBreak();
   };
 
-  e.deleteBackward = unit => {
+  e.deleteBackward = (unit) => {
     if (unit !== 'character') {
       return deleteBackward(unit);
     }
 
     const [match] = Editor.nodes(e, {
-      match: n => n.type === LIST_ITEM
+      match: (n) => n.type === LIST_ITEM,
     });
 
     if (match) {
@@ -103,7 +103,7 @@ export const withList = (editor: EditorWithBlock) => {
 
       if (level === 0) {
         Transforms.liftNodes(e, {
-          match: n => n.type === LIST_ITEM
+          match: (n) => n.type === LIST_ITEM,
         });
 
         Transforms.setNodes(e, { type: PARAGRAPH });
@@ -118,7 +118,7 @@ export const withList = (editor: EditorWithBlock) => {
     deleteBackward(unit);
   };
 
-  e.normalizeNode = entry => {
+  e.normalizeNode = (entry) => {
     const [node, path] = entry;
 
     if (!Element.isElement(node)) {
@@ -158,11 +158,7 @@ export const withList = (editor: EditorWithBlock) => {
           counter++;
         }
 
-        Transforms.setNodes(
-          e,
-          { level, parent: node.type, number: counter },
-          { at: childPath }
-        );
+        Transforms.setNodes(e, { level, parent: node.type, number: counter }, { at: childPath });
 
         lastLevel = level;
 
@@ -180,7 +176,7 @@ export const withList = (editor: EditorWithBlock) => {
 
   e.increaseItemDepth = () => {
     const block = Editor.above(e, {
-      match: n => n.type === LIST_ITEM
+      match: (n) => n.type === LIST_ITEM,
     });
 
     if (block) {
@@ -190,14 +186,14 @@ export const withList = (editor: EditorWithBlock) => {
       Transforms.setNodes(
         e,
         { parent, level: Math.min(level + 1, 8) },
-        { match: n => n.type === LIST_ITEM }
+        { match: (n) => n.type === LIST_ITEM },
       );
     }
   };
 
   e.decreaseItemDepth = () => {
     const block = Editor.above(editor, {
-      match: n => n.type === LIST_ITEM
+      match: (n) => n.type === LIST_ITEM,
     });
 
     if (block) {
@@ -207,7 +203,7 @@ export const withList = (editor: EditorWithBlock) => {
       Transforms.setNodes(
         editor,
         { parent, level: Math.max(level - 1, 0) },
-        { match: n => n.type === LIST_ITEM }
+        { match: (n) => n.type === LIST_ITEM },
       );
     }
   };

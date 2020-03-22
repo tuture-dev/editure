@@ -23,7 +23,7 @@ export function detectShortcut(editor: Editor, regexes: RegExp[]) {
 export function handleMarkShortcut(
   editor: EditorWithMark,
   format: string,
-  matchArr: RegExpExecArray
+  matchArr: RegExpExecArray,
 ) {
   const { insertText, children } = editor;
   const { anchor } = editor.selection!;
@@ -51,20 +51,20 @@ export function handleMarkShortcut(
   const needMarkRangeEndOffset = needMarkRangeStartOffset + targetInsertText.length;
   const needMarkRangeStart = {
     ...anchor,
-    offset: needMarkRangeStartOffset
+    offset: needMarkRangeStartOffset,
   };
   const needMarkRangeEnd = { ...anchor, offset: needMarkRangeEndOffset };
 
   const needMarkRange = {
     anchor: needMarkRangeStart,
-    focus: needMarkRangeEnd
+    focus: needMarkRangeEnd,
   };
 
   Transforms.select(editor, needMarkRange);
   editor.toggleMark(format);
 
   Transforms.collapse(editor, {
-    edge: 'end'
+    edge: 'end',
   });
 
   // Remove marks and insert the space.

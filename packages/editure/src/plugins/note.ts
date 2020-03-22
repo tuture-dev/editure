@@ -10,7 +10,7 @@ const shortcutRegexes = [/^\s*:::\s*([a-zA-Z]*)$/];
 export const withNote = (editor: EditorWithContainer) => {
   const { getChildFormat, insertBreak, deleteBackward, toggleBlock } = editor;
 
-  editor.getChildFormat = format => {
+  editor.getChildFormat = (format) => {
     return format === NOTE ? PARAGRAPH : getChildFormat(format);
   };
 
@@ -36,13 +36,13 @@ export const withNote = (editor: EditorWithContainer) => {
     insertBreak();
   };
 
-  editor.deleteBackward = unit => {
+  editor.deleteBackward = (unit) => {
     if (unit !== 'character') {
       return deleteBackward(unit);
     }
 
     const match = Editor.above(editor, {
-      match: n => n.type === NOTE
+      match: (n) => n.type === NOTE,
     });
 
     if (match) {

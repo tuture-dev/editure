@@ -18,7 +18,7 @@ export const withVoid = <T extends Editor>(editor: T) => {
     }
 
     Transforms.removeNodes(e, {
-      match: n => n.children && !n.children[0].text
+      match: (n) => n.children && !n.children[0].text,
     });
 
     const text = { text: '' };

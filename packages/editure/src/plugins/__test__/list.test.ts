@@ -23,10 +23,10 @@ describe('withList', () => {
                 type: F.LIST_ITEM,
                 parent: F.BULLETED_LIST,
                 level: 0,
-                children: [{ text: 'hello' }]
-              }
-            ]
-          }
+                children: [{ text: 'hello' }],
+              },
+            ],
+          },
         ];
 
         expect(editor.children).toStrictEqual(nodes);
@@ -44,16 +44,16 @@ describe('withList', () => {
                 type: F.LIST_ITEM,
                 parent: F.BULLETED_LIST,
                 level: 0,
-                children: [{ text: 'foo' }]
+                children: [{ text: 'foo' }],
               },
               {
                 type: F.LIST_ITEM,
                 parent: F.BULLETED_LIST,
                 level: 0,
-                children: [{ text: 'bar' }]
-              }
-            ]
-          }
+                children: [{ text: 'bar' }],
+              },
+            ],
+          },
         ];
 
         expect(editor.children).toStrictEqual(nodes);
@@ -66,8 +66,8 @@ describe('withList', () => {
         const nodes = [
           {
             type: F.PARAGRAPH,
-            children: [{ text: '*foo* ' }]
-          }
+            children: [{ text: '*foo* ' }],
+          },
         ];
 
         expect(editor.children).toStrictEqual(nodes);
@@ -87,17 +87,17 @@ describe('withList', () => {
                 type: F.LIST_ITEM,
                 parent: F.BULLETED_LIST,
                 level: 0,
-                children: [{ text: 'foo' }]
+                children: [{ text: 'foo' }],
               },
               {
                 type: F.LIST_ITEM,
                 parent: F.BULLETED_LIST,
                 level: 0,
-                children: [{ text: 'bar' }]
-              }
-            ]
+                children: [{ text: 'bar' }],
+              },
+            ],
           },
-          { type: F.PARAGRAPH, children: [{ text: '' }] }
+          { type: F.PARAGRAPH, children: [{ text: '' }] },
         ];
 
         expect(editor.children).toStrictEqual(nodes);
@@ -110,12 +110,12 @@ describe('withList', () => {
         const nodes = [
           {
             type: F.PARAGRAPH,
-            children: [{ text: 'foo' }]
+            children: [{ text: 'foo' }],
           },
           {
             type: F.PARAGRAPH,
-            children: [{ text: 'bar' }]
-          }
+            children: [{ text: 'bar' }],
+          },
         ];
 
         expect(editor.children).toStrictEqual(nodes);
@@ -136,10 +136,10 @@ describe('withList', () => {
                 type: F.LIST_ITEM,
                 level: 0,
                 parent: F.BULLETED_LIST,
-                children: [{ text: 'f' }]
-              }
-            ]
-          }
+                children: [{ text: 'f' }],
+              },
+            ],
+          },
         ]);
 
         deleteNTimes(editor, 1);
@@ -151,18 +151,18 @@ describe('withList', () => {
                 type: F.LIST_ITEM,
                 level: 0,
                 parent: F.BULLETED_LIST,
-                children: [{ text: '' }]
-              }
-            ]
-          }
+                children: [{ text: '' }],
+              },
+            ],
+          },
         ]);
 
         deleteNTimes(editor, 1);
         expect(editor.children).toStrictEqual([
           {
             type: F.PARAGRAPH,
-            children: [{ text: '' }]
-          }
+            children: [{ text: '' }],
+          },
         ]);
       });
 
@@ -178,10 +178,10 @@ describe('withList', () => {
                 type: F.LIST_ITEM,
                 level: 0,
                 parent: F.BULLETED_LIST,
-                children: [{ text: '' }]
-              }
-            ]
-          }
+                children: [{ text: '' }],
+              },
+            ],
+          },
         ]);
         expect(Range.isCollapsed(editor.selection!)).toBe(true);
       });
@@ -191,14 +191,14 @@ describe('withList', () => {
           type: F.LIST_ITEM,
           level: 1,
           parent: F.BULLETED_LIST,
-          children: [{ text: '' }]
+          children: [{ text: '' }],
         };
 
         editor.children = [
           {
             type: F.BULLETED_LIST,
-            children: [listItem]
-          }
+            children: [listItem],
+          },
         ];
 
         Transforms.select(editor, { path: [0, 0, 0], offset: 0 });
@@ -207,8 +207,8 @@ describe('withList', () => {
         expect(editor.children).toStrictEqual([
           {
             type: F.BULLETED_LIST,
-            children: [{ ...listItem, level: 0 }]
-          }
+            children: [{ ...listItem, level: 0 }],
+          },
         ]);
       });
 
@@ -219,8 +219,8 @@ describe('withList', () => {
         const nodes = [
           {
             type: F.PARAGRAPH,
-            children: [{ text: 'fo' }]
-          }
+            children: [{ text: 'fo' }],
+          },
         ];
 
         expect(editor.children).toStrictEqual(nodes);
@@ -236,15 +236,15 @@ describe('withList', () => {
             children: [
               {
                 type: F.LIST_ITEM,
-                children: [{ text: 'foo' }]
+                children: [{ text: 'foo' }],
               },
               {
                 type: F.LIST_ITEM,
                 level: 1,
-                children: [{ text: 'bar' }]
-              }
-            ]
-          }
+                children: [{ text: 'bar' }],
+              },
+            ],
+          },
         ];
 
         Editor.normalize(editor, { force: true });
@@ -256,16 +256,16 @@ describe('withList', () => {
                 type: F.LIST_ITEM,
                 parent: F.BULLETED_LIST,
                 level: 0,
-                children: [{ text: 'foo' }]
+                children: [{ text: 'foo' }],
               },
               {
                 type: F.LIST_ITEM,
                 parent: F.BULLETED_LIST,
                 level: 1,
-                children: [{ text: 'bar' }]
-              }
-            ]
-          }
+                children: [{ text: 'bar' }],
+              },
+            ],
+          },
         ]);
       });
 
@@ -278,10 +278,10 @@ describe('withList', () => {
                 type: F.LIST_ITEM,
                 parent: F.BULLETED_LIST,
                 level: 0,
-                children: [{ type: F.PARAGRAPH, children: [{ text: 'foo' }] }]
-              }
-            ]
-          }
+                children: [{ type: F.PARAGRAPH, children: [{ text: 'foo' }] }],
+              },
+            ],
+          },
         ];
 
         Editor.normalize(editor, { force: true });
@@ -293,10 +293,10 @@ describe('withList', () => {
                 type: F.LIST_ITEM,
                 parent: F.BULLETED_LIST,
                 level: 0,
-                children: [{ text: 'foo' }]
-              }
-            ]
-          }
+                children: [{ text: 'foo' }],
+              },
+            ],
+          },
         ]);
       });
     });
@@ -314,10 +314,10 @@ describe('withList', () => {
                 type: F.LIST_ITEM,
                 parent: F.BULLETED_LIST,
                 level: 1,
-                children: [{ text: '' }]
-              }
-            ]
-          }
+                children: [{ text: '' }],
+              },
+            ],
+          },
         ];
 
         expect(editor.children).toStrictEqual(nodes);
@@ -335,10 +335,10 @@ describe('withList', () => {
                 type: F.LIST_ITEM,
                 parent: F.BULLETED_LIST,
                 level: 1,
-                children: [{ text: 'test' }]
-              }
-            ]
-          }
+                children: [{ text: 'test' }],
+              },
+            ],
+          },
         ];
 
         expect(editor.children).toStrictEqual(nodes);
@@ -362,22 +362,22 @@ describe('withList', () => {
                 type: F.LIST_ITEM,
                 parent: F.BULLETED_LIST,
                 level: 0,
-                children: [{ text: 'foo' }]
+                children: [{ text: 'foo' }],
               },
               {
                 type: F.LIST_ITEM,
                 parent: F.BULLETED_LIST,
                 level: 1,
-                children: [{ text: 'bar' }]
+                children: [{ text: 'bar' }],
               },
               {
                 type: F.LIST_ITEM,
                 parent: F.BULLETED_LIST,
                 level: 2,
-                children: [{ text: 'baz' }]
-              }
-            ]
-          }
+                children: [{ text: 'baz' }],
+              },
+            ],
+          },
         ];
 
         expect(editor.children).toStrictEqual(nodes);
@@ -397,10 +397,10 @@ describe('withList', () => {
                 type: F.LIST_ITEM,
                 parent: F.BULLETED_LIST,
                 level: 0,
-                children: [{ text: 'test' }]
-              }
-            ]
-          }
+                children: [{ text: 'test' }],
+              },
+            ],
+          },
         ];
 
         expect(editor.children).toStrictEqual(nodes);
@@ -411,14 +411,14 @@ describe('withList', () => {
           type: F.LIST_ITEM,
           parent: F.BULLETED_LIST,
           level: 2,
-          children: [{ text: 'test' }]
+          children: [{ text: 'test' }],
         };
 
         editor.children = [
           {
             type: F.BULLETED_LIST,
-            children: [listItem]
-          }
+            children: [listItem],
+          },
         ];
 
         Transforms.select(editor, { path: [0, 0, 0], offset: 2 });
@@ -427,16 +427,16 @@ describe('withList', () => {
         expect(editor.children).toStrictEqual([
           {
             type: F.BULLETED_LIST,
-            children: [{ ...listItem, level: 1 }]
-          }
+            children: [{ ...listItem, level: 1 }],
+          },
         ]);
 
         editor.decreaseItemDepth();
         expect(editor.children).toStrictEqual([
           {
             type: F.BULLETED_LIST,
-            children: [{ ...listItem, level: 0 }]
-          }
+            children: [{ ...listItem, level: 0 }],
+          },
         ]);
       });
     });
@@ -456,10 +456,10 @@ describe('withList', () => {
                 parent: F.NUMBERED_LIST,
                 number: 1,
                 level: 0,
-                children: [{ text: 'hello' }]
-              }
-            ]
-          }
+                children: [{ text: 'hello' }],
+              },
+            ],
+          },
         ];
 
         expect(editor.children).toStrictEqual(nodes);
@@ -478,17 +478,17 @@ describe('withList', () => {
                 parent: F.NUMBERED_LIST,
                 number: 1,
                 level: 0,
-                children: [{ text: 'foo' }]
+                children: [{ text: 'foo' }],
               },
               {
                 type: F.LIST_ITEM,
                 parent: F.NUMBERED_LIST,
                 number: 2,
                 level: 0,
-                children: [{ text: 'bar' }]
-              }
-            ]
-          }
+                children: [{ text: 'bar' }],
+              },
+            ],
+          },
         ];
 
         expect(editor.children).toStrictEqual(nodes);
@@ -509,18 +509,18 @@ describe('withList', () => {
                 parent: F.NUMBERED_LIST,
                 number: 1,
                 level: 0,
-                children: [{ text: 'foo' }]
+                children: [{ text: 'foo' }],
               },
               {
                 type: F.LIST_ITEM,
                 parent: F.NUMBERED_LIST,
                 number: 2,
                 level: 0,
-                children: [{ text: 'bar' }]
-              }
-            ]
+                children: [{ text: 'bar' }],
+              },
+            ],
           },
-          { type: F.PARAGRAPH, children: [{ text: '' }] }
+          { type: F.PARAGRAPH, children: [{ text: '' }] },
         ];
 
         expect(editor.children).toStrictEqual(nodes);
@@ -542,10 +542,10 @@ describe('withList', () => {
                 level: 0,
                 number: 1,
                 parent: F.NUMBERED_LIST,
-                children: [{ text: 'f' }]
-              }
-            ]
-          }
+                children: [{ text: 'f' }],
+              },
+            ],
+          },
         ]);
 
         deleteNTimes(editor, 1);
@@ -558,18 +558,18 @@ describe('withList', () => {
                 level: 0,
                 number: 1,
                 parent: F.NUMBERED_LIST,
-                children: [{ text: '' }]
-              }
-            ]
-          }
+                children: [{ text: '' }],
+              },
+            ],
+          },
         ]);
 
         deleteNTimes(editor, 1);
         expect(editor.children).toStrictEqual([
           {
             type: F.PARAGRAPH,
-            children: [{ text: '' }]
-          }
+            children: [{ text: '' }],
+          },
         ]);
       });
 
@@ -586,10 +586,10 @@ describe('withList', () => {
                 level: 0,
                 number: 1,
                 parent: F.NUMBERED_LIST,
-                children: [{ text: '' }]
-              }
-            ]
-          }
+                children: [{ text: '' }],
+              },
+            ],
+          },
         ]);
         expect(Range.isCollapsed(editor.selection!)).toBe(true);
       });
@@ -603,19 +603,19 @@ describe('withList', () => {
             children: [
               {
                 type: F.LIST_ITEM,
-                children: [{ text: 'foo' }]
+                children: [{ text: 'foo' }],
               },
               {
                 type: F.LIST_ITEM,
-                children: [{ text: 'bar' }]
+                children: [{ text: 'bar' }],
               },
               {
                 type: F.LIST_ITEM,
                 level: 1,
-                children: [{ text: 'baz' }]
-              }
-            ]
-          }
+                children: [{ text: 'baz' }],
+              },
+            ],
+          },
         ];
 
         Editor.normalize(editor, { force: true });
@@ -628,24 +628,24 @@ describe('withList', () => {
                 level: 0,
                 number: 1,
                 parent: F.NUMBERED_LIST,
-                children: [{ text: 'foo' }]
+                children: [{ text: 'foo' }],
               },
               {
                 type: F.LIST_ITEM,
                 level: 0,
                 number: 2,
                 parent: F.NUMBERED_LIST,
-                children: [{ text: 'bar' }]
+                children: [{ text: 'bar' }],
               },
               {
                 type: F.LIST_ITEM,
                 level: 1,
                 number: 1,
                 parent: F.NUMBERED_LIST,
-                children: [{ text: 'baz' }]
-              }
-            ]
-          }
+                children: [{ text: 'baz' }],
+              },
+            ],
+          },
         ]);
       });
 
@@ -659,10 +659,10 @@ describe('withList', () => {
                 parent: F.NUMBERED_LIST,
                 number: 1,
                 level: 0,
-                children: [{ type: F.PARAGRAPH, children: [{ text: 'foo' }] }]
-              }
-            ]
-          }
+                children: [{ type: F.PARAGRAPH, children: [{ text: 'foo' }] }],
+              },
+            ],
+          },
         ];
 
         Editor.normalize(editor, { force: true });
@@ -675,10 +675,10 @@ describe('withList', () => {
                 parent: F.NUMBERED_LIST,
                 number: 1,
                 level: 0,
-                children: [{ text: 'foo' }]
-              }
-            ]
-          }
+                children: [{ text: 'foo' }],
+              },
+            ],
+          },
         ]);
       });
     });
@@ -697,10 +697,10 @@ describe('withList', () => {
                 parent: F.NUMBERED_LIST,
                 number: 1,
                 level: 1,
-                children: [{ text: '' }]
-              }
-            ]
-          }
+                children: [{ text: '' }],
+              },
+            ],
+          },
         ];
 
         expect(editor.children).toStrictEqual(nodes);
@@ -719,10 +719,10 @@ describe('withList', () => {
                 parent: F.NUMBERED_LIST,
                 number: 1,
                 level: 1,
-                children: [{ text: 'test' }]
-              }
-            ]
-          }
+                children: [{ text: 'test' }],
+              },
+            ],
+          },
         ];
 
         expect(editor.children).toStrictEqual(nodes);
@@ -747,24 +747,24 @@ describe('withList', () => {
                 parent: F.NUMBERED_LIST,
                 number: 1,
                 level: 0,
-                children: [{ text: 'foo' }]
+                children: [{ text: 'foo' }],
               },
               {
                 type: F.LIST_ITEM,
                 parent: F.NUMBERED_LIST,
                 number: 1,
                 level: 1,
-                children: [{ text: 'bar' }]
+                children: [{ text: 'bar' }],
               },
               {
                 type: F.LIST_ITEM,
                 parent: F.NUMBERED_LIST,
                 number: 1,
                 level: 2,
-                children: [{ text: 'baz' }]
-              }
-            ]
-          }
+                children: [{ text: 'baz' }],
+              },
+            ],
+          },
         ];
 
         expect(editor.children).toStrictEqual(nodes);
@@ -785,10 +785,10 @@ describe('withList', () => {
                 parent: F.NUMBERED_LIST,
                 number: 1,
                 level: 0,
-                children: [{ text: 'test' }]
-              }
-            ]
-          }
+                children: [{ text: 'test' }],
+              },
+            ],
+          },
         ];
 
         expect(editor.children).toStrictEqual(nodes);
@@ -800,14 +800,14 @@ describe('withList', () => {
           parent: F.NUMBERED_LIST,
           number: 1,
           level: 2,
-          children: [{ text: 'test' }]
+          children: [{ text: 'test' }],
         };
 
         editor.children = [
           {
             type: F.NUMBERED_LIST,
-            children: [listItem]
-          }
+            children: [listItem],
+          },
         ];
 
         Transforms.select(editor, { path: [0, 0, 0], offset: 2 });
@@ -816,16 +816,16 @@ describe('withList', () => {
         expect(editor.children).toStrictEqual([
           {
             type: F.NUMBERED_LIST,
-            children: [{ ...listItem, level: 1 }]
-          }
+            children: [{ ...listItem, level: 1 }],
+          },
         ]);
 
         editor.decreaseItemDepth();
         expect(editor.children).toStrictEqual([
           {
             type: F.NUMBERED_LIST,
-            children: [{ ...listItem, level: 0 }]
-          }
+            children: [{ ...listItem, level: 0 }],
+          },
         ]);
       });
     });

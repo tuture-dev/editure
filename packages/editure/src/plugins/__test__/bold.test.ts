@@ -16,7 +16,7 @@ describe('withBold', () => {
       inputText(editor, '**bold** ');
 
       const nodes = [
-        { type: F.PARAGRAPH, children: [{ text: 'bold', bold: true }, { text: ' ' }] }
+        { type: F.PARAGRAPH, children: [{ text: 'bold', bold: true }, { text: ' ' }] },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -28,7 +28,7 @@ describe('withBold', () => {
       inputText(editor, '__bold__ ');
 
       const nodes = [
-        { type: F.PARAGRAPH, children: [{ text: 'bold', bold: true }, { text: ' ' }] }
+        { type: F.PARAGRAPH, children: [{ text: 'bold', bold: true }, { text: ' ' }] },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -42,8 +42,8 @@ describe('withBold', () => {
       const nodes = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'foo ' }, { text: 'bar', bold: true }, { text: ' ' }]
-        }
+          children: [{ text: 'foo ' }, { text: 'bar', bold: true }, { text: ' ' }],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -55,8 +55,8 @@ describe('withBold', () => {
       editor.children = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'foo' }]
-        }
+          children: [{ text: 'foo' }],
+        },
       ];
 
       const point = { path: [0, 0], offset: 0 };
@@ -66,8 +66,8 @@ describe('withBold', () => {
       const nodes = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'bar', bold: true }, { text: ' foo' }]
-        }
+          children: [{ text: 'bar', bold: true }, { text: ' foo' }],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -79,8 +79,8 @@ describe('withBold', () => {
       editor.children = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'foo bar' }]
-        }
+          children: [{ text: 'foo bar' }],
+        },
       ];
 
       const point = { path: [0, 0], offset: 4 };
@@ -90,8 +90,8 @@ describe('withBold', () => {
       const nodes = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'foo ' }, { text: 'baz', bold: true }, { text: ' bar' }]
-        }
+          children: [{ text: 'foo ' }, { text: 'baz', bold: true }, { text: ' bar' }],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);

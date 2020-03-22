@@ -1,0 +1,15 @@
+language: node_js
+
+node_js:
+  - 12
+
+install:
+  - yarn
+  - yarn bootstrap
+  - yarn build
+
+script:
+  - yarn lint
+  - yarn test
+
+cache: yarn

@@ -13,7 +13,7 @@ export const withBaseBlock = <T extends Editor>(editor: T) => {
 
   e.isBlockActive = (format: string) => {
     const [match] = Editor.nodes(editor, {
-      match: n => n.type === format
+      match: (n) => n.type === format,
     });
     return !!match;
   };
@@ -22,27 +22,27 @@ export const withBaseBlock = <T extends Editor>(editor: T) => {
     if (!e.isBlockActive(format)) {
       return Transforms.setNodes(editor, {
         ...props,
-        type: format
+        type: format,
       });
     }
 
     const [match] = Editor.nodes(editor, {
-      match: n => n.type === format
+      match: (n) => n.type === format,
     });
     const [node] = match;
 
     Transforms.setNodes(editor, {
-      type: F.PARAGRAPH
+      type: F.PARAGRAPH,
     });
 
     // Remove other fields.
-    const attrs = Object.keys(node).filter(k => !['type', 'children'].includes(k));
+    const attrs = Object.keys(node).filter((k) => !['type', 'children'].includes(k));
     Transforms.unsetNodes(editor, attrs);
   };
 
   e.updateBlock = (format: string, props?: any) => {
     Transforms.setNodes(editor, props, {
-      match: n => n.type === format
+      match: (n) => n.type === format,
     });
   };
 
@@ -53,7 +53,7 @@ export const withBaseBlock = <T extends Editor>(editor: T) => {
     for (const format of formats) {
       if (e.isBlockActive(format)) {
         const block = Editor.above(editor, {
-          match: n => n.type === format
+          match: (n) => n.type === format,
         });
 
         if (block) {

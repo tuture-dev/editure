@@ -16,7 +16,7 @@ describe('withHr', () => {
 
       const nodes = [
         { type: F.HR, children: [{ text: '' }] },
-        { type: F.PARAGRAPH, children: [{ text: '' }] }
+        { type: F.PARAGRAPH, children: [{ text: '' }] },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -28,7 +28,7 @@ describe('withHr', () => {
 
       const nodes = [
         { type: F.HR, children: [{ text: '' }] },
-        { type: F.PARAGRAPH, children: [{ text: '' }] }
+        { type: F.PARAGRAPH, children: [{ text: '' }] },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -40,7 +40,7 @@ describe('withHr', () => {
 
       const nodes = [
         { type: F.HR, children: [{ text: '' }] },
-        { type: F.PARAGRAPH, children: [{ text: '' }] }
+        { type: F.PARAGRAPH, children: [{ text: '' }] },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -52,7 +52,7 @@ describe('withHr', () => {
 
       const nodes = [
         { type: F.PARAGRAPH, children: [{ text: 'foo' }] },
-        { type: F.PARAGRAPH, children: [{ text: '' }] }
+        { type: F.PARAGRAPH, children: [{ text: '' }] },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -65,13 +65,13 @@ describe('withHr', () => {
       const path = [0, 0];
       Transforms.select(editor, {
         anchor: { path, offset: 0 },
-        focus: { path, offset: 3 }
+        focus: { path, offset: 3 },
       });
       editor.insertBreak();
 
       const nodes = [
         { type: F.PARAGRAPH, children: [{ text: '' }] },
-        { type: F.PARAGRAPH, children: [{ text: '' }] }
+        { type: F.PARAGRAPH, children: [{ text: '' }] },
       ];
 
       expect(editor.children).toStrictEqual(nodes);

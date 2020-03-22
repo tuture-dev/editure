@@ -8,7 +8,7 @@ import {
   createEditorWithContainer,
   reset,
   inputText,
-  deleteNTimes
+  deleteNTimes,
 } from './utils';
 
 describe('withBlockquote', () => {
@@ -24,8 +24,8 @@ describe('withBlockquote', () => {
       const nodes = [
         {
           type: F.BLOCK_QUOTE,
-          children: [{ type: F.PARAGRAPH, children: [{ text: 'test' }] }]
-        }
+          children: [{ type: F.PARAGRAPH, children: [{ text: 'test' }] }],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -40,9 +40,9 @@ describe('withBlockquote', () => {
           type: F.BLOCK_QUOTE,
           children: [
             { type: F.PARAGRAPH, children: [{ text: 'foo' }] },
-            { type: F.PARAGRAPH, children: [{ text: 'bar' }] }
-          ]
-        }
+            { type: F.PARAGRAPH, children: [{ text: 'bar' }] },
+          ],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -69,18 +69,18 @@ describe('withBlockquote', () => {
           type: F.BLOCK_QUOTE,
           children: [
             { type: F.PARAGRAPH, children: [{ text: 'foo' }] },
-            { type: F.PARAGRAPH, children: [{ text: '' }] }
-          ]
-        }
+            { type: F.PARAGRAPH, children: [{ text: '' }] },
+          ],
+        },
       ]);
 
       editor.insertBreak();
       expect(editor.children).toStrictEqual([
         {
           type: F.BLOCK_QUOTE,
-          children: [{ type: F.PARAGRAPH, children: [{ text: 'foo' }] }]
+          children: [{ type: F.PARAGRAPH, children: [{ text: 'foo' }] }],
         },
-        { type: F.PARAGRAPH, children: [{ text: '' }] }
+        { type: F.PARAGRAPH, children: [{ text: '' }] },
       ]);
     });
 
@@ -90,12 +90,12 @@ describe('withBlockquote', () => {
       const nodes = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'foo' }]
+          children: [{ text: 'foo' }],
         },
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'bar' }]
-        }
+          children: [{ text: 'bar' }],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -111,24 +111,24 @@ describe('withBlockquote', () => {
       expect(editor.children).toStrictEqual([
         {
           type: F.BLOCK_QUOTE,
-          children: [{ type: F.PARAGRAPH, children: [{ text: 'f' }] }]
-        }
+          children: [{ type: F.PARAGRAPH, children: [{ text: 'f' }] }],
+        },
       ]);
 
       deleteNTimes(editor, 1);
       expect(editor.children).toStrictEqual([
         {
           type: F.BLOCK_QUOTE,
-          children: [{ type: F.PARAGRAPH, children: [{ text: '' }] }]
-        }
+          children: [{ type: F.PARAGRAPH, children: [{ text: '' }] }],
+        },
       ]);
 
       deleteNTimes(editor, 1);
       expect(editor.children).toStrictEqual([
         {
           type: F.PARAGRAPH,
-          children: [{ text: '' }]
-        }
+          children: [{ text: '' }],
+        },
       ]);
     });
 
@@ -140,14 +140,12 @@ describe('withBlockquote', () => {
       expect(editor.children).toStrictEqual([
         {
           type: F.BLOCK_QUOTE,
-          children: [{ type: F.PARAGRAPH, children: [{ text: 'oo' }] }]
-        }
+          children: [{ type: F.PARAGRAPH, children: [{ text: 'oo' }] }],
+        },
       ]);
 
       deleteNTimes(editor, 1);
-      expect(editor.children).toStrictEqual([
-        { type: F.PARAGRAPH, children: [{ text: 'oo' }] }
-      ]);
+      expect(editor.children).toStrictEqual([{ type: F.PARAGRAPH, children: [{ text: 'oo' }] }]);
     });
 
     test('delete by character within multiple paragraphs', () => {
@@ -161,9 +159,9 @@ describe('withBlockquote', () => {
           children: [
             { type: F.PARAGRAPH, children: [{ text: 'foo' }] },
             { type: F.PARAGRAPH, children: [{ text: 'ar' }] },
-            { type: F.PARAGRAPH, children: [{ text: 'baz' }] }
-          ]
-        }
+            { type: F.PARAGRAPH, children: [{ text: 'baz' }] },
+          ],
+        },
       ]);
 
       deleteNTimes(editor, 1);
@@ -172,9 +170,9 @@ describe('withBlockquote', () => {
           type: F.BLOCK_QUOTE,
           children: [
             { type: F.PARAGRAPH, children: [{ text: 'fooar' }] },
-            { type: F.PARAGRAPH, children: [{ text: 'baz' }] }
-          ]
-        }
+            { type: F.PARAGRAPH, children: [{ text: 'baz' }] },
+          ],
+        },
       ]);
     });
 
@@ -185,8 +183,8 @@ describe('withBlockquote', () => {
       expect(editor.children).toStrictEqual([
         {
           type: F.BLOCK_QUOTE,
-          children: [{ type: F.PARAGRAPH, children: [{ text: '' }] }]
-        }
+          children: [{ type: F.PARAGRAPH, children: [{ text: '' }] }],
+        },
       ]);
       expect(Range.isCollapsed(editor.selection!)).toBe(true);
     });
@@ -210,8 +208,8 @@ describe('withBlockquote', () => {
         { type: F.PARAGRAPH, children: [{ text: 'foo' }] },
         {
           type: F.BLOCK_QUOTE,
-          children: [{ type: F.PARAGRAPH, children: [{ text: '' }] }]
-        }
+          children: [{ type: F.PARAGRAPH, children: [{ text: '' }] }],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -225,8 +223,8 @@ describe('withBlockquote', () => {
         { type: F.PARAGRAPH, children: [{ text: 'foo' }] },
         {
           type: F.BLOCK_QUOTE,
-          children: [{ type: F.PARAGRAPH, children: [{ text: 'bar' }] }]
-        }
+          children: [{ type: F.PARAGRAPH, children: [{ text: 'bar' }] }],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);

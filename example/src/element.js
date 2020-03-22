@@ -9,7 +9,7 @@ import { palette, icons, levels } from './utils/note';
 
 const bulletedListStyleType = ['disc', 'circle', 'square'];
 
-const ListItemElement = props => {
+const ListItemElement = (props) => {
   const { attributes, children, element } = props;
   const { parent, level, number } = element;
 
@@ -27,15 +27,13 @@ const ListItemElement = props => {
   `;
 
   return (
-    <li
-      {...attributes}
-      className={parent === F.BULLETED_LIST ? bulletedStyle : numberedStyle}>
+    <li {...attributes} className={parent === F.BULLETED_LIST ? bulletedStyle : numberedStyle}>
       {children}
     </li>
   );
 };
 
-const CodeBlockElement = props => {
+const CodeBlockElement = (props) => {
   const { element } = props;
   const { lang: defaultLang = 'Plain Text' } = element;
 
@@ -48,8 +46,7 @@ const CodeBlockElement = props => {
     editor.updateBlock(F.CODE_BLOCK, { lang: newLang });
   }
 
-  const selectValue =
-    enumPrismLangToLanguage[enumPrismLangToLanguage[lang.toLocaleLowerCase()]];
+  const selectValue = enumPrismLangToLanguage[enumPrismLangToLanguage[lang.toLocaleLowerCase()]];
 
   return (
     <div
@@ -58,7 +55,7 @@ const CodeBlockElement = props => {
       `}
       {...props.attributes}>
       <select contentEditable={false} value={selectValue} onChange={handleChange}>
-        {languages.map(language => (
+        {languages.map((language) => (
           <option key={language} value={enumPrismLangToLanguage[language]}>
             {language}
           </option>
@@ -92,7 +89,7 @@ const HrElement = ({ attributes, children }) => {
   );
 };
 
-const ImageElement = props => {
+const ImageElement = (props) => {
   const { attributes, children, element } = props;
   const selected = useSelected();
   const focused = useFocused();
@@ -118,7 +115,7 @@ const ImageElement = props => {
   );
 };
 
-const NoteElement = props => {
+const NoteElement = (props) => {
   const { attributes, children, element } = props;
   const { level: defaultLevel = 'default' } = element;
 
@@ -167,7 +164,7 @@ const NoteElement = props => {
   return (
     <div {...attributes} className={cx(baseStyle, noteStyle, iconStyle)}>
       <select contentEditable={false} value={level} onChange={handleChange}>
-        {levels.map(level => (
+        {levels.map((level) => (
           <option key={level} value={level}>
             {level}
           </option>
@@ -178,7 +175,7 @@ const NoteElement = props => {
   );
 };
 
-export default props => {
+export default (props) => {
   const { attributes, children, element } = props;
 
   switch (element.type) {

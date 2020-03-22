@@ -3,5 +3,5 @@ export {
   useFocused,
   useReadOnly,
   useSelected,
-  useSlate as useEditure
+  useSlate as useEditure,
 } from 'tuture-slate-react';

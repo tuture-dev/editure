@@ -9,7 +9,7 @@ const shortcutRegexes = [/^\s*---$/, /^\s*\*\*\*$/, /^\s*___$/];
 export const withHr = (editor: Editor) => {
   const { isVoid, insertBreak } = editor;
 
-  editor.isVoid = element => {
+  editor.isVoid = (element) => {
     return element.type === HR ? true : isVoid(element);
   };
 

@@ -10,13 +10,13 @@ import {
   inputText,
   deleteNTimes,
   configureEditor,
-  createEditorWithContainer
+  createEditorWithContainer,
 } from './utils';
 
 describe('withNote', () => {
   const editor = configureEditor({
     marks: [withBold],
-    containers: [withNote]
+    containers: [withNote],
   }) as EditorWithMark & EditorWithContainer;
   reset(editor);
 
@@ -46,9 +46,9 @@ describe('withNote', () => {
           level: '',
           children: [
             { type: F.PARAGRAPH, children: [{ text: 'foo' }] },
-            { type: F.PARAGRAPH, children: [{ text: 'bar' }] }
-          ]
-        }
+            { type: F.PARAGRAPH, children: [{ text: 'bar' }] },
+          ],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -64,9 +64,9 @@ describe('withNote', () => {
           level: 'warning',
           children: [
             { type: F.PARAGRAPH, children: [{ text: 'foo' }] },
-            { type: F.PARAGRAPH, children: [{ text: 'bar' }] }
-          ]
-        }
+            { type: F.PARAGRAPH, children: [{ text: 'bar' }] },
+          ],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -82,9 +82,9 @@ describe('withNote', () => {
           level: 'danger',
           children: [
             { type: F.PARAGRAPH, children: [{ text: 'foo' }] },
-            { type: F.PARAGRAPH, children: [{ text: 'bar' }] }
-          ]
-        }
+            { type: F.PARAGRAPH, children: [{ text: 'bar' }] },
+          ],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -101,9 +101,9 @@ describe('withNote', () => {
           children: [
             { type: F.PARAGRAPH, children: [{ text: 'foo bar' }] },
             { type: F.PARAGRAPH, children: [{ text: ':::' }] },
-            { type: F.PARAGRAPH, children: [{ text: 'baz' }] }
-          ]
-        }
+            { type: F.PARAGRAPH, children: [{ text: 'baz' }] },
+          ],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -116,13 +116,13 @@ describe('withNote', () => {
       const path = [0, 0];
       Transforms.select(editor, {
         anchor: { path, offset: 1 },
-        focus: { path, offset: 3 }
+        focus: { path, offset: 3 },
       });
       editor.insertBreak();
 
       const nodes = [
         { type: F.PARAGRAPH, children: [{ text: ':' }] },
-        { type: F.PARAGRAPH, children: [{ text: '' }] }
+        { type: F.PARAGRAPH, children: [{ text: '' }] },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -134,12 +134,12 @@ describe('withNote', () => {
       const nodes = [
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'foo' }]
+          children: [{ text: 'foo' }],
         },
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'bar' }]
-        }
+          children: [{ text: 'bar' }],
+        },
       ];
 
       expect(editor.children).toStrictEqual(nodes);
@@ -156,8 +156,8 @@ describe('withNote', () => {
         {
           type: F.NOTE,
           level: 'info',
-          children: [{ type: F.PARAGRAPH, children: [{ text: 'foo' }] }]
-        }
+          children: [{ type: F.PARAGRAPH, children: [{ text: 'foo' }] }],
+        },
       ]);
 
       deleteNTimes(editor, 3);
@@ -165,16 +165,16 @@ describe('withNote', () => {
         {
           type: F.NOTE,
           level: 'info',
-          children: [{ type: F.PARAGRAPH, children: [{ text: '' }] }]
-        }
+          children: [{ type: F.PARAGRAPH, children: [{ text: '' }] }],
+        },
       ]);
 
       deleteNTimes(editor, 1);
       expect(editor.children).toStrictEqual([
         {
           type: F.PARAGRAPH,
-          children: [{ text: '' }]
-        }
+          children: [{ text: '' }],
+        },
       ]);
     });
 
@@ -185,38 +185,38 @@ describe('withNote', () => {
       expect(editor.children).toStrictEqual([
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'test' }]
+          children: [{ text: 'test' }],
         },
         {
           type: F.NOTE,
           level: 'info',
-          children: [{ type: F.PARAGRAPH, children: [{ text: 'foo' }] }]
-        }
+          children: [{ type: F.PARAGRAPH, children: [{ text: 'foo' }] }],
+        },
       ]);
 
       deleteNTimes(editor, 3);
       expect(editor.children).toStrictEqual([
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'test' }]
+          children: [{ text: 'test' }],
         },
         {
           type: F.NOTE,
           level: 'info',
-          children: [{ type: F.PARAGRAPH, children: [{ text: '' }] }]
-        }
+          children: [{ type: F.PARAGRAPH, children: [{ text: '' }] }],
+        },
       ]);
 
       deleteNTimes(editor, 1);
       expect(editor.children).toStrictEqual([
         {
           type: F.PARAGRAPH,
-          children: [{ text: 'test' }]
+          children: [{ text: 'test' }],
         },
         {
           type: F.PARAGRAPH,
-          children: [{ text: '' }]
-        }
+          children: [{ text: '' }],
+        },
       ]);
     });
 
@@ -232,9 +232,9 @@ describe('withNote', () => {
           children: [
             { type: F.PARAGRAPH, children: [{ text: 'foo' }] },
             { type: F.PARAGRAPH, children: [{ text: 'ar' }] },
-            { type: F.PARAGRAPH, children: [{ text: 'baz' }] }
-          ]
-        }
+            { type: F.PARAGRAPH, children: [{ text: 'baz' }] },
+          ],
+        },
       ]);
 
       deleteNTimes(editor, 1);
@@ -244,9 +244,9 @@ describe('withNote', () => {
           level: 'info',
           children: [
             { type: F.PARAGRAPH, children: [{ text: 'fooar' }] },
-            { type: F.PARAGRAPH, children: [{ text: 'baz' }] }
-          ]
-        }
+            { type: F.PARAGRAPH, children: [{ text: 'baz' }] },
+          ],
+        },
       ]);
     });
 
@@ -258,8 +258,8 @@ describe('withNote', () => {
         {
           type: F.NOTE,
           level: 'info',
-          children: [{ type: F.PARAGRAPH, children: [{ text: '' }] }]
-        }
+          children: [{ type: F.PARAGRAPH, children: [{ text: '' }] }],
+        },
       ]);
       expect(Range.isCollapsed(editor.selection!)).toBe(true);
     });

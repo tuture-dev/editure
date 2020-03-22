@@ -19,7 +19,7 @@ describe('withVoid', () => {
 
       const nodes = [
         { type: VOID_TYPE, ...props, children: [{ text: '' }] },
-        { type: F.PARAGRAPH, children: [{ text: '' }] }
+        { type: F.PARAGRAPH, children: [{ text: '' }] },
       ];
 
       const point = { path: [1, 0], offset: 0 };
@@ -36,7 +36,7 @@ describe('withVoid', () => {
     const nodes = [
       { type: F.PARAGRAPH, children: [{ text: 'foo' }] },
       { type: VOID_TYPE, ...props, children: [{ text: '' }] },
-      { type: F.PARAGRAPH, children: [{ text: '' }] }
+      { type: F.PARAGRAPH, children: [{ text: '' }] },
     ];
 
     const point = { path: [2, 0], offset: 0 };

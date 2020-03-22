@@ -25,11 +25,7 @@ type SelectOptions = {
   collapse?: 'anchor' | 'focus' | 'start' | 'end';
 };
 
-export const selectWithinBlock = (
-  editor: Editor,
-  format: string,
-  options?: SelectOptions
-) => {
+export const selectWithinBlock = (editor: Editor, format: string, options?: SelectOptions) => {
   const { selection } = editor;
   if (!selection) {
     return;
@@ -38,7 +34,7 @@ export const selectWithinBlock = (
   const { anchor } = selection;
 
   const block = Editor.above(editor, {
-    match: n => n.type === format
+    match: (n) => n.type === format,
   });
 
   if (!block) {

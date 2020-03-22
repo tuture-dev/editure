@@ -10,7 +10,7 @@ import { configureEditor, reset, inputText, deleteNTimes } from './utils';
 describe('withHeading', () => {
   const editor = configureEditor({
     marks: [withBold],
-    blocks: [withHeading]
+    blocks: [withHeading],
   }) as EditorWithMark & EditorWithContainer;
   reset(editor);
 
@@ -23,8 +23,8 @@ describe('withHeading', () => {
       const nodes = [
         {
           type: F.H1,
-          children: [{ text: 'test' }]
-        }
+          children: [{ text: 'test' }],
+        },
       ];
 
       expect(editor.children[0].id).toBeTruthy();
@@ -38,8 +38,8 @@ describe('withHeading', () => {
       const nodes = [
         {
           type: F.H2,
-          children: [{ text: 'test' }]
-        }
+          children: [{ text: 'test' }],
+        },
       ];
 
       expect(editor.children[0].id).toBeTruthy();
@@ -53,8 +53,8 @@ describe('withHeading', () => {
       const nodes = [
         {
           type: F.H3,
-          children: [{ text: 'test' }]
-        }
+          children: [{ text: 'test' }],
+        },
       ];
 
       expect(editor.children[0].id).toBeTruthy();
@@ -68,8 +68,8 @@ describe('withHeading', () => {
       const nodes = [
         {
           type: F.H4,
-          children: [{ text: 'test' }]
-        }
+          children: [{ text: 'test' }],
+        },
       ];
 
       expect(editor.children[0].id).toBeTruthy();
@@ -83,8 +83,8 @@ describe('withHeading', () => {
       const nodes = [
         {
           type: F.H5,
-          children: [{ text: 'test' }]
-        }
+          children: [{ text: 'test' }],
+        },
       ];
 
       expect(editor.children[0].id).toBeTruthy();
@@ -98,8 +98,8 @@ describe('withHeading', () => {
       const nodes = [
         {
           type: F.H6,
-          children: [{ text: 'test' }]
-        }
+          children: [{ text: 'test' }],
+        },
       ];
 
       expect(editor.children[0].id).toBeTruthy();
@@ -113,8 +113,8 @@ describe('withHeading', () => {
       const nodes = [
         {
           type: F.H2,
-          children: [{ text: 'test' }]
-        }
+          children: [{ text: 'test' }],
+        },
       ];
 
       expect(editor.children[0].id).toBeTruthy();
@@ -128,8 +128,8 @@ describe('withHeading', () => {
       const nodes = [
         {
           type: F.H2,
-          children: [{ text: 'foo ' }, { text: 'bar', bold: true }, { text: ' ' }]
-        }
+          children: [{ text: 'foo ' }, { text: 'bar', bold: true }, { text: ' ' }],
+        },
       ];
 
       expect(editor.children[0].id).toBeTruthy();
@@ -145,12 +145,12 @@ describe('withHeading', () => {
       const nodes = [
         {
           type: F.H2,
-          children: [{ text: 'test' }]
+          children: [{ text: 'test' }],
         },
         {
           type: F.PARAGRAPH,
-          children: [{ text: '' }]
-        }
+          children: [{ text: '' }],
+        },
       ];
 
       expect(editor.children).toMatchObject(nodes);
@@ -165,17 +165,13 @@ describe('withHeading', () => {
         inputText(editor, '# test');
 
         deleteNTimes(editor, 3);
-        expect(editor.children).toMatchObject([
-          { type: F.H1, children: [{ text: 't' }] }
-        ]);
+        expect(editor.children).toMatchObject([{ type: F.H1, children: [{ text: 't' }] }]);
 
         deleteNTimes(editor, 1);
         expect(editor.children).toMatchObject([{ type: F.H1, children: [{ text: '' }] }]);
 
         deleteNTimes(editor, 1);
-        expect(editor.children).toMatchObject([
-          { type: F.PARAGRAPH, children: [{ text: '' }] }
-        ]);
+        expect(editor.children).toMatchObject([{ type: F.PARAGRAPH, children: [{ text: '' }] }]);
       });
 
       test('from the middle and beginning', () => {
@@ -185,15 +181,11 @@ describe('withHeading', () => {
 
         // Delete from the middle.
         deleteNTimes(editor, 1);
-        expect(editor.children).toMatchObject([
-          { type: F.H1, children: [{ text: 'est' }] }
-        ]);
+        expect(editor.children).toMatchObject([{ type: F.H1, children: [{ text: 'est' }] }]);
 
         // Delete from the beginning.
         deleteNTimes(editor, 1);
-        expect(editor.children).toMatchObject([
-          { type: F.PARAGRAPH, children: [{ text: 'est' }] }
-        ]);
+        expect(editor.children).toMatchObject([{ type: F.PARAGRAPH, children: [{ text: 'est' }] }]);
       });
     });
 
@@ -206,8 +198,8 @@ describe('withHeading', () => {
         const nodes = [
           {
             type: F.H1,
-            children: [{ text: '' }]
-          }
+            children: [{ text: '' }],
+          },
         ];
 
         expect(editor.children).toMatchObject(nodes);
@@ -223,8 +215,8 @@ describe('withHeading', () => {
         const nodes = [
           {
             type: F.H1,
-            children: [{ text: 'st' }]
-          }
+            children: [{ text: 'st' }],
+          },
         ];
 
         expect(editor.children).toMatchObject(nodes);
