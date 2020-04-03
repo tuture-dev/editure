@@ -24,10 +24,8 @@ const EditLink = () => {
 
     if (text) {
       if (!editor.isMarkActive(LINK)) {
-        console.log('insertLink called');
         editor.insertLink({ text, url });
       } else {
-        console.log('updateLink called');
         editor.updateLink({ text, url });
       }
     }

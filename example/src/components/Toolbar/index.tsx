@@ -21,7 +21,8 @@ const Toolbar = (props: { [prop: string]: any }) => {
     <Menu
       {...props}
       css={css`
-        position: relative;
+        display: flex;
+        justify-content: center;
 
         & .ant-select-selection {
           background: none;

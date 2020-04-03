@@ -5,7 +5,7 @@ export type EditorState = {
 };
 
 const initialState: EditorState = {
-  value: [{ type: 'paragraph', children: [{ text: 'editor 1' }] }],
+  value: [{ type: 'paragraph', children: [{ text: 'Write something beautiful here ...' }] }],
 };
 
 export const editor = {

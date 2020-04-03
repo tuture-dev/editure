@@ -3,6 +3,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Editure, Editable } from 'editure-react';
 import { updateLastSelection } from 'editure';
 
+/** @jsx jsx */
+import { css, jsx } from '@emotion/core';
+
 import Element from './element';
 import Leaf from './leaf';
 import Toolbar from './components/Toolbar';
@@ -21,13 +24,6 @@ function App() {
   const hotKeyHandler = createHotKeysHandler(editor);
   const dropListener = createDropListener(editor);
 
-  const style = {
-    margin: '8%',
-    width: '700px',
-    padding: '1%',
-    border: '1px solid grey',
-  };
-
   const value = useSelector((state: RootState) => state.editor.value);
   console.log('nodes', editor.children);
 
@@ -39,18 +35,26 @@ function App() {
         editor={editor}
         value={value}
         onChange={(newVal) => dispatch.editor.setValue(newVal)}>
-        <Toolbar />
-        <div style={style}>
-          <Editable
-            placeholder="Enter something ..."
-            renderElement={renderElement}
-            renderLeaf={renderLeaf}
-            onKeyDown={(e) => hotKeyHandler(e as any)}
-            onDrop={dropListener}
-            onCopy={(e) => {
-              e.clipboardData.setData('application/x-editure-fragment', JSON.stringify(true));
-            }}
-          />
+        <div
+          css={css`
+            width: 666px;
+            padding-top: 3rem;
+            margin: auto;
+          `}>
+          <Toolbar />
+          <div>
+            <Editable
+              spellCheck={false}
+              placeholder="Enter something ..."
+              renderElement={renderElement}
+              renderLeaf={renderLeaf}
+              onKeyDown={(e) => hotKeyHandler(e as any)}
+              onDrop={dropListener}
+              onCopy={(e) => {
+                e.clipboardData.setData('application/x-editure-fragment', JSON.stringify(true));
+              }}
+            />
+          </div>
         </div>
       </Editure>
     </ButtonRefsContext.Provider>
