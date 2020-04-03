@@ -1,6 +1,9 @@
 *.md
+*.css
 *.html
 *.json
+*.png
+favicon.ico
 .github
 build
 dist
