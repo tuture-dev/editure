@@ -133,6 +133,22 @@ describe('withLink', () => {
       expect(Editor.marks(editor)).toStrictEqual({});
     });
 
+    test('insert link within multi paragraphs', () => {
+      inputText(editor, 'foo\nbar');
+      Transforms.select(editor, { path: [0, 0], offset: 3 });
+
+      const link = { text: 'foo', url: 'https://test.com' };
+      editor.insertLink(link);
+
+      const nodes = [
+        { type: F.PARAGRAPH, children: [{ text: 'foo' }, { link: true, ...link }] },
+        { type: F.PARAGRAPH, children: [{ text: 'bar' }] },
+      ];
+
+      expect(editor.children).toStrictEqual(nodes);
+      expect(Editor.marks(editor)).toStrictEqual({});
+    });
+
     test('no selection', () => {
       const link = { text: 'foo', url: 'https://test.com' };
       Transforms.deselect(editor);

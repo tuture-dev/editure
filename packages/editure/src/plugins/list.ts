@@ -1,4 +1,4 @@
-import { Transforms, Editor, Point, Range, Element, Node } from 'tuture-slate';
+import { Transforms, Editor, Range, Element, Node } from 'tuture-slate';
 import { LIST_ITEM, BULLETED_LIST, NUMBERED_LIST, PARAGRAPH } from 'editure-constants';
 
 import { EditorWithBlock } from './base-block';
@@ -44,7 +44,7 @@ const toggleList = (editor: EditorWithBlock, format: string, props?: any) => {
 
 export const withList = (editor: EditorWithBlock) => {
   const e = editor as EditorWithList;
-  const { insertText, insertBreak, deleteBackward, normalizeNode } = e;
+  const { insertText, insertBreak, deleteBackward, normalizeNode, toggleBlock } = e;
 
   e.insertText = (text) => {
     if (text === ' ' && Range.isCollapsed(editor.selection!)) {
@@ -127,7 +127,7 @@ export const withList = (editor: EditorWithBlock) => {
 
     if (node.type === BULLETED_LIST) {
       for (const [child, childPath] of Node.children(e, path)) {
-        const { level = 0, children } = child;
+        const { level = 0, children = [] } = child;
         Transforms.setNodes(e, { level, parent: node.type }, { at: childPath });
 
         // List item should not have any block child.
@@ -145,7 +145,7 @@ export const withList = (editor: EditorWithBlock) => {
       let lastLevel = 0;
 
       for (const [child, childPath] of Node.children(e, path)) {
-        const { level = 0, children } = child;
+        const { level = 0, children = [] } = child;
         if (level > lastLevel) {
           counterStack.push(counter);
           counter = 1;
@@ -172,6 +172,25 @@ export const withList = (editor: EditorWithBlock) => {
 
     // Fall back to the original `normalizeNode` to enforce other constraints.
     normalizeNode(entry);
+  };
+
+  e.toggleBlock = (format, props) => {
+    if (![NUMBERED_LIST, BULLETED_LIST].includes(format)) {
+      return toggleBlock(format, props);
+    }
+
+    if (!e.isBlockActive(format)) {
+      const nodeProp = { type: LIST_ITEM, level: 0, parent: format };
+      toggleList(e, format, nodeProp);
+    } else {
+      Transforms.unwrapNodes(editor, { match: (n) => n.type === format, split: true });
+      Transforms.setNodes(editor, {
+        type: PARAGRAPH,
+      });
+
+      // Remove other fields.
+      Transforms.unsetNodes(editor, ['parent', 'level']);
+    }
   };
 
   e.increaseItemDepth = () => {
