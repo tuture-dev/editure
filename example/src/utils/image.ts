@@ -3,11 +3,13 @@ import { IMAGE } from 'editure-constants';
 import { Editor } from 'editure';
 import { ReactEditor } from 'editure-react';
 
+const IMAGE_HOSTING_URL = 'https://imgkr.com/api/files/upload';
+
 export const uploadImage = (file: File, callback: (err?: Error | null, url?: string) => void) => {
   const data = new FormData();
   data.append('file', file);
 
-  fetch('/upload', {
+  fetch(IMAGE_HOSTING_URL, {
     method: 'POST',
     body: data,
   })
@@ -18,10 +20,11 @@ export const uploadImage = (file: File, callback: (err?: Error | null, url?: str
       return res.json();
     })
     .then((data) => {
-      if (!data.path) {
-        throw new Error('服务器返回的路径无效');
+      console.log('data', data);
+      if (!data.success) {
+        throw new Error('上传失败，请重试！');
       }
-      callback(null, data.path);
+      callback(null, data.data);
     })
     .catch((err: Error) => callback(err));
 };
