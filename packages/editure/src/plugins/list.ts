@@ -51,7 +51,7 @@ export const withList = (editor: EditorWithBlock) => {
       for (const [format, regexes] of shortcutRegexes) {
         const matchArr = detectShortcut(e, regexes);
 
-        if (matchArr) {
+        if (matchArr && !editor.detectBlockFormat([NUMBERED_LIST, BULLETED_LIST])) {
           Transforms.select(e, getBeforeText(e).range!);
           Transforms.delete(e);
 

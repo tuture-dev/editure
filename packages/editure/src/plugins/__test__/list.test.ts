@@ -73,6 +73,27 @@ describe('withList', () => {
         expect(editor.children).toStrictEqual(nodes);
         expect(Range.isCollapsed(editor.selection!)).toBe(true);
       });
+
+      test('should not toggle in a list item', () => {
+        inputText(editor, '- - ');
+
+        const nodes = [
+          {
+            type: F.BULLETED_LIST,
+            children: [
+              {
+                type: F.LIST_ITEM,
+                parent: F.BULLETED_LIST,
+                level: 0,
+                children: [{ text: '- ' }],
+              },
+            ],
+          },
+        ];
+
+        expect(editor.children).toStrictEqual(nodes);
+        expect(Range.isCollapsed(editor.selection!)).toBe(true);
+      });
     });
 
     describe('insertBreak', () => {
@@ -561,6 +582,27 @@ describe('withList', () => {
                 number: 2,
                 level: 0,
                 children: [{ text: 'bar' }],
+              },
+            ],
+          },
+        ];
+
+        expect(editor.children).toStrictEqual(nodes);
+        expect(Range.isCollapsed(editor.selection!)).toBe(true);
+      });
+
+      test('should not toggle in a list item', () => {
+        inputText(editor, '1. 1. ');
+
+        const nodes = [
+          {
+            type: F.NUMBERED_LIST,
+            children: [
+              {
+                type: F.LIST_ITEM,
+                parent: F.NUMBERED_LIST,
+                level: 0,
+                children: [{ text: '1. ' }],
               },
             ],
           },
