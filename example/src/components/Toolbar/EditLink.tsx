@@ -9,7 +9,7 @@ import { css, jsx } from '@emotion/core';
 import { selectLastPoint } from 'editure';
 import { LINK } from 'editure-constants';
 
-import { IEditor } from '../../editor';
+import { IEditor, syncDOMSelection } from '../../editor';
 import { Dispatch, RootState } from '../../store';
 
 const EditLink = () => {
@@ -20,7 +20,7 @@ const EditLink = () => {
   const handleOk = () => {
     // Go back to last selected point.
     selectLastPoint(editor);
-    console.log('editor.selection', editor.selection);
+    syncDOMSelection(editor);
 
     if (text) {
       if (!editor.isMarkActive(LINK)) {
@@ -35,6 +35,7 @@ const EditLink = () => {
 
   const handleCancel = () => {
     selectLastPoint(editor);
+    syncDOMSelection(editor);
     dispatch.link.reset();
   };
 

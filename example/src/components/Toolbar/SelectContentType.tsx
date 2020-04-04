@@ -1,9 +1,10 @@
 import React from 'react';
 import { Select } from 'antd';
+import { selectLastPoint } from 'editure';
 import { useEditure } from 'editure-react';
 import { H1, H2, H3, H4, H5, PARAGRAPH } from 'editure-constants';
 
-import { IEditor } from '../../editor';
+import { IEditor, syncDOMSelection } from '../../editor';
 import IconFont from '../IconFont';
 
 /** @jsx jsx */
@@ -32,6 +33,8 @@ const SelectContentType = () => {
 
   const handleChange = (value: string) => {
     editor.toggleBlock(value);
+    selectLastPoint(editor);
+    syncDOMSelection(editor);
   };
 
   const suffixIcon = <IconFont type="icon-caret-down" />;

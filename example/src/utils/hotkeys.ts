@@ -9,7 +9,7 @@ import {
 } from 'editure';
 import * as F from 'editure-constants';
 
-import { IS_MAC } from './getOS';
+import { IS_MAC } from './environment';
 import { IEditor } from '../editor';
 
 export function getHotkeyHint(hotkey: string) {

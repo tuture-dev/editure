@@ -5,7 +5,7 @@ import { useEditure } from 'editure-react';
 import { selectLastPoint } from 'editure';
 import { NOTE } from 'editure-constants';
 
-import { IEditor } from '../../editor';
+import { IEditor, syncDOMSelection } from '../../editor';
 import { levels } from '../../utils/note';
 import IconFont from '../IconFont';
 
@@ -18,6 +18,8 @@ const NoteButton = () => {
   const handleClick = (e: ClickParam) => {
     selectLastPoint(editor);
     editor.toggleBlock(NOTE, { level: e.key });
+
+    syncDOMSelection(editor);
   };
 
   const menu = (

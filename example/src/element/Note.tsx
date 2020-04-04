@@ -7,7 +7,7 @@ import { NOTE } from 'editure-constants';
 import { css, jsx } from '@emotion/core';
 
 import { levels } from '../utils/note';
-import { IS_MAC } from '../utils/getOS';
+import { IS_MAC } from '../utils/environment';
 import IconFont from '../components/IconFont';
 
 import { ElementProps } from './index';
