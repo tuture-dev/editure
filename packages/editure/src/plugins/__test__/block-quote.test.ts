@@ -49,6 +49,20 @@ describe('withBlockquote', () => {
       expect(Range.isCollapsed(editor.selection!)).toBe(true);
     });
 
+    test('should not toggle when in a blockquote already', () => {
+      inputText(editor, '> > ');
+
+      const nodes = [
+        {
+          type: F.BLOCK_QUOTE,
+          children: [{ type: F.PARAGRAPH, children: [{ text: '> ' }] }],
+        },
+      ];
+
+      expect(editor.children).toStrictEqual(nodes);
+      expect(Range.isCollapsed(editor.selection!)).toBe(true);
+    });
+
     test('should not interfere with regular space inserting', () => {
       inputText(editor, '*test* ');
 
@@ -100,6 +114,27 @@ describe('withBlockquote', () => {
 
       expect(editor.children).toStrictEqual(nodes);
       expect(Range.isCollapsed(editor.selection!)).toBe(true);
+    });
+
+    test('should call insertBreak in a list within a blockquote', () => {
+      const baseEditor = createEditorWithContainer();
+      const insertBreakSpy = jest.spyOn(baseEditor, 'insertBreak');
+
+      const blockquoteEditor = withBlockquote(baseEditor);
+
+      blockquoteEditor.children = [
+        {
+          type: F.BLOCK_QUOTE,
+          children: [
+            { type: F.BULLETED_LIST, children: [{ type: F.LIST_ITEM, children: [{ text: '' }] }] },
+          ],
+        },
+      ];
+
+      Transforms.select(blockquoteEditor, { path: [0, 0, 0], offset: 0 });
+      blockquoteEditor.insertBreak();
+
+      expect(insertBreakSpy).toBeCalled();
     });
   });
 
