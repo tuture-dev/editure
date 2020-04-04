@@ -20,7 +20,7 @@ export const withBlockquote = (editor: EditorWithContainer) => {
     if (text === ' ' && selection && Range.isCollapsed(selection)) {
       const matchArr = detectShortcut(editor, shortcutRegexes);
 
-      if (matchArr) {
+      if (matchArr && !editor.isBlockActive(BLOCK_QUOTE)) {
         Transforms.select(editor, getBeforeText(editor).range!);
         Transforms.delete(editor);
 
@@ -35,10 +35,11 @@ export const withBlockquote = (editor: EditorWithContainer) => {
 
   editor.insertBreak = () => {
     if (editor.isBlockActive(BLOCK_QUOTE)) {
+      const block = Editor.above(editor);
       const { wholeLineText } = getLineText(editor);
 
-      if (!wholeLineText) {
-        // Exit the blockquote if last line is empty.
+      if (!wholeLineText && block && block[0].type === PARAGRAPH) {
+        // Exit the blockquote if last line is empty and is not in a list.
         editor.exitBlock(BLOCK_QUOTE);
       } else {
         insertBreak();

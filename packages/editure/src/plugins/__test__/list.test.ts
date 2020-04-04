@@ -73,6 +73,27 @@ describe('withList', () => {
         expect(editor.children).toStrictEqual(nodes);
         expect(Range.isCollapsed(editor.selection!)).toBe(true);
       });
+
+      test('should not toggle in a list item', () => {
+        inputText(editor, '- - ');
+
+        const nodes = [
+          {
+            type: F.BULLETED_LIST,
+            children: [
+              {
+                type: F.LIST_ITEM,
+                parent: F.BULLETED_LIST,
+                level: 0,
+                children: [{ text: '- ' }],
+              },
+            ],
+          },
+        ];
+
+        expect(editor.children).toStrictEqual(nodes);
+        expect(Range.isCollapsed(editor.selection!)).toBe(true);
+      });
     });
 
     describe('insertBreak', () => {
@@ -301,6 +322,81 @@ describe('withList', () => {
       });
     });
 
+    describe('toggleBlock', () => {
+      test('activate bulleted list', () => {
+        inputText(editor, 'foo');
+        editor.toggleBlock(F.BULLETED_LIST);
+
+        const nodes = [
+          {
+            type: F.BULLETED_LIST,
+            children: [
+              {
+                type: F.LIST_ITEM,
+                parent: F.BULLETED_LIST,
+                level: 0,
+                children: [{ text: 'foo' }],
+              },
+            ],
+          },
+        ];
+
+        expect(editor.children).toStrictEqual(nodes);
+      });
+
+      test('deactivate bulleted list', () => {
+        inputText(editor, '- foo');
+        editor.toggleBlock(F.BULLETED_LIST);
+
+        const nodes = [
+          {
+            type: F.PARAGRAPH,
+            children: [{ text: 'foo' }],
+          },
+        ];
+
+        expect(editor.children).toStrictEqual(nodes);
+      });
+
+      test('deactivate bulleted list (multiple items)', () => {
+        inputText(editor, '- foo\nbar\nbaz');
+        Transforms.select(editor, { path: [0, 1, 0], offset: 1 });
+
+        editor.toggleBlock(F.BULLETED_LIST);
+
+        const nodes = [
+          {
+            type: F.BULLETED_LIST,
+            children: [
+              {
+                type: F.LIST_ITEM,
+                parent: F.BULLETED_LIST,
+                level: 0,
+                children: [{ text: 'foo' }],
+              },
+            ],
+          },
+          {
+            type: F.PARAGRAPH,
+            children: [{ text: 'bar' }],
+          },
+          {
+            type: F.BULLETED_LIST,
+            children: [
+              {
+                type: F.LIST_ITEM,
+                parent: F.BULLETED_LIST,
+                level: 0,
+                children: [{ text: 'baz' }],
+              },
+            ],
+          },
+        ];
+
+        expect(editor.children).toStrictEqual(nodes);
+      });
+    });
+
     describe('increaseItemDepth', () => {
       test('should work for empty list item', () => {
         inputText(editor, '- ');
@@ -486,6 +582,28 @@ describe('withList', () => {
                 number: 2,
                 level: 0,
                 children: [{ text: 'bar' }],
+              },
+            ],
+          },
+        ];
+
+        expect(editor.children).toStrictEqual(nodes);
+        expect(Range.isCollapsed(editor.selection!)).toBe(true);
+      });
+
+      test('should not toggle in a list item', () => {
+        inputText(editor, '1. 1. ');
+
+        const nodes = [
+          {
+            type: F.NUMBERED_LIST,
+            children: [
+              {
+                type: F.LIST_ITEM,
+                parent: F.NUMBERED_LIST,
+                level: 0,
+                number: 1,
+                children: [{ text: '1. ' }],
               },
             ],
           },

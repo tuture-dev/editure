@@ -60,10 +60,13 @@ export const withLink = (editor: EditorWithMark) => {
     Transforms.select(e, range);
     e.toggleMark(LINK);
 
+    // Add url attribute.
+    Transforms.setNodes(e, { url }, { match: (n) => n.link });
+
     Transforms.collapse(e, { edge: 'end' });
     e.toggleMark(LINK);
 
-    Transforms.setNodes(e, { url }, { match: (n) => n.link });
+    Editor.removeMark(e, 'url');
   };
 
   e.getLinkData = () => {
