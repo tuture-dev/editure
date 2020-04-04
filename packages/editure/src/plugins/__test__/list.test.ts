@@ -602,6 +602,7 @@ describe('withList', () => {
                 type: F.LIST_ITEM,
                 parent: F.NUMBERED_LIST,
                 level: 0,
+                number: 1,
                 children: [{ text: '1. ' }],
               },
             ],
