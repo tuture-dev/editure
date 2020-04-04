@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { Node, updateLastSelection } from 'editure';
 import { Editure, Editable } from 'editure-react';
-import { updateLastSelection } from 'editure';
 
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core';
@@ -27,14 +27,17 @@ function App() {
   const value = useSelector((state: RootState) => state.editor.value);
   console.log('nodes', editor.children);
 
-  updateLastSelection(editor.selection);
+  function handleChange(newVal: Node[]) {
+    dispatch.editor.setValue(newVal);
+
+    if (editor.selection) {
+      updateLastSelection(editor.selection);
+    }
+  }
 
   return (
     <ButtonRefsContext.Provider value={buttonRefs}>
-      <Editure
-        editor={editor}
-        value={value}
-        onChange={(newVal) => dispatch.editor.setValue(newVal)}>
+      <Editure editor={editor} value={value} onChange={handleChange}>
         <div
           css={css`
             width: 666px;
