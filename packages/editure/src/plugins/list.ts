@@ -19,26 +19,28 @@ const toggleList = (editor: EditorWithBlock, format: string, props?: any) => {
   if ([BULLETED_LIST, NUMBERED_LIST].includes(format)) {
     const isActive = !!editor.detectBlockFormat([BULLETED_LIST, NUMBERED_LIST]);
 
-    if (!isActive) {
-      Transforms.setNodes(editor, {
-        ...props,
-        type: LIST_ITEM,
-      });
+    Editor.withoutNormalizing(editor, () => {
+      if (!isActive) {
+        Transforms.setNodes(editor, {
+          ...props,
+          type: LIST_ITEM,
+        });
 
-      const block = { type: format, children: [] };
-      Transforms.wrapNodes(editor, block, props);
-    } else {
-      Transforms.unwrapNodes(editor, {
-        match: (n) => [BULLETED_LIST, NUMBERED_LIST].includes(n.type),
-        split: true,
-      });
+        const block = { type: format, children: [] };
+        Transforms.wrapNodes(editor, block, props);
+      } else {
+        Transforms.unwrapNodes(editor, {
+          match: (n) => [BULLETED_LIST, NUMBERED_LIST].includes(n.type),
+          split: true,
+        });
 
-      Transforms.setNodes(editor, {
-        type: PARAGRAPH,
-      });
+        Transforms.setNodes(editor, {
+          type: PARAGRAPH,
+        });
 
-      Transforms.unsetNodes(editor, ['parent', 'number', 'level']);
-    }
+        Transforms.unsetNodes(editor, ['parent', 'number', 'level']);
+      }
+    });
   }
 };
 
@@ -168,6 +170,14 @@ export const withList = (editor: EditorWithBlock) => {
         }
       }
       return;
+    }
+
+    if (node.type === LIST_ITEM) {
+      const parent = Editor.parent(editor, path);
+      if (![BULLETED_LIST, NUMBERED_LIST].includes(parent[0].type)) {
+        Transforms.setNodes(editor, { type: PARAGRAPH }, { at: path });
+        Transforms.unsetNodes(editor, ['parent', 'number', 'level']);
+      }
     }
 
     // Fall back to the original `normalizeNode` to enforce other constraints.
