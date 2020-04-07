@@ -4,7 +4,7 @@ import { withBold } from './bold';
 import { withItalic } from './italic';
 import { withInlineCode } from './inline-code';
 import { withStrikethrough } from './strikethrough';
-import { withLink } from './link';
+import { EditorWithLink, withLink } from './link';
 
 import { EditorWithMark, withBaseMark } from './base-mark';
 import { EditorWithBlock, withBaseBlock } from './base-block';
@@ -12,7 +12,7 @@ import { EditorWithContainer, withBaseContainer } from './base-container';
 import { EditorWithVoid, withVoid } from './void';
 
 import { withParagraph } from './paragraph';
-import { withList } from './list';
+import { EditorWithList, withList } from './list';
 import { withHeading } from './heading';
 import { withCodeBlock } from './code-block';
 import { withBlockquote } from './block-quote';
@@ -37,6 +37,8 @@ export {
   withNote,
   withHr,
   withVoid,
+  EditorWithLink,
+  EditorWithList,
   EditorWithMark,
   EditorWithBlock,
   EditorWithContainer,
