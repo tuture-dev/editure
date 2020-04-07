@@ -22,9 +22,11 @@ export const withBaseContainer = <T extends EditorWithBlock>(editor: T) => {
     const node = { type: format, ...props, children: [text] };
     const childFormat = e.getChildFormat(format);
 
-    Transforms.setNodes(editor, { type: childFormat, children: [text] });
-    Transforms.wrapNodes(editor, node, {
-      match: (n) => n.type === childFormat,
+    Editor.withoutNormalizing(editor, () => {
+      Transforms.setNodes(editor, { type: childFormat, children: [text] });
+      Transforms.wrapNodes(editor, node, {
+        match: (n) => n.type === childFormat,
+      });
     });
   };
 
