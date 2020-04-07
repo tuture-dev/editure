@@ -338,6 +338,26 @@ describe('withCodeBlock', () => {
 
       expect(editor.children).toStrictEqual(nodes);
     });
+
+    test('normalize code lines outside code blocks', () => {
+      editor.children = [
+        {
+          type: F.CODE_LINE,
+          children: [{ text: 'foo' }],
+        },
+      ];
+
+      Editor.normalize(editor, { force: true });
+
+      const nodes = [
+        {
+          type: F.PARAGRAPH,
+          children: [{ text: 'foo' }],
+        },
+      ];
+
+      expect(editor.children).toStrictEqual(nodes);
+    });
   });
 
   describe('getChildFormat', () => {

@@ -320,6 +320,25 @@ describe('withList', () => {
           },
         ]);
       });
+
+      test('normalize list items outside bulleted lists', () => {
+        editor.children = [
+          {
+            type: F.LIST_ITEM,
+            parent: F.BULLETED_LIST,
+            level: 0,
+            children: [{ text: 'foo' }],
+          },
+        ];
+
+        Editor.normalize(editor, { force: true });
+        expect(editor.children).toStrictEqual([
+          {
+            type: F.PARAGRAPH,
+            children: [{ text: 'foo' }],
+          },
+        ]);
+      });
     });
 
     describe('toggleBlock', () => {
@@ -796,6 +815,26 @@ describe('withList', () => {
                 children: [{ text: 'foo' }],
               },
             ],
+          },
+        ]);
+      });
+
+      test('normalize list items outside numbered lists', () => {
+        editor.children = [
+          {
+            type: F.LIST_ITEM,
+            parent: F.NUMBERED_LIST,
+            number: 1,
+            level: 0,
+            children: [{ text: 'foo' }],
+          },
+        ];
+
+        Editor.normalize(editor, { force: true });
+        expect(editor.children).toStrictEqual([
+          {
+            type: F.PARAGRAPH,
+            children: [{ text: 'foo' }],
           },
         ]);
       });

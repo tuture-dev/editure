@@ -94,6 +94,13 @@ export const withCodeBlock = (editor: EditorWithContainer) => {
       return;
     }
 
+    if (Element.isElement(node) && node.type === CODE_LINE) {
+      const parent = Editor.parent(editor, path);
+      if (parent[0].type !== CODE_BLOCK) {
+        Transforms.setNodes(editor, { type: PARAGRAPH }, { at: path });
+      }
+    }
+
     normalizeNode(entry);
   };
 
