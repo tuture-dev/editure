@@ -9,8 +9,8 @@ import Button from './Button';
 import ToolbarIcon from './ToolbarIcon';
 
 import { IEditor } from '../../editor';
+import { insertImage } from '../../utils/image';
 import { BLOCK_HOTKEYS, getHotkeyHint, ButtonRefsContext } from '../../utils/hotkeys';
-import { uploadImage, createInsertImageCallback } from '../../utils/image';
 
 const ImageButton = () => {
   const editor = useEditure() as IEditor;
@@ -21,7 +21,7 @@ const ImageButton = () => {
     e.persist();
 
     if (e.target.files) {
-      uploadImage(e.target.files[0], createInsertImageCallback(editor));
+      insertImage(editor, e.target.files);
     }
   };
 
