@@ -20,6 +20,7 @@ function ImageElement(props: ElementProps) {
           alt={path}
           css={css`
             display: block;
+            cursor: pointer;
             margin-left: auto;
             margin-right: auto;
             max-width: 100%;
