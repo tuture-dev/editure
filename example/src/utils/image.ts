@@ -33,6 +33,7 @@ export const createInsertImageCallback = (editor: Editor) => (err?: Error | null
   if (err) {
     return message.error(String(err));
   }
+
   editor.insertVoid(IMAGE, { url });
 };
 

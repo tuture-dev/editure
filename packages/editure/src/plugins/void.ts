@@ -17,10 +17,6 @@ export const withVoid = <T extends Editor>(editor: T) => {
       Editor.insertBreak(e);
     }
 
-    Transforms.removeNodes(e, {
-      match: (n) => n.children && !n.children[0].text,
-    });
-
     const text = { text: '' };
     Transforms.insertNodes(e, { type: format, ...props, children: [text] });
     Transforms.insertNodes(e, { type: PARAGRAPH, children: [text] });
