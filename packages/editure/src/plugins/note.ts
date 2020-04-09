@@ -1,5 +1,5 @@
 import { Transforms, Editor, Range, Point } from 'tuture-slate';
-import { NOTE, PARAGRAPH } from 'editure-constants';
+import { NOTE, PARAGRAPH, IMAGE, HR } from 'editure-constants';
 
 import { EditorWithContainer } from './base-container';
 import { getBeforeText, getLineText } from '../utils';
@@ -48,7 +48,7 @@ export const withNote = (editor: EditorWithContainer) => {
     if (match) {
       const { beforeText } = getBeforeText(editor);
 
-      if (beforeText) {
+      if (beforeText || editor.isBlockActive(IMAGE) || editor.isBlockActive(HR)) {
         return deleteBackward('character');
       }
 
