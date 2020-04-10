@@ -17,9 +17,9 @@
     "jsdom": "^16.1.0",
     "markdown-it": "^10.0.0",
     "shortid": "^2.2.15",
-    "tuture-slate": "^0.57.3",
-    "tuture-slate-history": "^0.57.3",
-    "tuture-slate-hyperscript": "^0.57.3"
+    "tuture-slate": "^0.57.4",
+    "tuture-slate-history": "^0.57.4",
+    "tuture-slate-hyperscript": "^0.57.4"
   },
   "devDependencies": {
     "@types/escape-html": "^0.0.20",

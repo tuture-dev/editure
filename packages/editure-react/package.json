@@ -11,7 +11,7 @@
   ],
   "dependencies": {
     "editure": "^0.1.4",
-    "tuture-slate-react": "^0.57.3"
+    "tuture-slate-react": "^0.57.4"
   },
   "peerDependencies": {
     "react": ">=16.8.0",
