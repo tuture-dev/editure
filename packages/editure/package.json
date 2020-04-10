@@ -26,5 +26,6 @@
     "@types/is-url": "^1.2.28",
     "@types/markdown-it": "^0.0.9",
     "@types/shortid": "^0.0.29"
-  }
+  },
+  "gitHead": "9327e3a1f7968f14fe16973e2eb36f0323724d15"
 }
