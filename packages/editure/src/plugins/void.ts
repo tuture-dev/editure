@@ -14,16 +14,17 @@ export const withVoid = <T extends Editor>(editor: T) => {
     const { beforeText } = getBeforeText(editor);
 
     if (beforeText) {
-      Editor.insertBreak(e);
+      editor.insertBreak();
     }
 
-    Transforms.removeNodes(e, {
-      match: (n) => n.children && !n.children[0].text,
-    });
-
     const text = { text: '' };
-    Transforms.insertNodes(e, { type: format, ...props, children: [text] });
-    Transforms.insertNodes(e, { type: PARAGRAPH, children: [text] });
+
+    Transforms.setNodes(editor, {
+      type: format,
+      ...props,
+      children: [text],
+    });
+    Transforms.insertNodes(editor, { type: PARAGRAPH, children: [text] });
   };
 
   return e;

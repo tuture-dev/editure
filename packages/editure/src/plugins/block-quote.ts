@@ -63,7 +63,7 @@ export const withBlockquote = (editor: EditorWithContainer) => {
     if (match) {
       const { beforeText } = getBeforeText(editor);
 
-      if (beforeText || editor.isBlockActive(IMAGE) || editor.isBlockActive(HR)) {
+      if (beforeText) {
         return deleteBackward('character');
       }
 
