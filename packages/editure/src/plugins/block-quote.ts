@@ -1,5 +1,5 @@
 import { Editor, Transforms, Range } from 'tuture-slate';
-import { BLOCK_QUOTE, PARAGRAPH } from 'editure-constants';
+import { BLOCK_QUOTE, PARAGRAPH, IMAGE, HR } from 'editure-constants';
 
 import { EditorWithContainer } from './base-container';
 import { getLineText, getBeforeText } from '../utils';

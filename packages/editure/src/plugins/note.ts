@@ -1,4 +1,4 @@
-import { Transforms, Editor, Range, Point } from 'tuture-slate';
+import { Transforms, Editor, Range } from 'tuture-slate';
 import { NOTE, PARAGRAPH } from 'editure-constants';
 
 import { EditorWithContainer } from './base-container';
