@@ -15,7 +15,14 @@ export const insertImage = (editor: IEditor, files: FileList) => {
         const url = reader.result;
 
         if (url) {
-          editor.insertVoid(IMAGE, { url: url.toString(), file });
+          Transforms.setNodes(editor, {
+            type: IMAGE,
+            url: url.toString(),
+            file,
+          });
+
+          const text = { text: '' };
+          Transforms.insertNodes(editor, { type: PARAGRAPH, children: [text] });
         }
       });
 
