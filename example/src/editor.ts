@@ -13,7 +13,7 @@ import { withPaste, withReact, ReactEditor } from 'editure-react';
 import { IS_FIREFOX } from './utils/environment';
 import { withImages } from './utils/image';
 
-const plugins: Function[] = [withReact, ...defaultPlugins, withImages, withPaste, withHistory];
+const plugins: Function[] = [withReact, withImages, ...defaultPlugins, withPaste, withHistory];
 
 export type IEditor = Editor &
   EditorWithVoid &
