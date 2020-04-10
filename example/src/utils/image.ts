@@ -15,6 +15,12 @@ export const insertImage = (editor: IEditor, files: FileList) => {
         const url = reader.result;
 
         if (url) {
+          const { beforeText } = getBeforeText(editor);
+
+          if (beforeText) {
+            editor.insertBreak();
+          }
+
           Transforms.setNodes(editor, {
             type: IMAGE,
             url: url.toString(),
