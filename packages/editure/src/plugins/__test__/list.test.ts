@@ -125,6 +125,35 @@ describe('withList', () => {
         expect(Range.isCollapsed(editor.selection!)).toBe(true);
       });
 
+      test('should insert break correctly at the start of list item', () => {
+        inputText(editor, '- foo');
+        Transforms.select(editor, { path: [0, 0], offset: 0 });
+
+        editor.insertBreak();
+
+        const nodes = [
+          {
+            type: F.BULLETED_LIST,
+            children: [
+              {
+                type: F.LIST_ITEM,
+                parent: F.BULLETED_LIST,
+                level: 0,
+                children: [{ text: '' }],
+              },
+              {
+                type: F.LIST_ITEM,
+                parent: F.BULLETED_LIST,
+                level: 0,
+                children: [{ text: 'foo' }],
+              },
+            ],
+          },
+        ];
+
+        expect(editor.children).toStrictEqual(nodes);
+      });
+
       test('should not interfere with regular break', () => {
         inputText(editor, 'foo\nbar');
 

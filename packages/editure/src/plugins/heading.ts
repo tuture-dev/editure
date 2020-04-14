@@ -3,7 +3,7 @@ import { Editor, Transforms, Range, Point } from 'tuture-slate';
 import { H1, H2, H3, H4, H5, H6, PARAGRAPH } from 'editure-constants';
 
 import { EditorWithBlock } from './base-block';
-import { getBeforeText } from '../utils';
+import { getBeforeText, getLineText } from '../utils';
 import { detectShortcut } from '../shortcuts';
 
 const shortcutRegexes: [string, RegExp[]][] = [
@@ -40,8 +40,10 @@ export const withHeading = (editor: EditorWithBlock) => {
   editor.insertBreak = () => {
     insertBreak();
 
+    const { wholeLineText } = getLineText(editor);
+
     [H1, H2, H3, H4, H5].forEach((format) => {
-      if (editor.isBlockActive(format)) {
+      if (editor.isBlockActive(format) && !wholeLineText) {
         editor.toggleBlock(format);
       }
     });

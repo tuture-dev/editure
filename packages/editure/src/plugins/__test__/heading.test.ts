@@ -139,7 +139,7 @@ describe('withHeading', () => {
   });
 
   describe('insertBreak', () => {
-    test('toggle heading after insertBreak', () => {
+    test('should toggle heading after inserting break from the end', () => {
       inputText(editor, '## test\n');
 
       const nodes = [
@@ -150,6 +150,27 @@ describe('withHeading', () => {
         {
           type: F.PARAGRAPH,
           children: [{ text: '' }],
+        },
+      ];
+
+      expect(editor.children).toMatchObject(nodes);
+      expect(Range.isCollapsed(editor.selection!)).toBe(true);
+      expect(editor.selection!.anchor).toStrictEqual({ path: [1, 0], offset: 0 });
+    });
+
+    test('should move heading to next line after inserting break from the start', () => {
+      inputText(editor, '## test');
+      Transforms.select(editor, { path: [0, 0], offset: 0 });
+      editor.insertBreak();
+
+      const nodes = [
+        {
+          type: F.H2,
+          children: [{ text: '' }],
+        },
+        {
+          type: F.H2,
+          children: [{ text: 'test' }],
         },
       ];
 
