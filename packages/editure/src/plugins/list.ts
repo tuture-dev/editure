@@ -2,7 +2,7 @@ import { Transforms, Editor, Range, Element, Node } from 'tuture-slate';
 import { LIST_ITEM, BULLETED_LIST, NUMBERED_LIST, PARAGRAPH } from 'editure-constants';
 
 import { EditorWithBlock } from './base-block';
-import { getBeforeText } from '../utils';
+import { getBeforeText, getLineText } from '../utils';
 import { detectShortcut } from '../shortcuts';
 
 export interface EditorWithList extends EditorWithBlock {
@@ -71,10 +71,10 @@ export const withList = (editor: EditorWithBlock) => {
   e.insertBreak = () => {
     for (const format of [BULLETED_LIST, NUMBERED_LIST]) {
       if (e.isBlockActive(format)) {
-        const { beforeText } = getBeforeText(e);
+        const { wholeLineText } = getLineText(e);
 
         // Exit the list if empty.
-        if (!beforeText) {
+        if (!wholeLineText) {
           return toggleList(e, format);
         }
 
