@@ -1,6 +1,6 @@
 # Editure
 
-[![Build Status](https://travis-ci.com/tuture-dev/editure.svg?branch=master)](https://travis-ci.com/tuture-dev/editure)
+[![Build Status](https://travis-ci.com/tuture-dev/editure.svg?branch=master)](https://travis-ci.com/tuture-dev/editure)[![codecov](https://codecov.io/gh/tuture-dev/editure/branch/master/graph/badge.svg)](https://codecov.io/gh/tuture-dev/editure)
 
 Editure is a richtext markdown editor built on top of [Slate](https://www.slatejs.org/), with out-of-the-box support for markdown **shortcuts**, **hotkeys**, **serialization**. It aims to provide editing experience on par with [Typora](https://typora.io/) or [Yuque](https://www.yuque.com/).
 
