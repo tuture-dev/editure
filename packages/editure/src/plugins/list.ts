@@ -130,7 +130,7 @@ export const withList = (editor: EditorWithBlock) => {
     if (node.type === BULLETED_LIST) {
       for (const [child, childPath] of Node.children(e, path)) {
         const { level = 0, children = [] } = child;
-        Transforms.setNodes(e, { level, parent: node.type }, { at: childPath });
+        Transforms.setNodes(e, { type: LIST_ITEM, level, parent: node.type }, { at: childPath });
 
         // List item should not have any block child.
         if (children.length === 1 && Element.isElement(children[0])) {
