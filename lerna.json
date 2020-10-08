@@ -1,20 +1,14 @@
 {
-  "packages": [
-    "packages/*"
-  ],
+  "packages": ["packages/*"],
   "npmClient": "yarn",
   "useWorkspaces": true,
-  "version": "0.1.9",
+  "version": "0.1.10",
   "command": {
     "publish": {
-      "ignoreChanges": [
-        "*.md"
-      ]
+      "ignoreChanges": ["*.md"]
     },
     "bootstrap": {
-      "npmClientArgs": [
-        "--no-lockfile"
-      ]
+      "npmClientArgs": ["--no-lockfile"]
     }
   }
 }

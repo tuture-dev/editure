@@ -1,6 +1,6 @@
 {
   "name": "example-next",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "private": true,
   "dependencies": {
     "@emotion/core": "^10.0.28",
@@ -18,7 +18,7 @@
     "babel-plugin-import": "^1.13.0",
     "customize-cra": "^0.9.1",
     "editure": "^0.1.9",
-    "editure-react": "^0.1.9",
+    "editure-react": "^0.1.10",
     "react": "^16.13.1",
     "react-app-rewired": "^2.1.5",
     "react-dom": "^16.13.1",
