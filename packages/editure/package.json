@@ -1,7 +1,7 @@
 {
   "name": "editure",
   "description": "The richtext markdown editor from the future.",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "license": "MIT",
   "repository": "https://github.com/tuture-dev/editure.git",
   "main": "dist/index.js",
@@ -11,15 +11,15 @@
     "dist/"
   ],
   "dependencies": {
-    "editure-constants": "^0.1.2",
+    "editure-constants": "*",
     "escape-html": "^1.0.3",
     "is-url": "^1.2.4",
     "jsdom": "^16.1.0",
     "markdown-it": "^10.0.0",
     "shortid": "^2.2.15",
-    "tuture-slate": "0.57.8",
-    "tuture-slate-history": "0.57.8",
-    "tuture-slate-hyperscript": "^0.57.8"
+    "tuture-slate": "0.57.9",
+    "tuture-slate-history": "0.57.9",
+    "tuture-slate-hyperscript": "0.57.9"
   },
   "devDependencies": {
     "@types/escape-html": "^0.0.20",

@@ -1,7 +1,7 @@
 {
   "name": "editure-react",
   "description": "React-specific components, plugins and hooks for editure.",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "license": "MIT",
   "repository": "https://github.com/tuture-dev/editure.git",
   "main": "dist/index.js",
@@ -10,8 +10,8 @@
     "dist/"
   ],
   "dependencies": {
-    "editure": "0.1.9",
-    "tuture-slate-react": "0.57.8"
+    "editure": "*",
+    "tuture-slate-react": "0.57.9"
   },
   "peerDependencies": {
     "react": ">=16.8.0",
