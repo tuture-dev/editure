@@ -14826,25 +14826,25 @@ tunnel-agent@^0.6.0:
   dependencies:
     safe-buffer "^5.0.1"
 
-tuture-slate-history@0.57.9:
-  version "0.57.9"
-  resolved "https://registry.npm.taobao.org/tuture-slate-history/download/tuture-slate-history-0.57.9.tgz#9acfa87056e53814700434f81b63ba263109d74c"
-  integrity sha1-ms+ocFblOBRwBDT4G2O6JjEJ10w=
+tuture-slate-history@0.58.0:
+  version "0.58.0"
+  resolved "https://registry.npm.taobao.org/tuture-slate-history/download/tuture-slate-history-0.58.0.tgz#edef2b553e11bdccc24cc001c42d81a33af4ed78"
+  integrity sha1-7e8rVT4RvczCTMABxC2Bozr07Xg=
   dependencies:
     immer "^5.0.0"
     is-plain-object "^3.0.0"
 
-tuture-slate-hyperscript@0.57.9:
-  version "0.57.9"
-  resolved "https://registry.npm.taobao.org/tuture-slate-hyperscript/download/tuture-slate-hyperscript-0.57.9.tgz#351e4a3abd36e2e85a06a35edd88d108cb1c1ec7"
-  integrity sha1-NR5KOr024uhaBqNe3YjRCMscHsc=
+tuture-slate-hyperscript@0.58.0:
+  version "0.58.0"
+  resolved "https://registry.npm.taobao.org/tuture-slate-hyperscript/download/tuture-slate-hyperscript-0.58.0.tgz#612940dc6ee3a360b828106338952ec97d9a559f"
+  integrity sha1-YSlA3G7jo2C4KBBjOJUuyX2aVZ8=
   dependencies:
     is-plain-object "^3.0.0"
 
-tuture-slate-react@0.57.9:
-  version "0.57.9"
-  resolved "https://registry.npm.taobao.org/tuture-slate-react/download/tuture-slate-react-0.57.9.tgz#13d392acdf2523923ee010cd7c2670e911f1b920"
-  integrity sha1-E9OSrN8lI5I+4BDNfCZw6RHxuSA=
+tuture-slate-react@0.58.0:
+  version "0.58.0"
+  resolved "https://registry.npm.taobao.org/tuture-slate-react/download/tuture-slate-react-0.58.0.tgz#a9fe92009b28fa03d3b88415c3cdc681463b6ed6"
+  integrity sha1-qf6SAJso+gPTuIQVw83GgUY7btY=
   dependencies:
     "@types/is-hotkey" "^0.1.1"
     "@types/lodash" "^4.14.149"
@@ -14854,10 +14854,10 @@ tuture-slate-react@0.57.9:
     lodash "^4.17.4"
     scroll-into-view-if-needed "^2.2.20"
 
-tuture-slate@0.57.9:
-  version "0.57.9"
-  resolved "https://registry.npm.taobao.org/tuture-slate/download/tuture-slate-0.57.9.tgz#11baa25e3344b25e659f21314eafc3af165bfa7b"
-  integrity sha1-EbqiXjNEsl5lnyExTq/DrxZb+ns=
+tuture-slate@0.58.0:
+  version "0.58.0"
+  resolved "https://registry.npm.taobao.org/tuture-slate/download/tuture-slate-0.58.0.tgz#8ad22af5d0db48ba05571e4890c683a8618c78b2"
+  integrity sha1-itIq9dDbSLoFVx5IkMaDqGGMeLI=
   dependencies:
     "@types/esrever" "^0.2.0"
     esrever "^0.2.0"
